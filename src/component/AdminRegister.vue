@@ -6,6 +6,9 @@
       outlined
       :loading="isLoading"
   >
+    <v-card-title class="justify-center">
+      Admin Registration
+    </v-card-title>
     <v-form
         ref="form"
         v-model="valid"
@@ -94,7 +97,7 @@
                         <br><br>
                         <span style="color: grey">
                             *If you want to know how this application send invitation code via email, checkout the
-                            <a href="https://github.com/LearnDifferent/mtm/blob/master/src/main/java/com/github/learndifferent/mtm/manager/InvitationCodeManager.java"
+                            <a href="https://github.com/LearnDifferent/mtm/blob/master/src/main/java/com/github/learndifferent/mtm/service/impl/InvitationCodeServiceImpl.java"
                                target="_blank">source code on GitHub</a>.
                           </span>
                         <br>

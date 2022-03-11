@@ -7,6 +7,9 @@
         outlined
         :loading="isLoading"
     >
+      <v-card-title class="justify-center">
+        Sign In
+      </v-card-title>
       <v-form
           ref="form"
           v-model="valid"
