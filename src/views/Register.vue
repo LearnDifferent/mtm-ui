@@ -111,6 +111,13 @@
           </v-btn>
         </div>
 
+        <div style="text-align:center;color: grey;margin-bottom: 2px">
+          Already have an account?
+          <a href="javascript:void(0);" style="color: dimgrey" @click="goToSignIn">
+            Sign in
+          </a>
+        </div>
+
       </v-form>
       <v-progress-linear
           v-show="isLoading"
@@ -239,6 +246,10 @@ export default {
       }).then(resp => {
         this.verCode = resp.data;
       });
+    },
+    // 跳转到登陆页面
+    goToSignIn() {
+      this.$router.push("/login");
     },
   },
 
