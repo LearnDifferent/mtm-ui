@@ -281,15 +281,23 @@ export default {
         let code = res.data.code;
         if (code === 200) {
           this.websiteData = res.data.data;
-        } else if (code === 500) {
-          alert("You don't have permission to view the post");
-          this.websiteData = '';
         } else {
           alert("Something went wrong..");
           this.websiteData = '';
         }
       }).catch(error => {
-        alert("Something went wrong..");
+        let code = error.response.data.code;
+
+        if (code === 2009) {
+          // 代码 2009 表示没有权限
+          alert("You don't have permission to view the post");
+        } else if (code === 2001) {
+          // 2001 表示网页数据不存在
+          alert("The post doesn't exist");
+        } else {
+          alert("Something went wrong..");
+        }
+
         this.websiteData = '';
       }).finally(() => {
         this.checkWebsiteDataAndContinue(index, notificationData);
