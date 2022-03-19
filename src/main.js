@@ -1,13 +1,20 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
 import vuetify from './plugins/vuetify';
-import axios from 'axios'
-import VueAxios from 'vue-axios'
+import axios from 'axios';
+import VueAxios from 'vue-axios';
 import Login from "@/views/Login";
+import moment from 'moment';
+import DatetimePicker from 'vuetify-datetime-picker';
 
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios);
+Vue.use(DatetimePicker);
+
+Vue.filter('dateFormat', function (daraStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
+    return moment(daraStr).format(pattern)
+})
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.timeout = 10000;
