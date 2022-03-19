@@ -28,7 +28,7 @@
             no-resize
             readonly
             rows="1"
-            :value="user.createTime"
+            :value="user.createTime | dateFormat('YYYY-MM-DD HH:mm')"
         ></v-textarea>
       </v-list-item-title>
 

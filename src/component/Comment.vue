@@ -162,7 +162,7 @@
                 <v-icon left>
                   mdi-clock-outline
                 </v-icon>
-                {{ c.creationTime }}
+                {{ c.creationTime | dateFormat}}
 
                 <!-- 打开重新编辑评论的按钮 -->
                 <v-divider

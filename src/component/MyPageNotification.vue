@@ -56,7 +56,7 @@
                   <v-icon color="#d3cbc6" small>
                     mdi-clock-outline
                   </v-icon>
-                  {{ notification.creationTime }}
+                  {{ notification.creationTime | dateFormat('YYYY-MM-DD HH:mm')}}
                 </span>
               </v-list-item-title>
             </v-list-item-content>
@@ -140,7 +140,7 @@
                 <div>
                   <v-icon>mdi-clock-outline</v-icon>
                   <span style="color: grey;">
-                      {{ websiteData.createTime }}
+                      {{ websiteData.createTime | dateFormat }}
                     </span>
                 </div>
               </v-card-actions>

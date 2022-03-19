@@ -45,7 +45,7 @@
           <v-icon left>
             mdi-clock-outline
           </v-icon>
-          {{ c.creationTime }}
+          {{ c.creationTime | dateFormat}}
         </p>
         <!-- 评论内容 -->
         <p>{{ c.comment }}</p>

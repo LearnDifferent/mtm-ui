@@ -21,7 +21,7 @@
             <v-icon left>
               mdi-clock-outline
             </v-icon>
-            {{ item.createTime }}
+            {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm')}}
           </v-chip>
         </v-card-actions>
       </div>

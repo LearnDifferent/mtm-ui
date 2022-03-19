@@ -87,7 +87,7 @@
                     <v-icon left>
                       mdi-clock-outline
                     </v-icon>
-                    {{ item.createTime }}
+                    {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm') }}
                   </v-chip>
                 </v-card-actions>
 
@@ -199,7 +199,7 @@
                   <div v-show="onThisWebData == item.webId && clickRecent">
                     <v-icon>mdi-clock-outline</v-icon>
                     <span style="color: grey;" v-show="!item.count">
-                      {{ item.createTime }}
+                      {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm') }}
                     </span>
                   </div>
 
@@ -305,6 +305,7 @@ import Comment from "../component/Comment";
 import FilterWebsiteData from "../component/FilterWebsiteData";
 import MarkUrl from "../component/MarkUrl";
 import HomePageButtons from "../component/HomePageButtons";
+import moment from "moment";
 
 export default {
   components: {
@@ -458,10 +459,23 @@ export default {
     },
     // 发送筛选请求
     filterSendRequest() {
+      let toDateString = this.dates.pop();
+      let fromDateString = this.dates.pop();
+
+
+      let dates = [];
+      if (fromDateString != null && fromDateString !== '') {
+        let fromDate = moment(fromDateString).local(true);
+        dates.push(fromDate);
+      }
+      if (toDateString != null && fromDateString !== '') {
+        let toDate = moment(toDateString).local(true);
+        dates.push(toDate);
+      }
 
       let data = {
         usernames: this.usernames,
-        dates: this.dates,
+        dates: dates,
         load: this.filterLoad,
         ifOrderByTime: this.ifOrderByTime,
         ifDesc: this.ifDesc
