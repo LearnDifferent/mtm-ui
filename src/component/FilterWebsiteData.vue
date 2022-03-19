@@ -25,14 +25,25 @@
             cols="12"
             order-lg="6"
         >
-          <v-text-field
-              v-model="dateRangeText"
-              label="Date Filter"
-              prepend-icon="mdi-calendar"
-              readonly
-              @click="clearSelectedDate"
-          >
-          </v-text-field>
+          <v-datetime-picker label="Select Datetime" v-model="fromDate">
+            <template slot="dateIcon">
+              <v-icon>mdi-calendar-clock</v-icon>
+            </template>
+            <template slot="timeIcon">
+              <v-icon>mdi-clock</v-icon>
+            </template>
+          </v-datetime-picker>
+
+          <v-datetime-picker label="Select Another Datetime"
+                             v-model="toDate">
+            <template slot="dateIcon">
+              <v-icon>mdi-calendar-clock</v-icon>
+            </template>
+            <template slot="timeIcon">
+              <v-icon>mdi-clock</v-icon>
+            </template>
+          </v-datetime-picker>
+
         </v-col>
       </v-row>
 
@@ -58,7 +69,7 @@
           @click="showFilter = !showFilter"
       >
         <v-icon left>{{ showFilter ? 'mdi-arrow-down-thick' : 'mdi-filter-plus-outline' }}</v-icon>
-        Filter
+        User Filter
       </v-btn>
     </div>
 
@@ -72,7 +83,7 @@
         <!-- 数据筛选 -> 筛选用户的表格-->
         <v-col
             cols="12"
-            lg="6"
+            lg="12"
         >
           <v-text-field
               background-color="#484848"
@@ -97,18 +108,6 @@
               :single-select="singleSelect"
           >
           </v-data-table>
-        </v-col>
-
-        <!-- 数据筛选 -> 日期 -->
-        <v-col
-            cols="12"
-            lg="6"
-        >
-          <v-date-picker
-              dark
-              v-model="dates"
-              range
-          ></v-date-picker>
         </v-col>
       </v-row>
     </div>
@@ -155,7 +154,6 @@ export default {
     // Filter 相关内容：
     // 展示筛选器
     showFilter: true,
-    dates: [],
     // 用户筛选
     selected: [],
     singleSelect: false,
@@ -166,7 +164,7 @@ export default {
         sortable: false,
         value: 'userName',
       },
-      {text: 'Public Websites', value: 'webCount'},
+      {text: 'Bookmark(s)', value: 'webCount'},
     ],
     // 用于搜索：
     search: '',
@@ -175,6 +173,9 @@ export default {
     // 对筛选出来对结果进行排序
     ifOrderByTime: false,
     ifDesc: false,
+    // 筛选时间
+    fromDate: '',
+    toDate: '',
   }),
 
   props: {
@@ -189,12 +190,6 @@ export default {
   },
 
   methods: {
-    // 清除过滤中的日期
-    clearSelectedDate() {
-      if (confirm("Clear the Date Filter?")) {
-        this.dates = [];
-      }
-    },
     // 修改排序方式
     changeFilterOrder() {
       if (!this.ifDesc && !this.ifOrderByTime) {
@@ -222,16 +217,15 @@ export default {
         usernames.push(s.userName);
       }
 
+      let dates = [];
+      dates.push(this.fromDate);
+      dates.push(this.toDate);
+
       this.$emit("filterNewRequestSend",
-          usernames, this.dates, this.ifOrderByTime, this.ifDesc);
+          usernames, dates, this.ifOrderByTime, this.ifDesc);
     },
   },
 
-  computed: {
-    dateRangeText() {
-      return this.dates.join(' ~ ')
-    }
-  },
 }
 </script>
 
