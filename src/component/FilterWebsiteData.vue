@@ -69,7 +69,7 @@
           @click="showFilter = !showFilter"
       >
         <v-icon left>{{ showFilter ? 'mdi-arrow-down-thick' : 'mdi-filter-plus-outline' }}</v-icon>
-        User Filter
+        Select Users
       </v-btn>
     </div>
 
@@ -171,7 +171,7 @@ export default {
     // 加载了多少条数据
     count: 0,
     // 对筛选出来对结果进行排序
-    ifOrderByTime: false,
+    ifOrderByTime: true,
     ifDesc: false,
     // 筛选时间
     fromDate: '',
