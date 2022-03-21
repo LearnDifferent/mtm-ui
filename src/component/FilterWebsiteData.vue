@@ -146,6 +146,8 @@
 </template>
 
 <script>
+import moment from "moment";
+
 export default {
   name: "FilterWebsiteData",
   data: () => ({
@@ -218,8 +220,14 @@ export default {
       }
 
       let dates = [];
-      dates.push(this.fromDate);
-      dates.push(this.toDate);
+      if (this.fromDate != null && this.fromDate !== '') {
+        let fromDate = moment(this.fromDate).local(true);
+        dates.push(fromDate);
+      }
+      if (this.toDate != null && this.toDate !== '') {
+        let toDate = moment(this.toDate).local(true);
+        dates.push(toDate);
+      }
 
       this.$emit("filterNewRequestSend",
           usernames, dates, this.ifOrderByTime, this.ifDesc);

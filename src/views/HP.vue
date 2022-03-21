@@ -305,7 +305,6 @@ import Comment from "../component/Comment";
 import FilterWebsiteData from "../component/FilterWebsiteData";
 import MarkUrl from "../component/MarkUrl";
 import HomePageButtons from "../component/HomePageButtons";
-import moment from "moment";
 
 export default {
   components: {
@@ -459,27 +458,13 @@ export default {
     },
     // 发送筛选请求
     filterSendRequest() {
-      let toDateString = this.dates.pop();
-      let fromDateString = this.dates.pop();
-
-
-      let dates = [];
-      if (fromDateString != null && fromDateString !== '') {
-        let fromDate = moment(fromDateString).local(true);
-        dates.push(fromDate);
-      }
-      if (toDateString != null && fromDateString !== '') {
-        let toDate = moment(toDateString).local(true);
-        dates.push(toDate);
-      }
-
       let data = {
         usernames: this.usernames,
-        dates: dates,
+        datetimeList: this.dates,
         load: this.filterLoad,
-        ifOrderByTime: this.ifOrderByTime,
-        ifDesc: this.ifDesc
-      }
+        isOrderByUsername: !this.ifOrderByTime,
+        isDesc: this.ifDesc
+      };
 
       this.axios.post("/home/filter", data).then(res => {
         // 网页数据
