@@ -32,8 +32,14 @@
           </v-tab>
 
           <v-tab id="myUserBtn" @click="changePage('/user')">
-            <v-icon left>mdi-account</v-icon>
-            User
+            <v-badge
+                :value="newNotificationCount > 0"
+                color="red"
+                dot
+            >
+              <v-icon left>mdi-account</v-icon>
+              User
+            </v-badge>
           </v-tab>
         </v-tabs>
       </div>
@@ -64,13 +70,27 @@
 
 export default {
   name: 'App',
+  data: () => ({
+    newNotificationCount: 0,
+  }),
 
   components: {},
 
   methods: {
     // 切换页面
     changePage(page) {
-      this.$router.push({path: page})
+      this.$router.push({path: page});
+      if (page !== '/user') {
+        this.getNewNotification();
+      }
+    },
+    // 获取新消息数量
+    getNewNotification() {
+      this.axios.get("/notify/reply/new").then(res => {
+        if (res.data.code === 200) {
+          this.newNotificationCount = res.data.data;
+        }
+      });
     },
     // 退出登陆
     logoutNow() {
@@ -84,6 +104,10 @@ export default {
       }
     }
   },
+
+  created() {
+    this.getNewNotification();
+  }
 };
 </script>
 

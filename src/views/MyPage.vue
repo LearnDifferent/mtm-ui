@@ -33,10 +33,16 @@
           :outlined="trueMarkedWebsFalseNotifications!==false"
           @click="getMyNotifications"
       >
-        <v-icon left>
-          mdi-at
-        </v-icon>
-        My Notifications
+        <v-badge
+            :value="newNotificationCount > 0"
+            color="red"
+            :content="newNotificationCount"
+        >
+          <v-icon left>
+            mdi-at
+          </v-icon>
+          My Notifications
+        </v-badge>
       </v-btn>
 
       <v-divider
@@ -215,6 +221,8 @@ export default {
     notificationList: '',
     // 消息提醒的总数
     totalNotifications: 0,
+    // 新消息的数量
+    newNotificationCount: 0,
   }),
 
   methods: {
@@ -348,16 +356,24 @@ export default {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     },
-
+    // 获取新消息数量
+    getNewNotification() {
+      this.axios.get("/notify/reply/new").then(res => {
+        if (res.data.code === 200) {
+          this.newNotificationCount = res.data.data;
+        }
+      });
+    },
 
   },
 
-  props:{
+  props: {
     getSystemNotifications: {},
   },
 
   created() {
     this.getPersonalInfo();
+    this.getNewNotification();
   }
 }
 </script>
