@@ -15,32 +15,43 @@
           v-model="valid"
           lazy-validation
       >
-        <div style="margin-left: 20px;margin-right: 20px;margin-top: 10px">
-          <v-text-field
-              v-model="name"
-              :counter="30"
-              :rules="nameRules"
-              label="Username"
-              :loading="isLoading"
-              required
-              @keyup.enter="validate"
-          ></v-text-field>
-        </div>
-        <div style="margin-left: 20px;margin-right: 20px">
-          <v-text-field
-              v-model="password"
-              :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="show1 ? 'text' : 'password'"
-              :rules="pwdRules"
-              name="input-10-1"
-              label="Password"
-              hint="At least 8 characters"
-              counter
-              :loading="isLoading"
-              @click:append="show1 = !show1"
-              @keyup.enter="validate"
-          ></v-text-field>
-        </div>
+        <v-tooltip right>
+          <template v-slot:activator="{ on, attrs }">
+            <div
+                v-bind="attrs"
+                v-on="on"
+            >
+              <div style="margin-left: 20px;margin-right: 20px;margin-top: 10px">
+                <v-text-field
+                    v-model="name"
+                    :counter="30"
+                    :rules="nameRules"
+                    label="Username"
+                    :loading="isLoading"
+                    required
+                    @keyup.enter="validate"
+                ></v-text-field>
+              </div>
+
+              <div style="margin-left: 20px;margin-right: 20px">
+                <v-text-field
+                    v-model="password"
+                    :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                    :type="show1 ? 'text' : 'password'"
+                    :rules="pwdRules"
+                    name="input-10-1"
+                    label="Password"
+                    hint="At least 8 characters"
+                    counter
+                    :loading="isLoading"
+                    @click:append="show1 = !show1"
+                    @keyup.enter="validate"
+                ></v-text-field>
+              </div>
+            </div>
+          </template>
+          <span>Case Sensitive</span>
+        </v-tooltip>
 
         <div style="margin-left: 20px;margin-right: 20px">
           <v-text-field
