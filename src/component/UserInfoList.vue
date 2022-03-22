@@ -9,6 +9,9 @@
             readonly
             rows="1"
             :value="user.userName"
+            :background-color="user.hasOwnProperty('highlightedFields')
+             && (user.highlightedFields[0] === 'userName'
+             || user.highlightedFields[1] === 'userName')? '#f3f3f3' : ''"
         ></v-textarea>
       </v-list-item-title>
 
@@ -18,6 +21,9 @@
             no-resize
             readonly
             rows="1"
+            :background-color="user.hasOwnProperty('highlightedFields')
+            && (user.highlightedFields[0] === 'userId'
+             || user.highlightedFields[1] === 'userId') ? '#f3f3f3' : ''"
             :value="user.userId"
         ></v-textarea>
       </v-list-item-title>
