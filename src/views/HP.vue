@@ -396,11 +396,11 @@ export default {
     // 不查看某人的收藏网页
     dontShowUser(userName) {
       if (userName === this.currentUser) {
-        if (confirm("Don't show yours?")) {
+        if (confirm("Don't Show Yours?")) {
           this.findOthers();
         }
       } else {
-        if (confirm("Don't show " + userName + "?")) {
+        if (confirm("Don't Show Bookmarks Shared By " + userName + "?")) {
           this.isOut = 'dontShow';
           this.pattern = 'withoutUserPage';
           this.toUserName = userName;
@@ -412,7 +412,7 @@ export default {
     // 查找某个用户收藏的所有网页
     toUser(userName) {
       if (userName === this.currentUser) {
-        if (confirm("View You Bookmarks?")) {
+        if (confirm("View Your Bookmarks?")) {
           this.findMine();
         }
       } else {
