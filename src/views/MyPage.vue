@@ -56,10 +56,16 @@
           outlined
           @click="getSystemNotifications"
       >
-        <v-icon left>
-          mdi-bell-ring-outline
-        </v-icon>
-        System Notifications
+        <v-badge
+            :value="hasReadNewSystemNotification == false"
+            color="red"
+            dot
+        >
+          <v-icon left>
+            mdi-bell-ring-outline
+          </v-icon>
+          System Notifications
+        </v-badge>
       </v-btn>
     </div>
 
@@ -223,6 +229,8 @@ export default {
     totalNotifications: 0,
     // 新消息的数量
     newNotificationCount: 0,
+    // 是否查看了最新的系统消息
+    hasReadNewSystemNotification: true,
   }),
 
   methods: {
@@ -356,15 +364,22 @@ export default {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     },
-    // 获取新消息数量
-    getNewNotification() {
+    // 获取新的回复消息数量
+    getNewReplyNotification() {
       this.axios.get("/notify/reply/new").then(res => {
         if (res.data.code === 200) {
           this.newNotificationCount = res.data.data;
         }
       });
     },
-
+    // 是否还未查看新的系统通知
+    hasNewSystemNotification() {
+      this.axios.get("/notify/read").then(res=>{
+        if (res.data.code === 200) {
+          this.hasReadNewSystemNotification = res.data.data;
+        }
+      });
+    }
   },
 
   props: {
@@ -373,7 +388,8 @@ export default {
 
   created() {
     this.getPersonalInfo();
-    this.getNewNotification();
+    this.getNewReplyNotification();
+    this.hasNewSystemNotification();
   }
 }
 </script>
