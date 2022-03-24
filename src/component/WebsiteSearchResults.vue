@@ -5,10 +5,10 @@
         <v-card-title
             class="headline"
             v-html="item.title"
-            @click="jump(item.url)"
+            @click="openWebPage(item)"
         ></v-card-title>
 
-        <v-card-subtitle v-html="item.desc" @click="jump(item.url)"></v-card-subtitle>
+        <v-card-subtitle v-html="item.desc" @click="openWebPage(item)"></v-card-subtitle>
 
         <v-card-actions v-show="item.createTime">
 
@@ -21,7 +21,7 @@
             <v-icon left>
               mdi-clock-outline
             </v-icon>
-            {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm')}}
+            {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm') }}
           </v-chip>
         </v-card-actions>
       </div>
@@ -30,7 +30,7 @@
           class="ma-3"
           size="125"
           tile
-          @click="jump(item.url)"
+          @click="openWebPage(item)"
       >
         <v-img :src="item.img"></v-img>
       </v-avatar>
@@ -43,8 +43,13 @@ export default {
 
   methods: {
     // 跳转页面
-    jump(url) {
-      window.open(url, '_blank')
+    openWebPage(item) {
+      let msg = "Title: " + item.title + "\n"
+          + "URL: " + item.url + "\n\n"
+          + "Do you want to open this website?";
+      if (confirm(msg)) {
+        window.open(item.url, '_blank');
+      }
     },
   },
 
