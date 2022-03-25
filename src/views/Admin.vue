@@ -104,6 +104,7 @@
         </div>
       </v-expansion-panel>
 
+
       <v-expansion-panel @click="key++">
         <v-expansion-panel-header>
           <h3>View Logs {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
@@ -139,6 +140,80 @@
           </v-expansion-panel-content>
         </div>
 
+      </v-expansion-panel>
+
+
+      <v-expansion-panel @click="key++">
+        <v-expansion-panel-header>
+          <h3>List All Visited Bookmarks {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content v-if="isAdmin===true">
+          <v-card>
+            <v-card-title>
+              All Visited Bookmarks
+              <v-spacer></v-spacer>
+            </v-card-title>
+            <v-simple-table
+                fixed-header
+                height="300px"
+            >
+              <template v-slot:default>
+                <thead>
+                <tr>
+                  <th class="text-left">
+                    Views
+                  </th>
+                  <th class="text-left">
+                    ID
+                  </th>
+                  <th class="text-left">
+                    Title
+                  </th>
+                  <th class="text-left">
+                    Username
+                  </th>
+                  <th class="text-left">
+                    Privacy (Edit)
+                  </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr
+                    v-for="item in visitedBookmarks"
+                    :key="item.webId"
+                >
+                  <td>{{ item.views }}</td>
+                  <td>{{ item.webId }}</td>
+                  <td>
+                    <a :href="item.url" target="_blank">{{ item.title }}</a>
+                  </td>
+                  <td>{{ item.userName }}</td>
+                  <td>
+                    <v-btn
+                        class="text-none"
+                        x-small
+                        :color="item.isPublic ? 'green' : 'red'"
+                        @click="changePrivacy(item.webId, item.userName, item.isPublic)"
+                    >
+                      {{ item.isPublic ? 'Public' : 'Private' }}
+                    </v-btn>
+                  </td>
+                </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card>
+        </v-expansion-panel-content>
+
+        <!-- 提示注册 Admin -->
+        <div v-show="isAdmin===false">
+          <v-expansion-panel-content>
+            Please Login as Admin Or Create New Admin Account
+          </v-expansion-panel-content>
+          <v-expansion-panel-content>
+            <AdminRegister :key="key"/>
+          </v-expansion-panel-content>
+        </div>
       </v-expansion-panel>
 
     </v-expansion-panels>
@@ -193,10 +268,39 @@ export default {
       {text: 'Role', value: 'role'},
     ],
     users: '',
-
+    // 网页 ID 及其阅读数
+    visitedBookmarks: [],
   }),
 
   methods: {
+    // 修改网页的隐私权限
+    changePrivacy(webId, userName, isPublic) {
+      let publicOrPrivate = isPublic ? "private" : "public";
+      if (confirm("Are you sure you want to make it "
+          + publicOrPrivate + " ?")) {
+        this.axios.get("/web", {
+          params: {
+            "webId": webId,
+            "userName": userName
+          }
+        }).then(res => {
+          if (res.data.code === 200 || res.data.code === 500) {
+            alert(res.data.msg);
+            this.getVisitedBookmarks();
+          } else {
+            alert("Something went wrong... Please try again later.")
+          }
+        }).catch(error => {
+          if (error.response.data.code === 2009
+              || error.response.data.code === 2001) {
+            // 2009 表示没有权限，2001 表示网页不存在
+            alert(error.response.data.msg);
+          } else {
+            alert("Something went wrong... Please try again later.")
+          }
+        });
+      }
+    },
     // 删除所有通知
     delNotify() {
       if (confirm("Remove All System Notifications?")) {
@@ -240,6 +344,10 @@ export default {
         this.isAdmin = res.data.admin;
         this.logs = res.data.logs;
         this.users = res.data.users;
+        // 如果是 admin，再获取 all visited bookmarks
+        if (this.isAdmin === true) {
+          this.getVisitedBookmarks();
+        }
       }).catch((error) => {
         if (error.response.data.code === 2009) {
           // 代码 2009 表示没有权限，此时获取验证码来注册管理员
@@ -267,7 +375,20 @@ export default {
     toSendNotify() {
       this.sendNotify();
     },
-
+    // 获取数据库中的被阅读过的网页的数据
+    getVisitedBookmarks() {
+      this.axios.get("/view/visited-bookmarks").then(res => {
+        if (res.data.code === 200) {
+          this.visitedBookmarks = res.data.data;
+        }
+      }).catch((error) => {
+        if (error.response.data.code === 2009) {
+          alert("Please Login as Admin");
+        } else {
+          alert(error.response.data.msg);
+        }
+      });
+    }
   },
 
   props: {
@@ -276,6 +397,7 @@ export default {
 
   created() {
     this.getInfo();
+
   }
 }
 </script>
