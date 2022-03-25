@@ -57,6 +57,35 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
 
+      <v-expansion-panel @click="key++">
+        <v-expansion-panel-header>
+          <h3>View Logs {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content v-if="isAdmin===true">
+          <v-card>
+            <v-card-title>
+              Logs
+              <v-spacer></v-spacer>
+              <v-text-field
+                  v-model="sysSearch"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+              ></v-text-field>
+            </v-card-title>
+            <v-data-table
+                :headers="sysHeaders"
+                :items="logs"
+                :search="sysSearch"
+            ></v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+
+        <!-- 提示注册 Admin -->
+        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
+
+      </v-expansion-panel>
 
       <v-expansion-panel @click="key++">
         <v-expansion-panel-header>
@@ -100,39 +129,20 @@
 
       <v-expansion-panel @click="key++">
         <v-expansion-panel-header>
-          <h3>View Logs {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content v-if="isAdmin===true">
-          <v-card>
-            <v-card-title>
-              Logs
-              <v-spacer></v-spacer>
-              <v-text-field
-                  v-model="sysSearch"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-              ></v-text-field>
-            </v-card-title>
-            <v-data-table
-                :headers="sysHeaders"
-                :items="logs"
-                :search="sysSearch"
-            ></v-data-table>
-          </v-card>
-        </v-expansion-panel-content>
-
-        <!-- 提示注册 Admin -->
-        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
-
-      </v-expansion-panel>
-
-
-      <v-expansion-panel @click="key++">
-        <v-expansion-panel-header>
           <h3>List All Visited Bookmarks {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
         </v-expansion-panel-header>
+        <v-expansion-panel-content style="font-size: small" v-if="isAdmin===true">
+          Data will be updated every 12 hours. You can
+          <a @click="updateViews" >
+            click here to
+            <v-btn class="text-none" color="#93ca76" x-small>
+              <v-icon left x-small>
+                mdi-refresh
+              </v-icon>
+              Update Immediately
+            </v-btn>
+          </a>
+        </v-expansion-panel-content>
         <v-expansion-panel-content v-if="isAdmin===true">
           <v-card>
             <v-card-title>
@@ -295,16 +305,47 @@ export default {
     },
     // 更新所有用户信息
     refreshAllUsers() {
-      this.axios.get("/user").then(res => {
-        if (res.data.code === 200) {
-          this.users = res.data.data;
-          alert("Success");
-        } else {
+      if (confirm("Are you sure you want to refresh now? It might take a long time.")) {
+        this.axios.get("/user").then(res => {
+          if (res.data.code === 200) {
+            this.users = res.data.data;
+            alert("Success");
+          } else {
+            alert("Something went wrong...");
+          }
+        }).catch(error => {
           alert("Something went wrong...");
-        }
-      }).catch(error => {
-        alert("Something went wrong...");
-      })
+        });
+      }
+    },
+
+    // 更新
+    updateViews() {
+      if (confirm("Are you sure you want to update now? It might take a long time.")) {
+        this.axios.get("/view/update-db").then(res => {
+          if (res.data.code === 200) {
+            let failKeys = res.data.data;
+            if (failKeys === null || failKeys.length === 0) {
+              alert("Success");
+            } else {
+              alert("Not Fully Successful.\nHere are the keys that failed to update: \n\n"
+                  + failKeys + "\n\n"
+                  + "You can check the keys in Redis to fix the error.");
+            }
+            // refresh
+            this.getVisitedBookmarks();
+          } else {
+            alert("Something went wrong...");
+          }
+        }).catch((error) => {
+          if (error.response.data.code === 2002) {
+            alert("No Data Available");
+          } else {
+            alert(error.response.data.msg);
+          }
+        });
+      }
+
     },
 
     // 获取随机字符串
