@@ -94,14 +94,7 @@
         </v-expansion-panel-content>
 
         <!-- 提示注册 Admin -->
-        <div v-show="isAdmin===false">
-          <v-expansion-panel-content>
-            Please Login as Admin Or Create New Admin Account
-          </v-expansion-panel-content>
-          <v-expansion-panel-content>
-            <AdminRegister :key="key"/>
-          </v-expansion-panel-content>
-        </div>
+        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
       </v-expansion-panel>
 
 
@@ -131,14 +124,7 @@
         </v-expansion-panel-content>
 
         <!-- 提示注册 Admin -->
-        <div v-show="isAdmin===false">
-          <v-expansion-panel-content>
-            Please Login as Admin Or Create New Admin Account
-          </v-expansion-panel-content>
-          <v-expansion-panel-content>
-            <AdminRegister :key="key"/>
-          </v-expansion-panel-content>
-        </div>
+        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
 
       </v-expansion-panel>
 
@@ -206,14 +192,7 @@
         </v-expansion-panel-content>
 
         <!-- 提示注册 Admin -->
-        <div v-show="isAdmin===false">
-          <v-expansion-panel-content>
-            Please Login as Admin Or Create New Admin Account
-          </v-expansion-panel-content>
-          <v-expansion-panel-content>
-            <AdminRegister :key="key"/>
-          </v-expansion-panel-content>
-        </div>
+        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
       </v-expansion-panel>
 
     </v-expansion-panels>
@@ -225,10 +204,11 @@
 <script>
 
 import AdminRegister from "../component/AdminRegister";
+import AdminRegisterNotification from "@/component/AdminRegisterNotification";
 
 export default {
   name: "Admin",
-  components: {AdminRegister},
+  components: {AdminRegisterNotification, AdminRegister},
   data: () => ({
     // 通知相关
     noticeCon: '',
