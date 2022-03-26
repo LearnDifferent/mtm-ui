@@ -164,7 +164,7 @@
                     Creation Time
                   </th>
                   <th class="text-left">
-                    Role
+                    Role (Edit)
                   </th>
                 </tr>
                 </thead>
@@ -176,7 +176,16 @@
                   <td>{{ item.userId }}</td>
                   <td>{{ item.userName }}</td>
                   <td>{{ item.createTime }}</td>
-                  <td>{{ item.role }}</td>
+                  <td>
+                    <v-btn
+                        class="text-none"
+                        x-small
+                        :color="item.role === 'admin' ? '#ecc960' : item.role === 'user' ? 'green' : 'white'"
+                        @click="changeUserRole(item.userId, item.userName, item.role)"
+                    >
+                      {{ item.role === 'admin' ? 'Admin' : item.role === 'user' ? 'User' : 'Guest' }}
+                    </v-btn>
+                  </td>
                 </tr>
                 </tbody>
               </template>
@@ -435,6 +444,48 @@ export default {
         } else {
           alert(error.response.data.msg);
         }
+      });
+    },
+    // 修改用户角色
+    changeUserRole(userId, userName, role) {
+
+      if (role === 'guest') {
+        alert("You don't have permission to modify the Guest");
+        return;
+      }
+      let msg;
+      let newRole;
+      if (role === 'admin') {
+        msg = "Do you want to Downgrade '" + userName
+            + "' from Admin to Standard User?";
+        newRole = 'user';
+      } else if (role === 'user') {
+        msg = "Do you want to Upgrade '" + userName
+            + "' from Standard User to Admin?";
+        newRole = 'admin';
+      } else {
+        alert("You don't have permission to modify this user")
+        return;
+      }
+
+      if (confirm(msg)) {
+        this.sendChangeUserRoleRequest(userId, newRole);
+      }
+    },
+    sendChangeUserRoleRequest(userId, newRole) {
+      this.axios.get("/user/role", {
+        params: {
+          userId: userId,
+          newRole: newRole
+        }
+      }).then(res => {
+        if (res.data.code === 200) {
+          // 成功的话，刷新列表
+          this.getUsers();
+        }
+        alert(res.data.msg);
+      }).catch((error) => {
+        alert(error.response.data.msg);
       });
     },
 
