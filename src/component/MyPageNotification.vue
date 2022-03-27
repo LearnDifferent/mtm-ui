@@ -220,8 +220,7 @@ export default {
       this.size = this.size + 10;
       this.axios.get("/notify/reply", {
         params: {
-          "username": this.currentUsername,
-          "to": this.size
+          "lastIndex": this.size
         }
       }).then(res => {
         let code = res.data.code;

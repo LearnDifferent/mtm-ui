@@ -73,7 +73,7 @@ export default {
         if (res.data.code == 200) {
           this.$router.push("/login");
           alert("You account has been deleted");
-        } else if (res.data.code == 500) {
+        } else if (res.data.code == 2006) {
           alert(res.data.msg);
           document.getElementById("myUserBtn").click();
         } else {

@@ -573,17 +573,17 @@ export default {
     },
     // 进入主页后，获取信息
     loadHome(currentPage) {
-      this.axios.get("/home/load", {
+      this.axios.get("/home", {
         params: {
           "currentPage": currentPage,
           "pattern": this.pattern,
-          "userName": this.toUserName
+          "requestedUsername": this.toUserName
         }
       }).then(res => {
         this.currentUser = res.data.currentUser;
         this.items = res.data.websiteDataInfo.webs;
         this.totalPage = res.data.websiteDataInfo.totalPage;
-        this.toUserName = res.data.optUsername;
+        this.toUserName = res.data.requestedUsername;
 
         if (this.totalPage < this.currentPage && this.totalPage !== 0) {
           this.currentPage = this.totalPage;
