@@ -1,5 +1,13 @@
 <template>
   <v-container>
+    <v-alert
+        v-show="roleChangeMsg !== ''"
+        icon="mdi-close-circle-outline"
+        color="#e6b422"
+        @click="clearRoleChangeMsg"
+    >
+      {{ roleChangeMsg }}
+    </v-alert>
 
     <MyPageTop
         :user="user"
@@ -206,6 +214,8 @@ export default {
   },
   name: "MyPage",
   data: () => ({
+    // User Role 变化的通知
+    roleChangeMsg: '',
     // 收藏的网页
     myWebs: '',
     // 分页
@@ -407,11 +417,32 @@ export default {
     },
     // 是否还未查看新的系统通知
     hasNewSystemNotification() {
-      this.axios.get("/notify/read").then(res=>{
+      this.axios.get("/notify/read").then(res => {
         if (res.data.code === 200) {
           this.hasReadNewSystemNotification = res.data.data;
         }
       });
+    },
+
+    // Get Current User's Role Change Notification
+    getRoleChange() {
+      this.axios.get("/notify/role-changed").then(res => {
+        if (res.data.code === 200) {
+          this.roleChangeMsg = res.data.data;
+        } else if (res.data.code === 2002) {
+          this.roleChangeMsg = '';
+        } else {
+          // 自定义……
+          this.roleChangeMsg = '';
+        }
+      })
+    },
+    // clear the role change notification
+    clearRoleChangeMsg() {
+      if (confirm("Clear this message")) {
+        this.axios.delete("/notify/role-changed");
+        this.roleChangeMsg = '';
+      }
     }
   },
 
@@ -423,6 +454,7 @@ export default {
     this.getPersonalInfo();
     this.getNewReplyNotification();
     this.hasNewSystemNotification();
+    this.getRoleChange();
   }
 }
 </script>
