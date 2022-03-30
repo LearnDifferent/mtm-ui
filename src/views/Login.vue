@@ -150,7 +150,7 @@ export default {
     ],
     // 密码相关：
     show1: false,
-    password: '11111111', //默认密码
+    password: 'github.com/LearnDifferent/mtm', //默认密码
     pwdRules: [
       v => !!v || 'Password is required',
       v => (v && v.length >= 8) || 'Password must be greater than 8 characters',

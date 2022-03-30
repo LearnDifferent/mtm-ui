@@ -25,7 +25,7 @@
         <v-icon left>
           mdi-fire
         </v-icon>
-        Most
+        Popular
       </v-btn>
       <v-divider vertical style="margin-left: 1%;margin-right: 1%"></v-divider>
       <v-btn
@@ -92,7 +92,7 @@
         <v-icon left>
           mdi-download
         </v-icon>
-        Download {{ toUserName == currentUser ? "My" : toUserName + "'s" }} Data
+        Download {{ toUserName == currentUser ? "My" : toUserName + "'s" }} Bookmarks
       </v-chip>
     </div>
 

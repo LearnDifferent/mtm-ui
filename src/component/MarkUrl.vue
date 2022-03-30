@@ -28,7 +28,7 @@
     <div v-show="addToSearch" style="margin-bottom: 1%">
       <a @click="goToSearchPage">
         <v-icon left>mdi-alert-circle-outline</v-icon>
-        This Website will be searchable on Search Page
+        This Bookmark will be searchable on Search Page
       </a>
     </div>
     <div>
@@ -129,7 +129,7 @@ export default {
                 this.saveWebMsgColor = 'color: green';
                 this.$emit("showRefresh");
               } else {
-                this.saveWebMsg = "Fail to save this website.";
+                this.saveWebMsg = "Fail to bookmark this website.";
                 this.saveWebMsgColor = 'color: red';
               }
             } else {
@@ -144,7 +144,7 @@ export default {
                 this.$emit("showRefresh");
               } else {
                 // 只要没有存入数据库，就当作失败处理
-                this.saveWebMsg = "Fail to save this website.";
+                this.saveWebMsg = "Fail to bookmark this website.";
                 this.saveWebMsgColor = 'color: red';
               }
             }

@@ -12,7 +12,7 @@
         <v-icon left>
           mdi-file-find
         </v-icon>
-        Search Websites
+        Search Bookmarks
       </v-tab>
       <v-tab class="text-none" @click="changeSearchMode('user')">
         <v-icon left>
@@ -645,7 +645,7 @@ export default {
           alert("Something went wrong. Can't load this page.")
         }
       });
-    }
+    },
   },
   created() {
     window.onload = function () {

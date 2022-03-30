@@ -318,7 +318,7 @@ export default {
   name: "HP",
   data: () => ({
     // 展示模式
-    pattern: 'recent',
+    pattern: 'latest',
     // 跳转的用户
     toUserName: '',
     // 分页
@@ -377,7 +377,7 @@ export default {
     // 只查看自己的网页
     findMine() {
       this.isOut = 'mine';
-      this.pattern = 'userPage';
+      this.pattern = 'user';
       this.toUserName = this.currentUser;
       this.currentPage = 1;
       this.loadHome(this.currentPage);
@@ -387,7 +387,7 @@ export default {
     findOthers() {
       this.isOut = 'others';
       // 这里表示剔除当前用户之外的所有用户
-      this.pattern = 'withoutUserPage';
+      this.pattern = 'block';
       this.toUserName = this.currentUser;
       this.currentPage = 1;
       this.loadHome(this.currentPage);
@@ -402,7 +402,7 @@ export default {
       } else {
         if (confirm("Don't Show Bookmarks Shared By " + userName + "?")) {
           this.isOut = 'dontShow';
-          this.pattern = 'withoutUserPage';
+          this.pattern = 'block';
           this.toUserName = userName;
           this.currentPage = 1;
           this.loadHome(this.currentPage);
@@ -418,7 +418,7 @@ export default {
       } else {
         if (confirm("View Bookmarks Shared By " + userName + "?")) {
           this.toUserName = userName;
-          this.pattern = 'userPage';
+          this.pattern = 'user';
           this.currentPage = 1;
           this.loadHome(this.currentPage);
           this.isOut = 'otherOne';
@@ -441,7 +441,11 @@ export default {
 
       // 获取可供筛选的用户信息
       this.axios.get("/home/filter").then(res => {
-        this.userToSelect = res.data;
+        if (res.data.code === 200) {
+          this.userToSelect = res.data.data;
+        } else {
+          alert("No Results");
+        }
       });
     },
     // 点击发送筛选按钮：发送新的筛选请求
@@ -493,7 +497,7 @@ export default {
       this.clickMost = false;
       this.clickFilter = false;
       this.isOut = 'all';
-      this.pattern = 'recent';
+      this.pattern = 'latest';
       this.currentPage = 1;
       this.loadHome(1);
       this.refreshShow = false;
@@ -503,7 +507,7 @@ export default {
       this.clickMost = true;
       this.clickRecent = false;
       this.clickFilter = false;
-      this.pattern = 'marked';
+      this.pattern = 'popular';
       this.currentPage = 1;
       this.loadHome(1);
       this.refreshShow = false;
@@ -576,7 +580,7 @@ export default {
       this.axios.get("/home", {
         params: {
           "currentPage": currentPage,
-          "pattern": this.pattern,
+          "timeline": this.pattern,
           "requestedUsername": this.toUserName
         }
       }).then(res => {

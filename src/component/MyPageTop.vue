@@ -64,9 +64,9 @@
     <v-col order="last" v-show="!showChangePwd">
       <v-card color="#93deff">
         <v-card-title class="text-h5">
-          Export Websites Data
+          Export Bookmarks
         </v-card-title>
-        <v-card-subtitle>Press the EXPORT button to export your websites data to HTML file and DOWNLOAD it.
+        <v-card-subtitle>Press the EXPORT button to export your Bookmarks to HTML file and DOWNLOAD it.
         </v-card-subtitle>
         <v-card-actions>
           <v-btn color="#b6d7de" @click="exportHtmlFile">
@@ -80,10 +80,10 @@
 
       <v-card color="#b6d7de" style="margin-top: 2%">
         <v-card-title class="text-h5">
-          Import Websites Data
+          Import Bookmarks
         </v-card-title>
         <v-card-subtitle>
-          To import websites data from HTML file:
+          To import Bookmarks from HTML file:
           <p></p>
           <p>1. Upload HTML file:</p>
           <v-file-input

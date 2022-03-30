@@ -99,7 +99,7 @@
                     v-for="item in logs"
                     :key="item.name"
                 >
-                  <td>{{ item.optTime }}</td>
+                  <td>{{ item.optTime | dateFormat }}</td>
                   <td>{{ item.title }}</td>
                   <td>{{ item.method }}</td>
                   <td>{{ item.optType }}</td>
@@ -175,7 +175,7 @@
                 >
                   <td>{{ item.userId }}</td>
                   <td>{{ item.userName }}</td>
-                  <td>{{ item.createTime }}</td>
+                  <td>{{ item.createTime | dateFormat }}</td>
                   <td>
                     <v-btn
                         class="text-none"
