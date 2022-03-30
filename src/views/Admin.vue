@@ -63,6 +63,12 @@
           <h3>View Logs {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
         </v-expansion-panel-header>
         <v-expansion-panel-content v-if="isAdmin===true">
+          <v-switch
+              v-model="isReadFromDb"
+              color="green"
+              :label="isReadFromDb ? 'Get logs from database directly'
+              : 'Get logs from database and and cache memory'"
+          ></v-switch>
           <v-card>
             <v-card-title>
               Logs
@@ -227,7 +233,7 @@
           <a @click="updateViews">
             click here to
             <v-btn class="text-none" color="#93ca76" x-small>
-              <v-icon left x-small>
+              <v-icon x-small>
                 mdi-refresh
               </v-icon>
               Update Immediately
@@ -348,6 +354,9 @@ export default {
     users: [],
     // 网页 ID 及其阅读数
     visitedBookmarks: [],
+
+    // True if data is read from database directly
+    isReadFromDb: false,
   }),
 
   methods: {
@@ -495,7 +504,12 @@ export default {
     },
     // 获取 logs
     getLogs() {
-      this.axios.get("/admin/logs?currentPage=" + this.currentPage).then(res => {
+      this.axios.get("/admin/logs", {
+        params: {
+          currentPage: this.currentPage,
+          isReadFromDb: this.isReadFromDb
+        }
+      }).then(res => {
         if (res.data.code === 200) {
           let array = res.data.data;
           let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
