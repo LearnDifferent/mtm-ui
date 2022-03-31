@@ -14,6 +14,8 @@ import MyPageTop from "../component/MyPageTop";
 import MyPageNotification from "../component/MyPageNotification";
 import UserInfoList from "../component/UserInfoList";
 import UserPage from "../views/UserPage";
+import WebsiteSearchResults from "@/component/WebsiteSearchResults";
+import TagSearchPage from "@/component/TagSearchPage";
 
 Vue.use(VueRouter)
 
@@ -33,6 +35,8 @@ const routes = [
     {path: "/myPageNotification", component: MyPageNotification},
     {path: "/userInfoList", component: UserInfoList},
     {path: "/user", component: UserPage},
+    {path: "/web", component: WebsiteSearchResults, name: 'web', props: true},
+    {path: "/tag-search", component: TagSearchPage, name: 'tag-search', props: true},
 ]
 
 const router = new VueRouter({

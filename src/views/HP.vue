@@ -184,6 +184,18 @@
                   </v-chip>
 
                   <v-chip
+                      color="#683f36"
+                      @click="openTag(item)"
+                      outlined
+                      style="margin-right: 3px"
+                  >
+                    <v-icon left>
+                      mdi-tag-multiple-outline
+                    </v-icon>
+                    Tag
+                  </v-chip>
+
+                  <v-chip
                       v-show="currentUser == item.userName && onThisWebData == item.webId"
                       color="red"
                       outlined
@@ -363,6 +375,19 @@ export default {
     ifDesc: false,
   }),
   methods: {
+    // 打开标签页
+    openTag(item) {
+      this.$router.push({
+        name: 'web',
+        params: {
+          item: item,
+          tagMode: true,
+          previousPage: 'home',
+          previousPageNum: this.currentPage,
+        }
+      });
+    },
+
     // 显示 refreshShow
     showRefresh() {
       this.refreshShow = true;
@@ -705,7 +730,12 @@ export default {
     window.onload = function () {
       document.getElementById("myHomeBtn").click();
     }
-    this.loadHome();
+
+    let currentPage = this.$route.query.currentPage
+    if (currentPage !== null && currentPage > 1) {
+      this.currentPage = currentPage;
+    }
+    this.loadHome(this.currentPage);
   }
   ,
 }
