@@ -184,6 +184,7 @@
                   </v-chip>
 
                   <v-chip
+                      v-show="clickRecent"
                       color="#683f36"
                       @click="openTag(item)"
                       outlined
@@ -384,6 +385,7 @@ export default {
           tagMode: true,
           previousPage: 'home',
           previousPageNum: this.currentPage,
+          currentUser: this.currentUser,
         }
       });
     },
@@ -731,7 +733,7 @@ export default {
       document.getElementById("myHomeBtn").click();
     }
 
-    let currentPage = this.$route.query.currentPage
+    let currentPage = this.$route.query.currentPage;
     if (currentPage !== null && currentPage > 1) {
       this.currentPage = currentPage;
     }

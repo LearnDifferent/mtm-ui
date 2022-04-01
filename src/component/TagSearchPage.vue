@@ -17,6 +17,7 @@
         </v-btn>
       </v-col>
     </v-row>
+
     <v-row dense>
       <v-col
           v-for="(item, i) in items"
@@ -31,7 +32,11 @@
         <div
             v-show="this.items.length > 1"
             style="text-align: center;
-              margin-top: 3px"
+        position:absolute;
+        bottom: 20px;
+        margin: auto;
+        left: 0;
+        right: 0;"
         >
           <v-btn small rounded @click="changePage(-1)">
             <v-icon>mdi-skip-previous</v-icon>
@@ -49,6 +54,24 @@
       </v-col>
     </v-row>
 
+    <!-- Alert when no results -->
+    <v-alert
+        style="text-align: center;
+        position:absolute;
+        bottom: 60%;
+        margin: auto;
+        left: 0;
+        right: 0;"
+        outlined
+        v-show="items.length === 0"
+        color="#d0576b"
+        dismissible
+    >
+      <div style="text-align: center">
+        <v-icon color="red">mdi-alert-circle-outline</v-icon>
+        You are not allowed to view private bookmarks
+      </div>
+    </v-alert>
   </div>
 </template>
 
@@ -68,6 +91,21 @@ export default {
   methods: {
     // 回到前面
     goBack() {
+      let placeToGoBack = this.placeToGoBack;
+      // 回到 bookmark 的 tags 页面
+      if (placeToGoBack === 'bookmark') {
+        this.backToBookmarkWithTags();
+      }
+      if (placeToGoBack === 'all tags' || placeToGoBack === 'popular tags') {
+        // 回到所有标签页面
+        this.$router.push({
+          path: 'all-tags',
+          query: {showMode: placeToGoBack}
+        });
+      }
+
+    },
+    backToBookmarkWithTags() {
       this.$router.push({
         name: 'web',
         params: {
@@ -93,17 +131,21 @@ export default {
         // 此时已经没有数据
         this.noMoreData();
         return false;
+      } else {
+        // 有新的数据
+        return true;
       }
-      // 有新的数据
-      return true;
     },
     noMoreData() {
       if (this.currentPage > 1) {
         // 页面如果不是 1 的话，就 -1
         this.currentPage -= 1;
+        // 没有新的数据
+        alert("Last Page");
+      } else {
+        // 本来就没有数据
+        this.items = [];
       }
-      // 没有新的数据
-      alert("No More Data");
     },
 
     // 根据 tag 搜索 bookmarks
@@ -127,7 +169,7 @@ export default {
         if (error.response.data.code === 2013) {
           this.noMoreData();
         } else {
-          alert(error.response.data.msg);
+          document.getElementById("myHomeBtn").click();
         }
       });
     },
@@ -137,6 +179,7 @@ export default {
   props: {
     searchingTag: {},
     formerItem: {},
+    placeToGoBack: {},
   },
 
   watch: {
