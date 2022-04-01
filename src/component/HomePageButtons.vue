@@ -40,6 +40,22 @@
         </v-icon>
         Filter
       </v-btn>
+
+      <!-- Tag -->
+      <v-divider vertical style="margin-left: 1%;margin-right: 1%"></v-divider>
+      <v-btn
+          class="text-none"
+          rounded
+          outlined
+          color="black"
+          dark
+          @click="openAllTagsPage"
+      >
+        <v-icon left>
+          mdi-tag-multiple-outline
+        </v-icon>
+        Tag
+      </v-btn>
     </div>
 
     <!-- 点了 recent 之后显示的按钮 -->
@@ -131,6 +147,10 @@ export default {
       // 打开 3000 端口的 /file 路径，而 3000 号端口映射了后端服务器的端口
       window.open("/file?username=" + this.toUserName, "_blank");
     },
+    // 打开所有标签页面
+    openAllTagsPage() {
+      this.$router.push("/all-tags");
+    }
   },
 
   props: {

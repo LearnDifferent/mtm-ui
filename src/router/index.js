@@ -16,6 +16,7 @@ import UserInfoList from "../component/UserInfoList";
 import UserPage from "../views/UserPage";
 import WebsiteSearchResults from "@/component/WebsiteSearchResults";
 import TagSearchPage from "@/component/TagSearchPage";
+import AllTags from "@/component/AllTags";
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,7 @@ const routes = [
     {path: "/user", component: UserPage},
     {path: "/web", component: WebsiteSearchResults, name: 'web', props: true},
     {path: "/tag-search", component: TagSearchPage, name: 'tag-search', props: true},
+    {path: "/all-tags", component: AllTags},
 ]
 
 const router = new VueRouter({
