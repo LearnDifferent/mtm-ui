@@ -48,7 +48,7 @@
           只有者四个情况同时满足，才不会显示，否则，就显示出来
           -->
           <v-card
-              @mouseover="onThisWebData = item.webId"
+              @mouseenter="mouseEnterMethod(item, i)"
               @mouseleave="onThisWebData = -1"
               :id="item.webId"
               v-show="!(clickRecent
@@ -193,7 +193,7 @@
                     <v-icon left>
                       mdi-tag-multiple-outline
                     </v-icon>
-                    Tag
+                    Tag <span v-show="item.tagName">: {{ item.tagName }}</span>
                   </v-chip>
 
                   <v-chip
@@ -393,6 +393,26 @@ export default {
     // 显示 refreshShow
     showRefresh() {
       this.refreshShow = true;
+    },
+
+    // 鼠标在进入时候的方法
+    mouseEnterMethod(item, i) {
+      let webId = item.webId;
+      this.onThisWebData = webId;
+      // 在没有 tag 属性的时候，获取 tag
+      if (!this.items[i].tagName) {
+        this.getFirstTag(webId, i);
+      }
+    },
+    // 获取第一个 tag
+    getFirstTag(webId, i) {
+      this.axios.get("/tag/first?webId=" + webId).then(res => {
+        if (res.data.code === 200) {
+          this.items[i].tagName = res.data.data;
+        }
+      }).catch(error => {
+        // do nothing...
+      });
     },
 
     // 查看所有的网页
