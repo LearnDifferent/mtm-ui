@@ -4,23 +4,15 @@
     <MarkUrl :username="currentUser" @showRefresh="showRefresh"/>
     <v-divider></v-divider>
     <br>
-    <HomePageButtons :click-filter="clickFilter" :click-most="clickMost"
+    <HomePageButtons :click-most="clickMost"
                      :click-recent="clickRecent"
-                     :current-user="currentUser" :filter="filter" :find-all="findAll"
+                     :current-user="currentUser" :find-all="findAll"
                      :find-mine="findMine" :find-others="findOthers" :is-out="isOut"
                      :most-mark="mostMark" :recent="recent"
-                     :show-selected-user="showSelectedUser" :to-user-name="toUserName"/>
+                     :to-user-name="toUserName"/>
 
     <br>
     <v-container class="mx-auto">
-
-      <!-- 数据筛选模块 -->
-      <FilterWebsiteData
-          v-show="clickFilter"
-          :user-to-select="userToSelect"
-          :count="count"
-          @filterNewRequestSend="filterNewRequestSend"
-      ></FilterWebsiteData>
 
       <!-- 刷新 -->
       <v-btn v-show="refreshShow"
@@ -66,32 +58,7 @@
 
                 <v-card-subtitle v-text="item.desc"></v-card-subtitle>
 
-                <v-card-actions v-show="clickFilter">
-                  <v-chip
-                      class="ma-2"
-                      color="#8AC007"
-                      label
-                      outlined
-                  >
-                    <v-icon left>
-                      mdi-account-circle-outline
-                    </v-icon>
-                    {{ item.userName }}
-                  </v-chip>
-                  <v-chip
-                      class="ma-2"
-                      color="#8AC009"
-                      label
-                      outlined
-                  >
-                    <v-icon left>
-                      mdi-clock-outline
-                    </v-icon>
-                    {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm') }}
-                  </v-chip>
-                </v-card-actions>
-
-                <v-card-actions v-show="!clickFilter">
+                <v-card-actions>
 
                   <div
                       v-show="item.userName"
@@ -113,7 +80,7 @@
                       >
                       {{ item.userName }}
                     </span>
-                      <span v-show="showCloseIcon">
+                      <span v-show="!(isOut === 'others')">
                       <v-btn
                           icon
                           small
@@ -256,7 +223,7 @@
       <v-alert
           prominent
           type="warning"
-          v-show="totalPage===0&&!clickFilter"
+          v-show="totalPage===0"
       >
         <v-row align="center">
           <v-col class="grow">
@@ -285,21 +252,8 @@
         <v-icon>mdi-rocket</v-icon>
       </v-btn>
 
-      <!-- 点击加载更多数据 -->
-      <v-btn
-          block
-          color="yellow"
-          v-show="showMoreBtn"
-          @click="filterSendRequest"
-      >
-        <v-icon left>
-          mdi-refresh
-        </v-icon>
-        More
-      </v-btn>
-
       <!-- 分页：总数大于 0，或者没有点击筛选的时候才显示 -->
-      <v-row align-content="center" v-show="totalPage !== 0&&!clickFilter">
+      <v-row align-content="center" v-show="totalPage !== 0">
         <v-col>
           <v-pagination
               v-model="currentPage"
@@ -315,7 +269,6 @@
 
 <script>
 import Comment from "../component/Comment";
-import FilterWebsiteData from "../component/FilterWebsiteData";
 import MarkUrl from "../component/MarkUrl";
 import HomePageButtons from "../component/HomePageButtons";
 
@@ -325,8 +278,6 @@ export default {
     MarkUrl,
     // 评论区
     Comment: Comment,
-    // 数据筛选
-    FilterWebsiteData: FilterWebsiteData
   },
   name: "HP",
   data: () => ({
@@ -360,20 +311,6 @@ export default {
     clickRecent: true,
     // 是否点击了 most
     clickMost: false,
-    // 是否点击了 filter
-    clickFilter: false,
-    // Filter 相关内容
-    // 用于筛选：有 userName 和 webCount 的列表
-    userToSelect: [],
-    // 默认展示 10 条，每次加 10
-    filterLoad: 10,
-    // 筛选出来的结果的条数，如果新加载的条数和原来保存的条数相同，说明没有新的数据
-    count: 0,
-    // 子组件中得来的数据：usernames, dates, ifOrderByTime, ifDesc
-    usernames: [],
-    dates: [],
-    ifOrderByTime: false,
-    ifDesc: false,
   }),
   methods: {
     // 打开标签页
@@ -472,77 +409,11 @@ export default {
         }
       }
     },
-    // 过滤相关
-    // 点击过滤的最顶层选项
-    filter() {
-      this.clickFilter = true;
-      this.clickRecent = false;
-      this.clickMost = false;
-      // 先清除网页数据记录
-      this.items = '';
-      this.totalPage = 0;
-      this.refreshShow = false;
-      // 再重置已有的筛选数据
-      this.filterLoad = 10;
-      this.count = 0;
 
-      // 获取可供筛选的用户信息
-      this.axios.get("/home/filter").then(res => {
-        if (res.data.code === 200) {
-          this.userToSelect = res.data.data;
-        } else {
-          alert("No Results");
-        }
-      });
-    },
-    // 点击发送筛选按钮：发送新的筛选请求
-    filterNewRequestSend(usernames, dates, ifOrderByTime, ifDesc) {
-      // 重置筛选的数据
-      this.filterLoad = 10;
-      this.count = 0;
-      // 赋值
-      this.usernames = usernames;
-      this.dates = dates;
-      this.ifOrderByTime = ifOrderByTime;
-      this.ifDesc = ifDesc;
-      this.filterSendRequest();
-    },
-    // 发送筛选请求
-    filterSendRequest() {
-      let data = {
-        usernames: this.usernames,
-        datetimeList: this.dates,
-        load: this.filterLoad,
-        isOrderByUsername: !this.ifOrderByTime,
-        isDesc: this.ifDesc
-      };
-
-      this.axios.post("/home/filter", data).then(res => {
-        // 网页数据
-        let webs = res.data.data;
-        this.items = webs;
-        // 网页数据的数量
-        let count = webs.length;
-        if (count === 0) {
-          alert("No Result Found...");
-          // 重置数据
-          this.filterLoad = 10;
-          this.count = 0;
-        } else if (count === this.count) {
-          alert("No More Results");
-        } else {
-          // 统计加载的数量
-          this.count = count;
-          // 每次都新增 10
-          this.filterLoad += 10;
-        }
-      });
-    },
     // 查看最近的帖子
     recent() {
       this.clickRecent = true;
       this.clickMost = false;
-      this.clickFilter = false;
       this.isOut = 'all';
       this.pattern = 'latest';
       this.currentPage = 1;
@@ -553,7 +424,6 @@ export default {
     mostMark() {
       this.clickMost = true;
       this.clickRecent = false;
-      this.clickFilter = false;
       this.pattern = 'popular';
       this.currentPage = 1;
       this.loadHome(1);
@@ -651,7 +521,6 @@ export default {
       });
     },
 
-
     // 打开评论
     openComment(webId) {
       if (this.showComment == webId) {
@@ -729,25 +598,7 @@ export default {
     },
 
   },
-  computed: {
 
-    showMoreBtn() {
-      return this.count !== 0
-          && this.clickFilter
-          && this.count % 10 === 0
-      // 注意，因为每次 filterLoad 都会加 10
-      // ，所以结果一定是 10 的倍数，所以才能这样判断
-    }
-    ,
-    showSelectedUser() {
-      return !(this.clickFilter || this.clickMost);
-    }
-    ,
-    showCloseIcon() {
-      return !(this.clickFilter || this.clickMost || this.isOut === 'others');
-    }
-  }
-  ,
   created() {
     window.onload = function () {
       document.getElementById("myHomeBtn").click();
@@ -762,4 +613,3 @@ export default {
   ,
 }
 </script>
-

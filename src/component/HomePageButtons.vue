@@ -30,10 +30,10 @@
       <v-divider vertical style="margin-left: 1%;margin-right: 1%"></v-divider>
       <v-btn
           rounded
-          :outlined="!clickFilter"
+          outlined
           color="black"
           dark
-          @click="filter"
+          @click="goToFilter"
       >
         <v-icon left>
           mdi-filter-plus-outline
@@ -118,7 +118,7 @@
         v-show="isOut === 'otherOne' || isOut === 'dontShow'"
     >
       <v-chip
-          v-show="showSelectedUser"
+          v-show="!clickMost"
           class="ma-2"
           label
           :outlined="isOut !== 'otherOne' && isOut !== 'dontShow'"
@@ -150,22 +150,23 @@ export default {
     // 打开所有标签页面
     openAllTagsPage() {
       this.$router.push("/all-tags");
-    }
+    },
+    // 去 filter 页面
+    goToFilter() {
+      this.$router.push("/filter");
+    },
   },
 
   props: {
-    clickFilter: {},
     clickMost: {},
     clickRecent: {},
     currentUser: {},
-    filter: {},
     findAll: {},
     findMine: {},
     findOthers: {},
     isOut: {},
     mostMark: {},
     recent: {},
-    showSelectedUser: {},
     toUserName: {}
   }
 }

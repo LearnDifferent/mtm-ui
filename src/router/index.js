@@ -17,6 +17,7 @@ import UserPage from "../views/UserPage";
 import WebsiteSearchResults from "@/component/WebsiteSearchResults";
 import TagSearchPage from "@/component/TagSearchPage";
 import AllTags from "@/component/AllTags";
+import FilterPage from "@/component/FilterPage";
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,7 @@ const routes = [
     {path: "/web", component: WebsiteSearchResults, name: 'web', props: true},
     {path: "/tag-search", component: TagSearchPage, name: 'tag-search', props: true},
     {path: "/all-tags", component: AllTags},
+    {path: "/filter", component: FilterPage},
 ]
 
 const router = new VueRouter({
