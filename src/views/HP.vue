@@ -401,12 +401,12 @@ export default {
       this.onThisWebData = webId;
       // 在没有 tag 属性的时候，获取 tag
       if (!this.items[i].tagName) {
-        this.getFirstTag(webId, i);
+        this.getOneTag(webId, i);
       }
     },
-    // 获取第一个 tag
-    getFirstTag(webId, i) {
-      this.axios.get("/tag/first?webId=" + webId).then(res => {
+    // 获取一个 tag
+    getOneTag(webId, i) {
+      this.axios.get("/tag/one?webId=" + webId).then(res => {
         if (res.data.code === 200) {
           this.items[i].tagName = res.data.data;
         }
