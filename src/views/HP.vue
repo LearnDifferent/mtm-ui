@@ -40,7 +40,7 @@
           只有者四个情况同时满足，才不会显示，否则，就显示出来
           -->
           <v-card
-              @mouseenter="mouseEnterMethod(item, i)"
+              @mouseenter="onThisWebData = item.webId"
               @mouseleave="onThisWebData = -1"
               :id="item.webId"
               v-show="!(clickRecent
@@ -331,27 +331,6 @@ export default {
     showRefresh() {
       this.refreshShow = true;
     },
-
-    // 鼠标在进入时候的方法
-    mouseEnterMethod(item, i) {
-      let webId = item.webId;
-      this.onThisWebData = webId;
-      // 在没有 tag 属性的时候，获取 tag
-      if (!this.items[i].tagName) {
-        this.getOneTag(webId, i);
-      }
-    },
-    // 获取一个 tag
-    getOneTag(webId, i) {
-      this.axios.get("/tag/one?webId=" + webId).then(res => {
-        if (res.data.code === 200) {
-          this.items[i].tagName = res.data.data;
-        }
-      }).catch(error => {
-        // do nothing...
-      });
-    },
-
     // 查看所有的网页
     findAll() {
       this.recent();
@@ -511,6 +490,10 @@ export default {
           this.loadHome(this.currentPage);
         }
 
+        for (let i = 0; i < this.items.length; i++) {
+          this.getOneTag(this.items[i].webId, i);
+        }
+
         // 让页面返回顶部
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
@@ -518,6 +501,17 @@ export default {
         if (error.response.data.code === 2005) {
           this.$router.push("/login");
         }
+      });
+    },
+
+    // 获取一个 tag
+    getOneTag(webId, i) {
+      this.axios.get("/tag/one?webId=" + webId).then(res => {
+        if (res.data.code === 200) {
+          this.items[i].tagName = res.data.data;
+        }
+      }).catch(error => {
+        // do nothing...
       });
     },
 
