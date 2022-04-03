@@ -305,9 +305,8 @@ export default {
     },
     getWebsiteDataAndContinue(index, notificationData) {
       let webId = notificationData.webId;
-      this.axios.get("/web/get", {
+      this.axios.get("/bookmark/get", {
         params: {
-          userName: this.currentUsername,
           webId: webId
         }
       }).then(res => {

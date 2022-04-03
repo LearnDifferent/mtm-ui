@@ -552,11 +552,11 @@ export default {
     },
     // 查看该用户收藏的网页
     checkOutUserBookmarks(currentPage) {
-      this.axios.get("/web/get/" + this.showBookmarks, {
+      this.axios.get("/bookmark/get/" + this.showBookmarks, {
         params: {currentPage: currentPage}
       }).then(res => {
-        this.items = res.data.data.websiteData;
-        this.totalPage = res.data.data.totalPages;
+        this.items = res.data.bookmarks;
+        this.totalPage = res.data.totalPages;
       });
     },
 

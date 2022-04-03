@@ -1,51 +1,40 @@
 <template>
   <div>
-    <v-btn
-        large
-        block
-        class="text-none"
-        color="#80989b"
-        @click="backToHome"
-        style="margin-bottom: 5px"
-    >
-      <v-icon left>
-        mdi-keyboard-backspace
-      </v-icon>
-      Click here to go back
-      <v-icon>mdi-home-outline</v-icon>
-    </v-btn>
+    <BackToHomeButton msg="You are filtering bookmarks. "/>
 
-  <v-container class="mx-auto">
+    <v-container class="mx-auto">
 
-    <!-- 数据筛选模块 -->
-    <FilterWebsiteData
-        :user-to-select="userToSelect"
-        :count="count"
-        @filterNewRequestSend="filterNewRequestSend"
-    ></FilterWebsiteData>
+      <!-- 数据筛选模块 -->
+      <FilterWebsiteData
+          :user-to-select="userToSelect"
+          :count="count"
+          @filterNewRequestSend="filterNewRequestSend"
+      ></FilterWebsiteData>
 
-    <v-col
-        v-for="(item, i) in items"
-        :key="i"
-        cols="12"
-    >
-      <!-- 网页搜索结果 -->
-      <WebsiteSearchResults :item="item"/>
-    </v-col>
+      <v-col
+          v-for="(item, i) in items"
+          :key="i"
+          cols="12"
+      >
+        <!-- 网页搜索结果 -->
+        <WebsiteSearchResults :item="item"/>
+      </v-col>
 
-    <!-- 点击加载更多数据 -->
-    <v-btn
-        block
-        color="yellow"
-        v-show="showMoreBtn"
-        @click="filterSendRequest"
-    >
-      <v-icon left>
-        mdi-refresh
-      </v-icon>
-      More
-    </v-btn>
-  </v-container>
+      <!-- 点击加载更多数据 -->
+      <v-btn
+          block
+          color="yellow"
+          v-show="showMoreBtn"
+          @click="filterSendRequest"
+      >
+        <v-icon left>
+          mdi-refresh
+        </v-icon>
+        More
+      </v-btn>
+    </v-container>
+
+    <ToTopButton/>
   </div>
 </template>
 
@@ -53,10 +42,12 @@
 
 import FilterWebsiteData from "@/component/FilterWebsiteData";
 import WebsiteSearchResults from "@/component/WebsiteSearchResults";
+import BackToHomeButton from "@/component/BackToHomeButton";
+import ToTopButton from "@/component/ToTopButton";
 
 export default {
   name: "FilterPage",
-  components: {WebsiteSearchResults, FilterWebsiteData},
+  components: {ToTopButton, BackToHomeButton, WebsiteSearchResults, FilterWebsiteData},
   data: () => ({
     items: [],
     // 用于筛选：有 userName 和 webCount 的列表
@@ -72,11 +63,6 @@ export default {
     ifDesc: false,
   }),
   methods: {
-
-    // 返回首页
-    backToHome() {
-      document.getElementById("myHomeBtn").click();
-    },
 
     // 获取可供筛选的用户信息
     loadAllUser() {
@@ -130,45 +116,6 @@ export default {
         }
       });
     },
-
-
-    // 打开 view 详情
-    view(item) {
-      this.axios.get("/view/count", {
-        params: {webId: item.webId}
-      }).then(res => {
-        let msg = "Title: " + item.title + "\n"
-            + "URL: " + item.url + "\n"
-            + "Bookmarked By: " + item.userName + "\n\n";
-
-        let views;
-        if (res.data.code === 200) {
-          views = res.data.data;
-        } else {
-          views = 0;
-        }
-
-        if (views != null && views > 1) {
-          msg += "Views: " + views + "\n\n"
-        }
-        if (views != null && views === 1) {
-          msg += "View: 1" + "\n\n"
-        }
-
-        msg += "Do you want to open this website?";
-
-        if (confirm(msg)) {
-          this.jump(item.url, item.webId);
-        }
-      }).catch((err) => {
-        this.jump(item.url, item.webId);
-      });
-    },
-    // 跳转页面
-    jump(url, webId) {
-      window.open(url, '_blank');
-      this.axios.get("/view/incr?webId=" + webId);
-    },
   },
 
   computed: {
@@ -185,7 +132,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

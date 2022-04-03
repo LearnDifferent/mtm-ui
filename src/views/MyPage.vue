@@ -185,17 +185,7 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-btn
-        fab
-        large
-        dark
-        bottom
-        right
-        absolute
-        @click="toTop"
-    >
-      <v-icon>mdi-rocket</v-icon>
-    </v-btn>
+    <ToTopButton/>
 
   </v-container>
 </template>
@@ -204,9 +194,11 @@
 import Comment from "../component/Comment";
 import MyPageTop from "../component/MyPageTop";
 import MyPageNotification from "../component/MyPageNotification";
+import ToTopButton from "@/component/ToTopButton";
 
 export default {
   components: {
+    ToTopButton,
     MyPageTop,
     MyPageNotification,
     // 评论区
@@ -314,7 +306,7 @@ export default {
     },
     // 获取 tag 和评论数量
     getMoreInfo(webId, i) {
-      this.axios.get("/web/additional?webId=" + webId).then(res => {
+      this.axios.get("/bookmark/additional?webId=" + webId).then(res => {
         if (res.data.code === 200) {
           let info = res.data.data;
           this.myWebs[i].tagName = info.tag;
@@ -330,10 +322,9 @@ export default {
       let publicOrPrivate = isPublic ? "private" : "public";
       if (confirm("Are you sure you want to make it "
           + publicOrPrivate + " ?")) {
-        this.axios.get("/web", {
+        this.axios.get("/bookmark/privacy", {
           params: {
-            "webId": webId,
-            "userName": userName
+            "webId": webId
           }
         }).then(res => {
           if (res.data.code === 200 || res.data.code === 500) {
@@ -356,10 +347,9 @@ export default {
     // 删除收藏的网页
     delWeb(webId, arrayIndex) {
       if (confirm("Are you sure you want to delete it?")) {
-        this.axios.delete("/web", {
+        this.axios.delete("/bookmark", {
           params: {
-            "webId": webId,
-            "userName": this.user.userName
+            "webId": webId
           }
         }).then(res => {
           if (res.data.code === 3001) {
@@ -418,11 +408,6 @@ export default {
     jump(url, webId) {
       window.open(url, '_blank');
       this.axios.get("/view/incr?webId=" + webId);
-    },
-    // 页面回到顶部
-    toTop() {
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
     },
     // 获取新的回复消息数量
     getNewReplyNotification() {

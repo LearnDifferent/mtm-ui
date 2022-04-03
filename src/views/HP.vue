@@ -4,11 +4,9 @@
     <MarkUrl :username="currentUser" @showRefresh="showRefresh"/>
     <v-divider></v-divider>
     <br>
-    <HomePageButtons :click-most="clickMost"
-                     :click-recent="clickRecent"
-                     :current-user="currentUser" :find-all="findAll"
+    <HomePageButtons :current-user="currentUser" :find-all="findAll"
                      :find-mine="findMine" :find-others="findOthers" :is-out="isOut"
-                     :most-mark="mostMark" :recent="recent"
+                     :recent="recent"
                      :to-user-name="toUserName"/>
 
     <br>
@@ -32,31 +30,14 @@
             :key="i"
             cols="12"
         >
-          <!-- 不显示的情况，需要满足：
-          1. 在 clickRecent 下
-          2. isOut 是 all 或者 mine
-          3. isPublic 为 false，也就是私有
-          4. 该 website 的所有者不是当前用户
-          只有者四个情况同时满足，才不会显示，否则，就显示出来
-          -->
           <v-card
               @mouseenter="onThisWebData = item.webId"
               @mouseleave="onThisWebData = -1"
               :id="item.webId"
-              v-show="!(clickRecent
-              && (isOut == 'all' || isOut == 'mine')
-              && !item.isPublic
-              && currentUser!=item.userName)"
           >
             <div class="d-flex flex-no-wrap justify-space-between">
               <div>
-                <v-card-title
-                    class="headline"
-                    v-text="item.title"
-                    @click="view(item)"
-                ></v-card-title>
-
-                <v-card-subtitle v-text="item.desc"></v-card-subtitle>
+                <BookmarkTitle :item="item"/>
 
                 <v-card-actions>
 
@@ -95,7 +76,6 @@
                   </div>
 
                   <v-divider
-                      v-show="clickRecent"
                       class="mx-2"
                       vertical
                   ></v-divider>
@@ -113,32 +93,16 @@
                     Add
                   </v-chip>
 
-                  <v-chip
+                  <BookmarkPrivacy
                       v-show="currentUser==item.userName"
-                      :color="item.isPublic ? 'green' : 'pink'"
-                      :text-color="item.isPublic ? 'green' : 'pink'"
-                      outlined
-                      @click="changePrivacy(item.webId, item.userName, item.isPublic)"
-                      style="margin-right: 3px"
-                  >
-                    <v-icon left>{{ item.isPublic ? "mdi-eye" : "mdi-eye-off" }}</v-icon>
-                    {{ item.isPublic ? "Public" : "Private" }}
-                  </v-chip>
+                      :is-public="item.isPublic"
+                      :web-id="item.webId"
+                      :user-name="item.userName"
+                  />
+
+                  <BookmarkViewButton :item="item"/>
 
                   <v-chip
-                      color="#bf783a"
-                      @click="view(item)"
-                      outlined
-                      style="margin-right: 3px"
-                  >
-                    <v-icon left>
-                      mdi-link-variant
-                    </v-icon>
-                    View
-                  </v-chip>
-
-                  <v-chip
-                      v-show="clickRecent"
                       color="#84a2d4"
                       @click="openComment(item.webId)"
                       outlined
@@ -151,7 +115,6 @@
                   </v-chip>
 
                   <v-chip
-                      v-show="clickRecent"
                       color="#683f36"
                       @click="openTag(item)"
                       outlined
@@ -176,40 +139,23 @@
                     Delete
                   </v-chip>
 
-                  <div v-show="onThisWebData == item.webId && clickRecent">
+                  <div v-show="onThisWebData == item.webId">
                     <v-icon>mdi-clock-outline</v-icon>
                     <span style="color: grey;" v-show="!item.count">
                       {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm') }}
                     </span>
                   </div>
 
-                  <v-divider
-                      v-show="clickMost"
-                      class="mx-2"
-                      vertical
-                  ></v-divider>
-
-                  <div style="color: grey" v-show="item.count">Saved by {{ item.count }} user<span
-                      v-show="item.count > 1">s</span>
-                  </div>
-
                 </v-card-actions>
               </div>
 
-              <v-avatar
-                  class="ma-3"
-                  size="125"
-                  tile
-                  @click="view(item)"
-              >
-                <v-img :src="item.img"></v-img>
-              </v-avatar>
+              <BookmarkPic :item="item"/>
             </div>
 
           </v-card>
 
           <!-- 评论区 -->
-          <div v-show="showComment == item.webId && clickRecent">
+          <div v-show="showComment == item.webId">
             <Comment :webId="showComment"
                      :currentUsername="currentUser"
                      :totalComments="item.commentCount"
@@ -220,39 +166,12 @@
       </v-row>
 
       <!-- 没有内容时提示 -->
-      <v-alert
-          prominent
-          type="warning"
-          v-show="totalPage===0"
-      >
-        <v-row align="center">
-          <v-col class="grow">
-            No Data Available
-          </v-col>
-          <v-col class="shrink">
-            <v-btn @click="refreshPage">
-              <v-icon>
-                mdi-home
-              </v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-alert>
+      <NoDataInHomePage :refresh-page="refreshPage" :total-page="totalPage"/>
 
       <!-- 回到顶部按钮 -->
-      <v-btn
-          fab
-          large
-          dark
-          bottom
-          right
-          absolute
-          @click="toTop"
-      >
-        <v-icon>mdi-rocket</v-icon>
-      </v-btn>
+      <ToTopButton/>
 
-      <!-- 分页：总数大于 0，或者没有点击筛选的时候才显示 -->
+      <!-- pagination -->
       <v-row align-content="center" v-show="totalPage !== 0">
         <v-col>
           <v-pagination
@@ -271,9 +190,21 @@
 import Comment from "../component/Comment";
 import MarkUrl from "../component/MarkUrl";
 import HomePageButtons from "../component/HomePageButtons";
+import ToTopButton from "@/component/ToTopButton";
+import NoDataInHomePage from "@/component/NoDataInHomePage";
+import BookmarkTitle from "@/component/BookmarkTitle";
+import BookmarkViewButton from "@/component/BookmarkViewButton";
+import BookmarkPic from "@/component/BookmarkPic";
+import BookmarkPrivacy from "@/component/BookmarkPrivacy";
 
 export default {
   components: {
+    BookmarkPrivacy,
+    BookmarkPic,
+    BookmarkViewButton,
+    BookmarkTitle,
+    NoDataInHomePage,
+    ToTopButton,
     HomePageButtons,
     MarkUrl,
     // 评论区
@@ -291,13 +222,11 @@ export default {
     // 当前用户
     currentUser: '',
 
-    // myWebs 存放遍历的 website 的数据：webId,userName,url,img,title,desc
+    // 存放遍历的 website 的数据：webId,userName,url,img,title,desc
     // （还可能有 count 数据和是否公开 isPublic）
     items: '',
     // 显示该 webId 的评论
     showComment: -1,
-
-
     // 是否现实刷新信息
     refreshShow: false,
 
@@ -307,10 +236,6 @@ export default {
     onThisWebData: -1,
     // recent 的一些模式，被选中的有 outline 属性
     isOut: "all",
-    // 是否点击了 recent
-    clickRecent: true,
-    // 是否点击了 most
-    clickMost: false,
   }),
   methods: {
     // 打开标签页
@@ -391,19 +316,8 @@ export default {
 
     // 查看最近的帖子
     recent() {
-      this.clickRecent = true;
-      this.clickMost = false;
       this.isOut = 'all';
       this.pattern = 'latest';
-      this.currentPage = 1;
-      this.loadHome(1);
-      this.refreshShow = false;
-    },
-    // 按照最多收藏排序（注意，这种情况没有用户名，而有收藏次数）
-    mostMark() {
-      this.clickMost = true;
-      this.clickRecent = false;
-      this.pattern = 'popular';
       this.currentPage = 1;
       this.loadHome(1);
       this.refreshShow = false;
@@ -414,41 +328,12 @@ export default {
       this.recent();
       this.refreshShow = false;
     },
-    // 更新网页数据的隐私设置
-    changePrivacy(webId, userName, isPublic) {
-      let publicOrPrivate = isPublic ? "private" : "public";
-      if (confirm("Are you sure you want to make it "
-          + publicOrPrivate + " ?")) {
-        this.axios.get("/web", {
-          params: {
-            "webId": webId,
-            "userName": userName
-          }
-        }).then(res => {
-          if (res.data.code === 200 || res.data.code === 500) {
-            alert(res.data.msg);
-            this.loadHome(this.currentPage);
-          } else {
-            alert("Something went wrong... Please try again later.")
-          }
-        }).catch(error => {
-          if (error.response.data.code === 2009
-              || error.response.data.code === 2001) {
-            // 2009 表示没有权限，2001 表示网页不存在
-            alert(error.response.data.msg);
-          } else {
-            alert("Something went wrong... Please try again later.")
-          }
-        });
-      }
-    },
     // 删除收藏的网页
     delWeb(webId, arrayIndex) {
       if (confirm("Are you sure you want to delete it?")) {
-        this.axios.delete("/web", {
+        this.axios.delete("/bookmark", {
           params: {
-            "webId": webId,
-            "userName": this.currentUser
+            "webId": webId
           }
         }).then(res => {
           if (res.data.code === 3001) {
@@ -471,7 +356,7 @@ export default {
         });
       }
     },
-    // 进入主页后，获取信息
+    // 进入主页，获取信息
     loadHome(currentPage) {
       this.axios.get("/home", {
         params: {
@@ -481,8 +366,8 @@ export default {
         }
       }).then(res => {
         this.currentUser = res.data.currentUser;
-        this.items = res.data.websiteDataInfo.webs;
-        this.totalPage = res.data.websiteDataInfo.totalPage;
+        this.items = res.data.bookmarksAndTotalPages.bookmarks;
+        this.totalPage = res.data.bookmarksAndTotalPages.totalPages;
         this.toUserName = res.data.requestedUsername;
 
         if (this.totalPage < this.currentPage && this.totalPage !== 0) {
@@ -506,7 +391,7 @@ export default {
 
     // 获取 tag 和评论数量
     getMoreInfo(webId, i) {
-      this.axios.get("/web/additional?webId=" + webId).then(res => {
+      this.axios.get("/bookmark/additional?webId=" + webId).then(res => {
         if (res.data.code === 200) {
           let info = res.data.data;
           this.items[i].tagName = info.tag;
@@ -524,49 +409,7 @@ export default {
       }
       this.showComment = webId;
     },
-    // 打开 view 详情
-    view(item) {
-      this.axios.get("/view/count", {
-        params: {webId: item.webId}
-      }).then(res => {
-        let msg = "Title: " + item.title + "\n"
-            + "URL: " + item.url + "\n"
-            + "Bookmarked By: " + item.userName + "\n\n";
 
-        let views;
-        if (res.data.code === 200) {
-          views = res.data.data;
-        } else {
-          views = 0;
-        }
-
-        if (views != null && views > 1) {
-          msg += "Views: " + views + "\n\n"
-        }
-        if (views != null && views === 1) {
-          msg += "View: 1" + "\n\n"
-        }
-
-        msg += "Do you want to open this website?";
-
-        if (confirm(msg)) {
-          this.jump(item.url, item.webId);
-        }
-      }).catch((err) => {
-        this.jump(item.url, item.webId);
-      });
-    },
-    // 跳转页面
-    jump(url, webId) {
-      window.open(url, '_blank');
-      this.axios.get("/view/incr?webId=" + webId);
-    },
-    // 页面回到顶部
-    toTop() {
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
-    }
-    ,
     // 此用户保存已经存放在数据库内的网页
     mark(item) {
       if (confirm("Add it to your Bookmarks?")) {
@@ -576,9 +419,7 @@ export default {
           img: item.img,
           desc: item.desc
         };
-        this.axios.post("/web/existing", website, {
-          params: {userName: this.currentUser}
-        }).then(res => {
+        this.axios.post("/bookmark", website).then(res => {
           alert(res.data.msg);
           if (res.data.code === 200) {
             // 收藏成功就展示刷新按钮

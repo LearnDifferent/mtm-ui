@@ -110,17 +110,16 @@ export default {
       this.saveWebMsg = "Saving this Web Page. Please wait......";
       this.isLoading = true;
 
-      let data = {
-        url: this.newWebUrl,
-        username: this.username,
-        syncToElasticsearch: this.addToSearch,
-        isPublic: this.publicPrivacy
-      };
+      this.axios.get("/bookmark",{
+        params:{
+          url: this.newWebUrl,
+          beInEs: this.addToSearch,
+          isPublic: this.publicPrivacy
+        }
+      }).then(res => {
 
-      this.axios.post("/web/new", data).then(res => {
-
-            let hasSavedToDatabase = res.data.data.hasSavedToDatabase;
-            let hasSavedToElasticsearch = res.data.data.hasSavedToElasticsearch;
+            let hasSavedToDatabase = res.data.hasSavedToDatabase;
+            let hasSavedToElasticsearch = res.data.hasSavedToElasticsearch;
 
             if (hasSavedToElasticsearch === null) {
               // 无需同步到 Elasticsearch 的情况

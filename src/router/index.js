@@ -18,6 +18,7 @@ import WebsiteSearchResults from "@/component/WebsiteSearchResults";
 import TagSearchPage from "@/component/TagSearchPage";
 import AllTags from "@/component/AllTags";
 import FilterPage from "@/component/FilterPage";
+import PopularBookmarks from "@/component/PopularBookmarks";
 
 Vue.use(VueRouter)
 
@@ -41,6 +42,7 @@ const routes = [
     {path: "/tag-search", component: TagSearchPage, name: 'tag-search', props: true},
     {path: "/all-tags", component: AllTags},
     {path: "/filter", component: FilterPage},
+    {path: "/popular", component: PopularBookmarks},
 ]
 
 const router = new VueRouter({

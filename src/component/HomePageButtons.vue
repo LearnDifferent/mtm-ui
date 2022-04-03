@@ -3,7 +3,6 @@
     <!-- 选择按钮 -->
     <div class="d-flex justify-center" style="margin-bottom: 2%">
       <v-btn
-          :outlined="!clickRecent"
           rounded
           color="black"
           dark
@@ -17,10 +16,10 @@
       <v-divider vertical style="margin-left: 1%;margin-right: 1%"></v-divider>
       <v-btn
           rounded
-          :outlined="!clickMost"
+          outlined
           color="black"
           dark
-          @click="mostMark"
+          @click="goToPopularPage"
       >
         <v-icon left>
           mdi-fire
@@ -58,8 +57,7 @@
       </v-btn>
     </div>
 
-    <!-- 点了 recent 之后显示的按钮 -->
-    <div class="text-center" v-show="clickRecent">
+    <div class="text-center">
       <v-chip
           class="ma-2"
           label
@@ -99,9 +97,9 @@
         </v-icon>
         Only Others
       </v-chip>
-      <!-- 导出用户收藏的网页数据（点了 recent 且在 mine 和 otherOne 的情况下才会显示-->
+      <!-- 导出用户收藏的网页数据（在 mine 和 otherOne 的情况下才会显示-->
       <v-chip
-          v-show="clickRecent && (isOut === 'mine' || isOut === 'otherOne')"
+          v-show="isOut === 'mine' || isOut === 'otherOne'"
           color="#b6d7de"
           @click="exportHtmlFile"
       >
@@ -118,7 +116,6 @@
         v-show="isOut === 'otherOne' || isOut === 'dontShow'"
     >
       <v-chip
-          v-show="!clickMost"
           class="ma-2"
           label
           :outlined="isOut !== 'otherOne' && isOut !== 'dontShow'"
@@ -155,17 +152,18 @@ export default {
     goToFilter() {
       this.$router.push("/filter");
     },
+    // 去最多收藏的页面
+    goToPopularPage() {
+      this.$router.push("/popular");
+    }
   },
 
   props: {
-    clickMost: {},
-    clickRecent: {},
     currentUser: {},
     findAll: {},
     findMine: {},
     findOthers: {},
     isOut: {},
-    mostMark: {},
     recent: {},
     toUserName: {}
   }
