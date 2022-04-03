@@ -277,7 +277,7 @@ export default {
     },
     // 加载收藏的网页
     getMyWebsData(currentPage) {
-      this.axios.get("/mypage/webs", {
+      this.axios.get("/mypage/bookmarks", {
         params: {
           "currentPage": currentPage,
         }
@@ -291,10 +291,14 @@ export default {
         }
 
         // 网页数据
-        this.myWebs = res.data.myWebsiteData;
+        this.myWebs = res.data.myBookmarks;
 
         if (this.myWebs.length === 0) {
           alert("No Bookmarks");
+        } else {
+          for (let i = 0; i < this.myWebs.length; i++) {
+            this.getMoreInfo(this.myWebs[i].webId, i);
+          }
         }
 
         // 让页面返回顶部
@@ -308,6 +312,19 @@ export default {
         this.trueMarkedWebsFalseNotifications = true;
       });
     },
+    // 获取 tag 和评论数量
+    getMoreInfo(webId, i) {
+      this.axios.get("/web/additional?webId=" + webId).then(res => {
+        if (res.data.code === 200) {
+          let info = res.data.data;
+          this.myWebs[i].tagName = info.tag;
+          this.myWebs[i].commentCount = info.commentCount;
+        }
+      }).catch(error => {
+        // do nothing...
+      });
+    },
+
     // 更新网页数据的隐私设置
     changePrivacy(webId, userName, isPublic) {
       let publicOrPrivate = isPublic ? "private" : "public";

@@ -491,7 +491,7 @@ export default {
         }
 
         for (let i = 0; i < this.items.length; i++) {
-          this.getOneTag(this.items[i].webId, i);
+          this.getMoreInfo(this.items[i].webId, i);
         }
 
         // 让页面返回顶部
@@ -504,11 +504,13 @@ export default {
       });
     },
 
-    // 获取一个 tag
-    getOneTag(webId, i) {
-      this.axios.get("/tag/one?webId=" + webId).then(res => {
+    // 获取 tag 和评论数量
+    getMoreInfo(webId, i) {
+      this.axios.get("/web/additional?webId=" + webId).then(res => {
         if (res.data.code === 200) {
-          this.items[i].tagName = res.data.data;
+          let info = res.data.data;
+          this.items[i].tagName = info.tag;
+          this.items[i].commentCount = info.commentCount;
         }
       }).catch(error => {
         // do nothing...
