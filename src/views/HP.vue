@@ -114,17 +114,8 @@
                     Comment {{ item.commentCount > 0 ? '(' + item.commentCount + ')' : '' }}
                   </v-chip>
 
-                  <v-chip
-                      color="#683f36"
-                      @click="openTag(item)"
-                      outlined
-                      style="margin-right: 3px"
-                  >
-                    <v-icon left>
-                      mdi-tag-multiple-outline
-                    </v-icon>
-                    Tag <span v-show="item.tagName">: {{ item.tagName }}</span>
-                  </v-chip>
+                  <BookmarkTagButton :key="item.webId" :item="item" :current-user="currentUser"
+                                     :previous-page-num="currentPage" />
 
                   <v-chip
                       v-show="currentUser == item.userName && onThisWebData == item.webId"
@@ -196,9 +187,11 @@ import BookmarkTitle from "@/component/BookmarkTitle";
 import BookmarkViewButton from "@/component/BookmarkViewButton";
 import BookmarkPic from "@/component/BookmarkPic";
 import BookmarkPrivacy from "@/component/BookmarkPrivacy";
+import BookmarkTagButton from "@/component/BookmarkTagButton";
 
 export default {
   components: {
+    BookmarkTagButton,
     BookmarkPrivacy,
     BookmarkPic,
     BookmarkViewButton,
@@ -238,20 +231,6 @@ export default {
     isOut: "all",
   }),
   methods: {
-    // 打开标签页
-    openTag(item) {
-      this.$router.push({
-        name: 'web',
-        params: {
-          item: item,
-          tagMode: true,
-          previousPage: 'home',
-          previousPageNum: this.currentPage,
-          currentUser: this.currentUser,
-        }
-      });
-    },
-
     // 显示 refreshShow
     showRefresh() {
       this.refreshShow = true;
@@ -376,7 +355,7 @@ export default {
         }
 
         for (let i = 0; i < this.items.length; i++) {
-          this.getMoreInfo(this.items[i].webId, i);
+          this.countComment(this.items[i].webId, i);
         }
 
         // 让页面返回顶部
@@ -389,13 +368,10 @@ export default {
       });
     },
 
-    // 获取 tag 和评论数量
-    getMoreInfo(webId, i) {
-      this.axios.get("/bookmark/additional?webId=" + webId).then(res => {
+    countComment(webId, i) {
+      this.axios.get("/comment/get/" + webId).then(res => {
         if (res.data.code === 200) {
-          let info = res.data.data;
-          this.items[i].tagName = info.tag;
-          this.items[i].commentCount = info.commentCount;
+          this.items[i].commentCount = res.data.data;
         }
       }).catch(error => {
         // do nothing...

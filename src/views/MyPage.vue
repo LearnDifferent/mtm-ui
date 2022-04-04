@@ -287,10 +287,6 @@ export default {
 
         if (this.myWebs.length === 0) {
           alert("No Bookmarks");
-        } else {
-          for (let i = 0; i < this.myWebs.length; i++) {
-            this.getMoreInfo(this.myWebs[i].webId, i);
-          }
         }
 
         // 让页面返回顶部
@@ -302,18 +298,6 @@ export default {
         }
       }).finally(() => {
         this.trueMarkedWebsFalseNotifications = true;
-      });
-    },
-    // 获取 tag 和评论数量
-    getMoreInfo(webId, i) {
-      this.axios.get("/bookmark/additional?webId=" + webId).then(res => {
-        if (res.data.code === 200) {
-          let info = res.data.data;
-          this.myWebs[i].tagName = info.tag;
-          this.myWebs[i].commentCount = info.commentCount;
-        }
-      }).catch(error => {
-        // do nothing...
       });
     },
 

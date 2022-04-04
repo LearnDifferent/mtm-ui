@@ -96,7 +96,10 @@
             @click="goToTagSearchPage(tag)"
         >
           {{ tag }}
-          <v-icon right @click.stop="deleteTag(tag)">
+          <v-icon
+              v-show="currentUser === item.userName"
+              right @click.stop="deleteTag(tag)"
+          >
             mdi-close
           </v-icon>
         </v-chip>
@@ -252,9 +255,11 @@ export default {
           tag: tag
         }
       }).then(res => {
-        alert(res.data.msg);
-        if (res.data.code === 200) {
+        if (res.data.code === 200 && res.data.data !== '') {
+          alert("Success");
           this.getTags();
+        } else {
+          alert("Please try again later...");
         }
       }).catch((error) => {
         if (error.response.data.code === 2009) {
