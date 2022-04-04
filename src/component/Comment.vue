@@ -73,7 +73,7 @@
               </v-icon>
               {{
                 showCommentArea ? 'Close'
-                    : totalComments >= 0 ? 'Show Comment (' + totalComments + ')'
+                    : commentCount >= 0 ? 'Show Comment (' + commentCount + ')'
                         : 'Show Comment'
               }}
             </v-btn>
@@ -321,24 +321,23 @@ export default {
     // 查看回复的模式
     replyMode: false,
     // 回复的数量
-    totalComments: 0,
+    commentCount: 0,
     // 突出该条评论
     prominentCommentId: -1,
   }),
 
   props: {
+    // web id that mouse entering
     webId: {
       type: Number,
       required: true
     },
+    // current web id
+    realWebId:{},
     currentUsername: {
       type: String,
       required: true
     },
-    totalComments: {
-      type: Number,
-      required: false
-    }
   },
 
   computed: {
@@ -349,7 +348,23 @@ export default {
     }
   },
 
+  created() {
+    this.countComment();
+  },
+
   methods: {
+    // 获取评论总数
+    countComment() {
+      this.axios.get("/comment/get/" + this.realWebId).then(res => {
+        if (res.data.code === 200) {
+          this.commentCount = res.data.data;
+        }
+      }).catch(error => {
+        // do nothing...
+      });
+    },
+
+
     // 重置数据
     resetDataAndGetComments(isGoingBack, getAll) {
       this.editOrReplyCommentId = -1;
@@ -450,7 +465,7 @@ export default {
     },
     // 对重新编辑过的已有评论进行发送
     sendEditComment(data) {
-      this.axios.post("comment", data).then(res => {
+      this.axios.post("/comment", data).then(res => {
         if (res.data.code == 200 || res.data.code == 500) {
           // 200 表示成功，500 表示失败
           alert(res.data.msg);
@@ -481,7 +496,6 @@ export default {
         this.axios.delete("/comment", {
           params: {
             commentId: commentId,
-            username: this.currentUsername
           }
         }).then(res => {
           if (res.data.code == 200) {
@@ -507,6 +521,7 @@ export default {
       this.showCommentArea = !this.showCommentArea;
       if (this.showCommentArea) {
         // 如果是打开评论区：
+        // 获取评论
         this.getComment();
       } else {
         // 如果是关闭评论区，需要重置数据：
@@ -515,7 +530,7 @@ export default {
       }
 
       // 如果没有新的评论，需要提示
-      if (this.noMoreResults) {
+      if (this.noMoreResults && this.load !== 10) {
         alert("No More Comments");
       }
     },
@@ -551,7 +566,6 @@ export default {
         params: {
           webId: this.webId,
           load: load,
-          username: this.currentUsername,
           isDesc: this.isDesc,
           replyToCommentId: replyToCommentId
         }
@@ -581,7 +595,7 @@ export default {
             this.noMoreResults = false;
           }
         } else {
-          // 如果状态码不为 200，表示没有新数据
+          // 如果状态码不为 200，表示没有新数据（比如 2013）
           // 重置数据
           this.load = 10;
           this.count = 0;
@@ -602,17 +616,15 @@ export default {
       if (confirm("Send this comment?")) {
         let comment = this.commentValue;
         let webId = this.webId;
-        let username = this.currentUsername;
-        this.sendComment(comment, webId, username);
+        this.sendComment(comment, webId);
       }
     },
     // 发送评论
-    sendComment(comment, webId, username, replyToCommentId) {
+    sendComment(comment, webId, replyToCommentId) {
       this.axios.get("/comment/create", {
         params: {
           comment: comment,
           webId: webId,
-          username: username,
           replyToCommentId: replyToCommentId
         }
       }).then(res => {

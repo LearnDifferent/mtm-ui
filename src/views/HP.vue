@@ -102,20 +102,15 @@
 
                   <BookmarkViewButton :item="item"/>
 
-                  <v-chip
-                      color="#84a2d4"
-                      @click="openComment(item.webId)"
-                      outlined
-                      style="margin-right: 3px"
-                  >
-                    <v-icon left>
-                      {{ showComment == item.webId ? 'mdi-comment-remove-outline' : 'mdi-comment-outline' }}
-                    </v-icon>
-                    Comment {{ item.commentCount > 0 ? '(' + item.commentCount + ')' : '' }}
-                  </v-chip>
+                  <BookmarkCommentButton
+                      @openComment="openComment"
+                      :key="item.webId"
+                      :item="item"
+                      :show-comment="showComment"/>
 
-                  <BookmarkTagButton :key="item.webId" :item="item" :current-user="currentUser"
-                                     :previous-page-num="currentPage" />
+                  <BookmarkTagButton :key="item.webId" :item="item"
+                                     :current-user="currentUser"
+                                     :previous-page-num="currentPage"/>
 
                   <v-chip
                       v-show="currentUser == item.userName && onThisWebData == item.webId"
@@ -147,9 +142,10 @@
 
           <!-- 评论区 -->
           <div v-show="showComment == item.webId">
-            <Comment :webId="showComment"
-                     :currentUsername="currentUser"
-                     :totalComments="item.commentCount"
+            <Comment
+                :realWebId="item.webId"
+                :webId="showComment"
+                :currentUsername="currentUser"
             ></Comment>
           </div>
 
@@ -188,9 +184,11 @@ import BookmarkViewButton from "@/component/BookmarkViewButton";
 import BookmarkPic from "@/component/BookmarkPic";
 import BookmarkPrivacy from "@/component/BookmarkPrivacy";
 import BookmarkTagButton from "@/component/BookmarkTagButton";
+import BookmarkCommentButton from "@/component/BookmarkCommentButton";
 
 export default {
   components: {
+    BookmarkCommentButton,
     BookmarkTagButton,
     BookmarkPrivacy,
     BookmarkPic,
@@ -354,10 +352,6 @@ export default {
           this.loadHome(this.currentPage);
         }
 
-        for (let i = 0; i < this.items.length; i++) {
-          this.countComment(this.items[i].webId, i);
-        }
-
         // 让页面返回顶部
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
@@ -365,16 +359,6 @@ export default {
         if (error.response.data.code === 2005) {
           this.$router.push("/login");
         }
-      });
-    },
-
-    countComment(webId, i) {
-      this.axios.get("/comment/get/" + webId).then(res => {
-        if (res.data.code === 200) {
-          this.items[i].commentCount = res.data.data;
-        }
-      }).catch(error => {
-        // do nothing...
       });
     },
 
