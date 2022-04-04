@@ -87,90 +87,66 @@
     <v-container class="mx-auto" v-show="trueMarkedWebsFalseNotifications===true">
       <v-row dense>
         <v-col
-            v-for="(item, i) in myWebs"
+            v-for="(item, i) in items"
             :key="i"
             cols="12"
         >
           <v-card :id="item.webId">
             <div class="d-flex flex-no-wrap justify-space-between">
               <div>
-                <v-card-title
-                    class="headline"
-                    v-text="item.title"
-                    @click="view(item)"
-                ></v-card-title>
-
-                <v-card-subtitle v-text="item.desc"></v-card-subtitle>
+                <BookmarkTitle :item="item"/>
 
                 <v-card-actions>
 
-                  <v-chip
-                      :color="item.isPublic ? 'green' : 'pink'"
-                      :text-color="item.isPublic ? 'green' : 'pink'"
-                      outlined
-                      @click="changePrivacy(item.webId, item.userName, item.isPublic)"
-                  >
-                    <v-icon left>{{ item.isPublic ? "mdi-eye" : "mdi-eye-off" }}</v-icon>
-                    {{ item.isPublic ? "Public" : "Private" }}
-                  </v-chip>
+                  <BookmarkPrivacy
+                      :is-public="item.isPublic"
+                      :web-id="item.webId"
+                      :user-name="item.userName"
+                  />
 
-                  <v-btn
-                      class="ma-2"
-                      outlined
+                  <BookmarkViewButton :item="item"/>
+
+                  <BookmarkCommentButton
+                      @openComment="openComment"
+                      :key="item.webId"
+                      :item="item"
+                      :show-comment="showComment"/>
+
+                  <BookmarkTagButton :key="item.webId" :item="item"
+                                     :current-user="user.userName"
+                                     :previous-page-num="currentPage"
+                                     previous-page="mypage"/>
+
+                  <v-chip
                       color="red"
-                      small
-                      @click="delWeb(item.webId, i);"
+                      outlined
+                      @click="delWeb(item.webId, i)"
+                      style="margin-right: 3px"
                   >
-                    <v-icon>
+                    <v-icon left>
                       mdi-trash-can-outline
                     </v-icon>
-                  </v-btn>
+                    Delete
+                  </v-chip>
 
-                  <v-btn
-                      class="ma-2"
-                      outlined
-                      color="#bf783a"
-                      small
-                      @click="view(item)"
-                  >
-                    <v-icon>
-                      mdi-link-variant
-                    </v-icon>
-                  </v-btn>
+                  <BookmarkTime :creationTime="item.createTime"/>
 
-                  <v-btn
-                      class="ma-2"
-                      outlined
-                      color="#84a2d4"
-                      small
-                      @click="openComment(item.webId)"
-                  >
-                    <v-icon>
-                      {{ showComment == item.webId ? 'mdi-comment-remove-outline' : 'mdi-comment-outline' }}
-                    </v-icon>
-                    {{ item.commentCount > 0 ? item.commentCount : '' }}
-                  </v-btn>
                 </v-card-actions>
               </div>
 
-              <v-avatar
-                  class="ma-3"
-                  size="125"
-                  tile
-                  @click="view(item)"
-              >
-                <v-img :src="item.img"></v-img>
-              </v-avatar>
+              <BookmarkPic :item="item"/>
             </div>
           </v-card>
 
           <!-- 评论区 -->
           <div v-show="showComment == item.webId">
-            <Comment :webId="showComment"
-                     :currentUsername="user.userName"
-                     :totalComments="item.commentCount"
+            <Comment
+                :realWebId="item.webId"
+                :webId="showComment"
+                :currentUsername="user.userName"
             ></Comment>
           </div>
+
         </v-col>
       </v-row>
 
@@ -195,9 +171,23 @@ import Comment from "../component/Comment";
 import MyPageTop from "../component/MyPageTop";
 import MyPageNotification from "../component/MyPageNotification";
 import ToTopButton from "@/component/ToTopButton";
+import BookmarkTitle from "@/component/BookmarkTitle";
+import BookmarkPrivacy from "@/component/BookmarkPrivacy";
+import BookmarkViewButton from "@/component/BookmarkViewButton";
+import BookmarkCommentButton from "@/component/BookmarkCommentButton";
+import BookmarkTagButton from "@/component/BookmarkTagButton";
+import BookmarkPic from "@/component/BookmarkPic";
+import BookmarkTime from "@/component/BookmarkTime";
 
 export default {
   components: {
+    BookmarkTime,
+    BookmarkPic,
+    BookmarkTagButton,
+    BookmarkCommentButton,
+    BookmarkViewButton,
+    BookmarkPrivacy,
+    BookmarkTitle,
     ToTopButton,
     MyPageTop,
     MyPageNotification,
@@ -209,7 +199,7 @@ export default {
     // User Role 变化的通知
     roleChangeMsg: '',
     // 收藏的网页
-    myWebs: '',
+    items: '',
     // 分页
     currentPage: 1,
     totalPage: 1,
@@ -283,9 +273,9 @@ export default {
         }
 
         // 网页数据
-        this.myWebs = res.data.myBookmarks;
+        this.items = res.data.myBookmarks;
 
-        if (this.myWebs.length === 0) {
+        if (this.items.length === 0) {
           alert("No Bookmarks");
         }
 
@@ -301,33 +291,6 @@ export default {
       });
     },
 
-    // 更新网页数据的隐私设置
-    changePrivacy(webId, userName, isPublic) {
-      let publicOrPrivate = isPublic ? "private" : "public";
-      if (confirm("Are you sure you want to make it "
-          + publicOrPrivate + " ?")) {
-        this.axios.get("/bookmark/privacy", {
-          params: {
-            "webId": webId
-          }
-        }).then(res => {
-          if (res.data.code === 200 || res.data.code === 500) {
-            alert(res.data.msg);
-            this.getMyWebsData(this.currentPage);
-          } else {
-            alert("Something went wrong... Please try again later.")
-          }
-        }).catch(error => {
-          if (error.response.data.code === 2009
-              || error.response.data.code === 2001) {
-            // 2009 表示没有权限，2001 表示网页不存在
-            alert(error.response.data.msg);
-          } else {
-            alert("Something went wrong... Please try again later.")
-          }
-        });
-      }
-    },
     // 删除收藏的网页
     delWeb(webId, arrayIndex) {
       if (confirm("Are you sure you want to delete it?")) {
@@ -339,8 +302,8 @@ export default {
           if (res.data.code === 3001) {
             // 3001 表示删除成功
             alert(res.data.msg);
-            this.myWebs.splice(arrayIndex, 1);
-            if (this.myWebs.length === 0) {
+            this.items.splice(arrayIndex, 1);
+            if (this.items.length === 0) {
               this.getMyWebsData(this.currentPage);
             }
           } else {
@@ -356,43 +319,7 @@ export default {
         });
       }
     },
-    // 打开 view 详情
-    view(item) {
-      this.axios.get("/view/count", {
-        params: {webId: item.webId}
-      }).then(res => {
-        let msg = "Title: " + item.title + "\n"
-            + "URL: " + item.url + "\n"
-            + "Bookmarked By: " + item.userName + "\n\n";
 
-        let views;
-        if (res.data.code === 200) {
-          views = res.data.data;
-        } else {
-          views = 0;
-        }
-
-        if (views != null && views > 1) {
-          msg += "Views: " + views + "\n\n"
-        }
-        if (views != null && views === 1) {
-          msg += "View: 1" + "\n\n"
-        }
-
-        msg += "Do you want to open this website?";
-
-        if (confirm(msg)) {
-          this.jump(item.url, item.webId);
-        }
-      }).catch((err) => {
-        this.jump(item.url, item.webId);
-      });
-    },
-    // 跳转页面
-    jump(url, webId) {
-      window.open(url, '_blank');
-      this.axios.get("/view/incr?webId=" + webId);
-    },
     // 获取新的回复消息数量
     getNewReplyNotification() {
       this.axios.get("/notify/reply/new").then(res => {
@@ -441,6 +368,11 @@ export default {
     this.getNewReplyNotification();
     this.hasNewSystemNotification();
     this.getRoleChange();
+
+    let currentPage = this.$route.query.currentPage;
+    if (currentPage !== null && currentPage > 0) {
+      this.getMyWebsData(currentPage);
+    }
   }
 }
 </script>

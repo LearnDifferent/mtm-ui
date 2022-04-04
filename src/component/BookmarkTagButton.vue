@@ -27,7 +27,7 @@ export default {
         params: {
           item: item,
           tagMode: true,
-          previousPage: 'home',
+          previousPage: this.previousPage,
           previousPageNum: this.previousPageNum,
           currentUser: this.currentUser,
         }
@@ -41,6 +41,7 @@ export default {
     item: {},
     previousPageNum: {},
     currentUser: {},
+    previousPage: {},
   },
 
   created() {

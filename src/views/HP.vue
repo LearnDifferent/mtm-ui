@@ -110,7 +110,8 @@
 
                   <BookmarkTagButton :key="item.webId" :item="item"
                                      :current-user="currentUser"
-                                     :previous-page-num="currentPage"/>
+                                     :previous-page-num="currentPage"
+                                     previous-page="home"/>
 
                   <v-chip
                       v-show="currentUser == item.userName && onThisWebData == item.webId"
@@ -125,12 +126,8 @@
                     Delete
                   </v-chip>
 
-                  <div v-show="onThisWebData == item.webId">
-                    <v-icon>mdi-clock-outline</v-icon>
-                    <span style="color: grey;" v-show="!item.count">
-                      {{ item.createTime | dateFormat('YYYY-MM-DD HH:mm') }}
-                    </span>
-                  </div>
+                  <BookmarkTime v-show="onThisWebData == item.webId"
+                                :creationTime="item.createTime"/>
 
                 </v-card-actions>
               </div>
@@ -185,9 +182,11 @@ import BookmarkPic from "@/component/BookmarkPic";
 import BookmarkPrivacy from "@/component/BookmarkPrivacy";
 import BookmarkTagButton from "@/component/BookmarkTagButton";
 import BookmarkCommentButton from "@/component/BookmarkCommentButton";
+import BookmarkTime from "@/component/BookmarkTime";
 
 export default {
   components: {
+    BookmarkTime,
     BookmarkCommentButton,
     BookmarkTagButton,
     BookmarkPrivacy,

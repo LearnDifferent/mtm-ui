@@ -460,7 +460,7 @@ export default {
         // 获取回复
         let replyToCommentId = data.commentId;
         // 发送回复
-        this.sendComment(comment, webId, username, replyToCommentId);
+        this.sendComment(comment, webId, replyToCommentId);
       }
     },
     // 对重新编辑过的已有评论进行发送
