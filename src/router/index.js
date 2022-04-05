@@ -6,7 +6,7 @@ import Admin from "@/views/Admin";
 import HP from "@/views/HP";
 import MyPage from "@/views/MyPage";
 import Find from "@/views/Find";
-import DeletingPage from "@/views/DeletingPage";
+import DeletingPage from "@/component/DeletingPage";
 import Comment from "../component/Comment";
 import ReplyToThisComment from "../component/ReplyToThisComment";
 import FilterWebsiteData from "../component/FilterWebsiteData";

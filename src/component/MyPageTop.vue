@@ -9,99 +9,16 @@
         <!-- 用户信息列表 -->
         <UserInfoList :ip="ip" :user="user"></UserInfoList>
 
-        <v-card-actions>
-          <v-row no-gutters>
-            <v-col order="first">
-              <v-btn
-                  class="text-none"
-                  outlined
-                  rounded
-                  text
-                  color="pink"
-                  @click="logout"
-              >
-                <v-icon left>
-                  mdi-logout
-                </v-icon>
-                Sign Out
-              </v-btn>
-            </v-col>
-            <v-col>
-              <v-btn
-                  class="text-none"
-                  outlined
-                  rounded
-                  text
-                  color="red"
-                  @click="deleteAccount"
-              >
-                <v-icon left>
-                  mdi-delete-outline
-                </v-icon>
-                Delete My Account
-              </v-btn>
-            </v-col>
-            <v-col order="last">
-              <v-btn
-                  class="text-none"
-                  outlined
-                  rounded
-                  text
-                  color="orange"
-                  @click="showChangePwd = !showChangePwd"
-              >
-                Change Password
-                <v-icon right>
-                  {{ showChangePwd ? 'mdi-arrow-right-bold-outline' : 'mdi-lock-plus-outline' }}
-                </v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-actions>
+        <ChangeUserInfoButton
+            :change-show-pwd="changeShowPwd"
+            :current-username="this.user.userName"
+            :show-change-pwd="showChangePwd"/>
       </v-card>
     </v-col>
 
     <v-col order="last" v-show="!showChangePwd">
-      <v-card color="#93deff">
-        <v-card-title class="text-h5">
-          Export Bookmarks
-        </v-card-title>
-        <v-card-subtitle>Press the EXPORT button to export your Bookmarks to HTML file and DOWNLOAD it.
-        </v-card-subtitle>
-        <v-card-actions>
-          <v-btn color="#b6d7de" @click="exportHtmlFile">
-            <v-icon left>
-              mdi-export
-            </v-icon>
-            <span style="color: #323643">EXPORT</span>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-
-      <v-card color="#b6d7de" style="margin-top: 2%">
-        <v-card-title class="text-h5">
-          Import Bookmarks
-        </v-card-title>
-        <v-card-subtitle>
-          To import Bookmarks from HTML file:
-          <p></p>
-          <p>1. Upload HTML file:</p>
-          <v-file-input
-              accept="text/html"
-              label="Please Upload HTML file"
-              v-model="chosenFile"
-          >
-          </v-file-input>
-          <p>2. Press the IMPORT button:</p>
-          <v-btn color="#93deff" @click="importHtmlFile" :disabled="importingFile">
-            <v-icon left>
-              mdi-import
-            </v-icon>
-            <span style="color: #323643">IMPORT</span>
-          </v-btn>
-          <span v-html="importingMsg" style="margin-left: 2%"></span>
-        </v-card-subtitle>
-      </v-card>
+      <ExportAndImport :current-username="user.userName"
+                       @openMyBookmarks="openMyBookmarks"/>
     </v-col>
 
     <v-col order="last" v-show="showChangePwd">
@@ -182,10 +99,12 @@
 
 <script>
 import UserInfoList from "./UserInfoList";
+import ChangeUserInfoButton from "@/component/ChangeUserInfoButton";
+import ExportAndImport from "@/component/ExportAndImport";
 
 export default {
   name: "MyPageTop",
-  components: {UserInfoList},
+  components: {ExportAndImport, ChangeUserInfoButton, UserInfoList},
   data: () => ({
     // 密码相关：
     show1: false,
@@ -203,12 +122,6 @@ export default {
     ip: '',
     // 是否显示修改密码的框
     showChangePwd: false,
-    // 是否正在处理上传的文件
-    importingFile: false,
-    // 上传文件时显示的内容
-    importingMsg: '',
-    // 需要上传的 HTML 文件
-    chosenFile: null,
     // 修改密码的进度提示
     isLoading: false,
   }),
@@ -225,6 +138,14 @@ export default {
   },
 
   methods: {
+
+    openMyBookmarks() {
+      this.$emit("getMyWebsDataByCurrentPage");
+    },
+
+    changeShowPwd() {
+      this.showChangePwd = !this.showChangePwd
+    },
 
     // 验证登陆信息，用于修改密码
     validate() {
@@ -263,75 +184,7 @@ export default {
       });
     },
 
-
-    // 退出登陆
-    logout() {
-      if (confirm("Are you sure you want to Sign Out?")) {
-        let userName = this.user.userName;
-
-        this.axios.get("/log/out").then(res => {
-          if (res.data.code === 200) {
-            alert("Good Bye " + userName)
-            this.$router.push("/login");
-          }
-        });
-      }
-    },
-
-    // 删除用户确认框
-    deleteAccount() {
-      if (confirm("Once you delete your account, there is no going back. Please be certain.\n\n"
-          + "Are you absolutely sure?")) {
-        let username = this.user.userName;
-        this.$router.push({
-          path: `/delete/${username}`,
-        })
-      }
-    },
-
-    // 导入数据
-    importHtmlFile() {
-      if (!this.chosenFile) {
-        alert("Please Upload HTML File.");
-      } else {
-        this.importingFile = true;
-        this.importingMsg = "<span style='color: #004a7c; font-size: 18px'>Importing... Please wait a minute.</span>"
-
-        let data = new FormData();
-        data.append("htmlFile", this.chosenFile);
-        this.axios.post('/file', data, {
-          headers: {'Content-Type': 'multipart/form-data'}
-        }).then(res => {
-          // 注意，这里的提示信息是存在 res.data.data 里面的，而不是 res.data.msg
-          let msg = res.data.data;
-          if (200 == res.data.code) {
-            this.importingMsg = "<span style='color: #fff5a5; font-size: 18px'>" + msg + "</span>";
-            // 刷新载入数据
-            this.$emit("getMyWebsDataByCurrentPage");
-          } else if (500 == res.data.code) {
-            this.importingMsg = "<span style='color: red; font-size: 15px'>" + msg + "</span>";
-          } else {
-            this.importingMsg = msg;
-          }
-        }).catch((error) => {
-          this.importingFile = "<span style='color: red; font-size: 15px'>" +
-              error.response.data.msg +
-              "</span>";
-        }).finally(() => {
-          this.importingFile = false;
-        });
-      }
-    },
-    // 导出数据
-    exportHtmlFile() {
-      let username = this.user.userName;
-      // 打开 3000 端口的 /file 路径，而 3000 号端口映射了后端服务器的端口
-      window.open("/file?username=" + username, "_blank");
-    },
   },
 }
 </script>
 
-<style scoped>
-
-</style>

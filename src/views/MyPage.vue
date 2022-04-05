@@ -58,23 +58,7 @@
           vertical
       ></v-divider>
 
-      <v-btn
-          class="text-none text-center"
-          color="yellow darken-2"
-          outlined
-          @click="getSystemNotifications"
-      >
-        <v-badge
-            :value="hasReadNewSystemNotification == false"
-            color="red"
-            dot
-        >
-          <v-icon left>
-            mdi-bell-ring-outline
-          </v-icon>
-          System Notifications
-        </v-badge>
-      </v-btn>
+      <SystemNotification :get-system-notifications="getSystemNotifications"/>
     </div>
 
     <MyPageNotification
@@ -178,9 +162,11 @@ import BookmarkCommentButton from "@/component/BookmarkCommentButton";
 import BookmarkTagButton from "@/component/BookmarkTagButton";
 import BookmarkPic from "@/component/BookmarkPic";
 import BookmarkTime from "@/component/BookmarkTime";
+import SystemNotification from "@/component/SystemNotification";
 
 export default {
   components: {
+    SystemNotification,
     BookmarkTime,
     BookmarkPic,
     BookmarkTagButton,
@@ -221,8 +207,6 @@ export default {
     totalNotifications: 0,
     // 新消息的数量
     newNotificationCount: 0,
-    // 是否查看了最新的系统消息
-    hasReadNewSystemNotification: true,
   }),
 
   methods: {
@@ -264,7 +248,7 @@ export default {
           "currentPage": currentPage,
         }
       }).then(res => {
-        // total page
+        // total pages
         this.totalPage = res.data.totalPages;
 
         if (this.totalPage < this.currentPage && this.totalPage !== 0) {
@@ -328,14 +312,6 @@ export default {
         }
       });
     },
-    // 是否还未查看新的系统通知
-    hasNewSystemNotification() {
-      this.axios.get("/notify/read").then(res => {
-        if (res.data.code === 200) {
-          this.hasReadNewSystemNotification = res.data.data;
-        }
-      });
-    },
 
     // Get Current User's Role Change Notification
     getRoleChange() {
@@ -366,7 +342,6 @@ export default {
   created() {
     this.getPersonalInfo();
     this.getNewReplyNotification();
-    this.hasNewSystemNotification();
     this.getRoleChange();
 
     let currentPage = this.$route.query.currentPage;
@@ -377,6 +352,3 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>

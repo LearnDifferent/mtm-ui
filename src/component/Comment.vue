@@ -59,25 +59,10 @@
           ></v-divider>
 
           <!-- 打开评论区  -->
-          <div>
-            <v-btn
-                rounded
-                outlined
-                :color="!showCommentArea ? '#5b7e91' : '#d0576b'"
-                dark
-                @click="showCommentsFunc"
-                class="text-none"
-            >
-              <v-icon left>
-                {{ showCommentArea ? 'mdi-comment-remove-outline' : 'mdi-comment-processing-outline' }}
-              </v-icon>
-              {{
-                showCommentArea ? 'Close'
-                    : commentCount >= 0 ? 'Show Comment (' + commentCount + ')'
-                        : 'Show Comment'
-              }}
-            </v-btn>
-          </div>
+          <OpenCommentAreaButton
+              :comment-count="commentCount"
+              :show-comment-area="showCommentArea"
+              :show-comments-func="showCommentsFunc"/>
 
           <!-- 选择是否 descending 排序  -->
           <v-divider
@@ -162,7 +147,7 @@
                 <v-icon left>
                   mdi-clock-outline
                 </v-icon>
-                {{ c.creationTime | dateFormat}}
+                {{ c.creationTime | dateFormat }}
 
                 <!-- 打开重新编辑评论的按钮 -->
                 <v-divider
@@ -278,9 +263,11 @@
 
 <script>
 import ReplyToThisComment from "./ReplyToThisComment";
+import OpenCommentAreaButton from "@/component/OpenCommentAreaButton";
 
 export default {
   components: {
+    OpenCommentAreaButton,
     ReplyToThisComment: ReplyToThisComment
   },
   name: "Comment",
@@ -333,7 +320,7 @@ export default {
       required: true
     },
     // current web id
-    realWebId:{},
+    realWebId: {},
     currentUsername: {
       type: String,
       required: true
@@ -683,5 +670,3 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
