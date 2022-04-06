@@ -104,6 +104,17 @@ export default {
         });
       }
 
+      if (placeToGoBack === 'findPageSearchTag') {
+        // 回到所有标签页面
+        this.$router.push({
+          path: 'find',
+          query: {
+            keyword: this.formerItem.keyword,
+            currentPage: this.formerItem.currentPage
+          }
+        });
+      }
+
     },
     backToBookmarkWithTags() {
       this.$router.push({

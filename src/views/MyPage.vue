@@ -220,7 +220,7 @@ export default {
 
     // 加载用户信息
     getPersonalInfo() {
-      this.axios.get("mypage").then(res => {
+      this.axios.get("/my-page").then(res => {
         this.user = res.data.user;
         this.ip = res.data.ip;
         this.totalNotifications = res.data.totalReplyNotifications;
@@ -243,7 +243,7 @@ export default {
     },
     // 加载收藏的网页
     getMyWebsData(currentPage) {
-      this.axios.get("/mypage/bookmarks", {
+      this.axios.get("/my-page/bookmarks", {
         params: {
           "currentPage": currentPage,
         }

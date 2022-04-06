@@ -20,6 +20,12 @@
         </v-icon>
         Search Users
       </v-tab>
+      <v-tab class="text-none" @click="changeSearchMode('tag')">
+        <v-icon left>
+          mdi-tag-multiple-outline
+        </v-icon>
+        Search Tags
+      </v-tab>
     </v-tabs>
 
     <!-- 不查看 Bookmarks，返回搜索页面 -->
@@ -27,7 +33,7 @@
       <v-icon left>
         mdi-keyboard-backspace
       </v-icon>
-      You are now viewing {{showBookmarks}}'s bookmarks. Click here to go back.
+      You are now viewing {{ showBookmarks }}'s bookmarks. Click here to go back.
     </v-btn>
 
     <v-container fill-height>
@@ -44,6 +50,12 @@
           :update-data="updateUserData"
       />
 
+      <!-- 提示更新 Tag 搜索的数据库 -->
+      <AlertWhenDataHasChanges
+          v-show="hasNewTagUpdate && hasTags && searchMode === 'tag' && !showBookmarks"
+          :update-data="updateTagData"
+      />
+
       <!-- 没有网页数据的时候，提示生成数据 -->
       <AlertWhenNoData
           v-show="!hasDb && searchMode === 'web' && !showBookmarks"
@@ -56,8 +68,14 @@
           :update-data="updateUserData"
           :search-mode="searchMode"/>
 
+      <!-- 没有 tag 数据的时候，提示生成数据 -->
+      <AlertWhenNoData
+          v-show="!hasTags && searchMode === 'tag' && !showBookmarks"
+          :update-data="updateTagData"
+          :search-mode="searchMode"/>
+
       <div style="margin-top: 1%" v-show="!showBookmarks">
-        <!-- 显示网页热搜 -->
+        <!-- 显示网页热搜按钮 -->
         <v-btn
             v-show="searchMode === 'web'"
             class="mx-2"
@@ -88,7 +106,8 @@
 
         <!-- 展开网页相关的更多选项 -->
         <v-expand-x-transition
-            v-for="tile in searchMode === 'web' ? tiles : userTitles"
+            v-for="tile in searchMode === 'web' ? tiles
+            : searchMode === 'user' ? userTitles : tagTitles"
         >
           <v-chip
               :key="tile.title"
@@ -110,16 +129,7 @@
       </div>
 
       <!-- 进度条 -->
-      <v-progress-linear
-          v-show="processing"
-          color="#b35c44"
-          indeterminate
-          rounded
-          height="30px"
-          style="margin-top: 1%;margin-bottom: 1%"
-      >
-        <div style="size: 20px">{{ processing }}</div>
-      </v-progress-linear>
+      <ProcessingLinear :processing="processing"/>
 
       <!--搜索框-->
       <v-row style="margin-top: 1%" v-show="!showBookmarks">
@@ -142,18 +152,11 @@
         </v-col>
       </v-row>
 
-      <v-progress-linear
-          v-show="isSearching"
-          color="orange"
-          indeterminate
-          rounded
-          height="30px"
-      >
-        <div style="size: 20px">Searching....</div>
-      </v-progress-linear>
+      <!-- SearchingLinear -->
+      <SearchingLinear v-show="isSearching"/>
 
-      <!-- 网页热搜数据 -->
-      <div class="text-center" v-show="this.showTrending && searchMode !== 'user' && !showBookmarks">
+      <!-- 热搜数据 -->
+      <div class="text-center" v-show="this.showTrending && searchMode === 'web' && !showBookmarks">
         <v-row>
           <v-col
               class="text-center"
@@ -228,6 +231,23 @@
 
             <!-- 网页搜索结果 -->
             <WebsiteSearchResults :item="item" v-show="searchMode==='web' || showBookmarks"/>
+
+            <!-- tag 搜索结果 -->
+            <v-row dense>
+              <v-col class="text-center">
+                <span>
+                  <v-chip
+                      v-show="searchMode==='tag' && !showBookmarks"
+                      class="ma-2"
+                      color="#e95464"
+                      text-color="white"
+                      @click="goToTagSearchPage(item.tag)"
+                  >
+                    {{ item.tag }} ({{ item.number }})
+                  </v-chip>
+                </span>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
 
@@ -253,9 +273,14 @@ import UserInfoList from "../component/UserInfoList";
 import AlertWhenNoData from "../component/AlertWhenNoData";
 import AlertWhenDataHasChanges from "../component/AlertWhenDataHasChanges";
 import WebsiteSearchResults from "../component/WebsiteSearchResults";
+import ProcessingLinear from "@/component/ProcessingLinear";
+import SearchingLinear from "@/component/SearchingLinear";
 
 export default {
-  components: {WebsiteSearchResults, AlertWhenDataHasChanges, AlertWhenNoData, UserInfoList},
+  components: {
+    SearchingLinear,
+    ProcessingLinear, WebsiteSearchResults, AlertWhenDataHasChanges, AlertWhenNoData, UserInfoList
+  },
   name: "Find",
   data: () => ({
     // 是否隐藏更多选项
@@ -285,19 +310,19 @@ export default {
     // 搜索网页时的选项
     tiles: [
       {
-        title: 'Delete All Trending Tags',
+        title: 'Delete All Trending Searches',
         tId: 'tags',
         icon: 'mdi-tag-off-outline',
         color: 'red lighten-1'
       },
       {
-        title: 'Generate (Update) Website Data',
+        title: 'Generate (Update) Bookmark Data',
         tId: 'gen',
         icon: 'mdi-database-refresh',
         color: 'green darken-2'
       },
       {
-        title: 'Delete All Website Data',
+        title: 'Delete All Bookmark Data',
         tId: 'del',
         icon: 'mdi-database-remove',
         color: 'red darken-2'
@@ -318,14 +343,33 @@ export default {
         color: 'red lighten-1'
       }
     ],
+    // 搜索 tag 时候的选项
+    tagTitles: [
+      {
+        title: 'Update (Generate) Tag Data',
+        tId: 'updateTag',
+        icon: 'mdi-tag-outline',
+        color: 'green lighten-1'
+      },
+      {
+        title: 'Delete All Tag Data',
+        tId: 'deleteAllTags',
+        icon: 'mdi-delete-variant',
+        color: 'red lighten-1'
+      }
+    ],
     // 是否有用户数据
     hasUserData: true,
     // 是否有网页
     hasDb: true,
+    // 是否有 tag 数据
+    hasTags: true,
     // 网页数据是否发生了变化
     hasNewUpdate: false,
     // 用户数据是否发生了变化
     hasNewUserUpdate: false,
+    // tag 数据是否发生了变化
+    hasNewTagUpdate: false,
     // 正在进行搜索数据库相关操作
     processing: '',
     // search mode: web, user
@@ -333,7 +377,23 @@ export default {
     // 查看 bookmarks，value 为用户名
     showBookmarks: null,
   }),
+
   methods: {
+    // 搜索该标签的所有网页数据
+    goToTagSearchPage(searchingTag) {
+      let data = {
+        keyword: this.keyword,
+        currentPage: this.currentPage
+      };
+      this.$router.push({
+        name: 'tag-search',
+        params: {
+          searchingTag: searchingTag,
+          formerItem: data,
+          placeToGoBack: 'findPageSearchTag'
+        }
+      });
+    },
 
     resetData() {
       this.items = '';
@@ -355,16 +415,19 @@ export default {
       // 重置数据
       this.resetData();
       // 获取数据状态
-      this.axios.get("/find/status?mode=" + this.searchMode).then(res => {
+      this.axios.get("/search/status?mode=" + searchMode).then(res => {
         let exists = res.data.exists;
         let hasChanges = res.data.hasChanges;
 
         if (searchMode === 'user') {
           this.hasUserData = exists;
           this.hasNewUserUpdate = hasChanges;
-        } else {
+        } else if (searchMode === 'web') {
           this.hasDb = exists;
           this.hasNewUpdate = hasChanges;
+        } else if (searchMode === 'tag') {
+          this.hasTags = exists;
+          this.hasNewTagUpdate = hasChanges;
         }
       });
     },
@@ -372,8 +435,8 @@ export default {
     // 删除某个热搜词
     delTrend(word, arrayIndex) {
       if (confirm("Delete this Trending Tag?")) {
-        this.axios.delete("/find/trends/" + word).then(res => {
-          if (res.data === true) {
+        this.axios.delete("/search/trending/" + word).then(res => {
+          if (res.data.data === true) {
             alert("Deleted");
             this.trending.splice(arrayIndex, 1);
           } else {
@@ -391,10 +454,9 @@ export default {
     },
     // 删除所有热搜标签
     delAllTrending() {
-      // this.dialog3 = false;
-      this.processing = 'Delete All Trending Tags.... Please wait a minute.';
-      this.axios.delete("/find/trends").then(res => {
-        if (res.data === true) {
+      this.processing = 'Delete All Trending Searches.... Please wait a minute.';
+      this.axios.delete("/search/trending").then(res => {
+        if (res.data.data === true) {
           alert("Deleted");
           this.trending = '';
         } else {
@@ -402,7 +464,7 @@ export default {
         }
       }).catch(error => {
         if (error.response.data.code === 2009) {
-          alert("You are now Login as Guest and Guest can't delete tags.\n\n" +
+          alert("You are now Login as Guest and Guest can't delete trending searches.\n\n" +
               "Please Login as Normal User or Admin to delete.");
         } else {
           alert("Something went wrong. Please try again later.");
@@ -414,17 +476,17 @@ export default {
     // 更多操作（打开生成/删除搜索数据库的按钮等）
     moreOptions(tId) {
       if (tId === 'del') {
-        if (confirm("Are you sure you want to Delete All Website Data?")) {
-          this.delDb();
+        if (confirm("Are you sure you want to Delete All Bookmark Data?")) {
+          this.deleteData('web');
         }
       }
       if (tId === 'gen') {
-        if (confirm("Are you sure you want to Generate (Update) Website Data?")) {
+        if (confirm("Are you sure you want to Generate (Update) Bookmark Data?")) {
           this.genDb();
         }
       }
       if (tId === 'tags') {
-        if (confirm("Are you sure you want to Delete All Trending Tags?")) {
+        if (confirm("Are you sure you want to Delete All Trending Searches?")) {
           this.delAllTrending();
         }
       }
@@ -435,37 +497,75 @@ export default {
       }
       if (tId === 'deleteAllUsers') {
         if (confirm("Are you sure you want to Delete All User Data?")) {
-          this.deleteAllUserData();
+          this.deleteData("user");
         }
       }
+      if (tId === 'updateTag') {
+        if (confirm("Are you sure you want to Update (Generate) Tag Data?")) {
+          this.updateTagData();
+        }
+      }
+      if (tId === 'deleteAllTags') {
+        if (confirm("Are you sure you want to Delete All Tag Data?")) {
+          this.deleteData("tag");
+        }
+      }
+    },
+    updateData(mode) {
+      this.axios.get("/search/build?mode=" + mode).then(res => {
+        if (res.data.data === true) {
+          alert("Success!");
+          if (mode === 'user') {
+            this.hasUserData = true;
+          } else if (mode === 'web') {
+            this.hasDb = true;
+          } else if (mode === 'tag') {
+            this.hasTags = true;
+          }
+        } else {
+          alert("Something went wrong. Please try again.")
+        }
+      }).catch(error => {
+        if (error.response.data.code === 5001) {
+          // 5001 表示网络异常
+          alert(error.response.data.msg);
+        }
+      }).finally(() => {
+        this.processing = '';
+      });
+    },
+    // 更新 tag 数据
+    updateTagData() {
+      this.hasNewTagUpdate = false;
+      this.processing = 'Updating Tag Data... Please wait a minute.';
+      this.updateData("tag");
+    },
+    // 生成搜索数据库操作
+    genDb() {
+      this.hasNewUpdate = false;
+      this.processing = 'Generating Bookmark Data... Please wait a minute.';
+      this.updateData("web");
     },
     // 更新用户数据
     updateUserData() {
       this.hasNewUserUpdate = false;
       this.processing = 'Updating User Data... Please wait a minute.';
-      this.axios.get("/find/build?mode=user").then(res => {
-        if (res.data == true) {
-          alert("Success!");
-          this.hasUserData = true;
-        } else {
-          alert("Something went wrong. Please try again.")
-        }
-        this.processing = '';
-      }).catch(error => {
-        if (error.response.data.code === 5001) {
-          this.processing = '';
-          // 5001 表示网络异常
-          alert(error.response.data.msg);
-        }
-      });
+      this.updateData("user");
     },
-    // 删除用户数据
-    deleteAllUserData() {
-      this.processing = 'Deleting All User Data.... Please wait a minute.';
-      this.axios.delete("/find/delete?mode=user").then(res => {
-        if (res.data == true) {
+
+    deleteData(searchMode) {
+      let msg = searchMode === 'web' ? 'bookmark' : searchMode;
+      this.processing = "Deleting all " + msg + " data.... Please wait a minute.";
+      this.axios.delete("/search?mode=" + searchMode).then(res => {
+        if (res.data.data == true) {
           alert("Deleted");
-          this.hasUserData = false;
+          if (searchMode === 'web') {
+            this.hasDb = false;
+          } else if (searchMode === 'user') {
+            this.hasUserData = false;
+          } else if (searchMode === 'tag') {
+            this.hasTags = false;
+          }
         } else {
           alert("Something went wrong. Please try again.")
         }
@@ -478,61 +578,13 @@ export default {
           alert(message);
         } else if (code === 2009) {
           // 2009 表示没有权限
-          alert("Only Admin Can Delete User Data.\n\n"
-              + "Normal User Or Guest Can Only Generate Or Update Data.");
+          alert("Only Admin can delete " + msg + " data.\n\n"
+              + "Standard user Or Guest can only generate or update data.");
         } else {
           alert(message);
         }
       }).finally(() => {
         this.processing = '';
-      });
-    },
-    // 删除搜索数据库
-    delDb() {
-      this.processing = 'Deleting All Website Data.... Please wait a minute.';
-      this.axios.delete("/find/delete?mode=web").then(res => {
-        if (res.data == true) {
-          alert("Deleted");
-          this.hasDb = false;
-        } else {
-          alert("Something went wrong. Please try again.")
-        }
-      }).catch(error => {
-        let code = error.response.data.code;
-        let message = error.response.data.msg;
-
-        if (code === 5001) {
-          // 5001 表示网络异常
-          alert(message);
-        } else if (code === 2009) {
-          // 2009 表示没有权限
-          alert("Only Admin Can Delete Website Data.\n\n"
-              + "Normal User Or Guest Can Only Generate Or Update Data.");
-        } else {
-          alert(message);
-        }
-      }).finally(() => {
-        this.processing = '';
-      });
-    },
-    // 生成搜索数据库操作
-    genDb() {
-      this.hasNewUpdate = false;
-      this.processing = 'Generating Website Data... Please wait a minute.';
-      this.axios.get("/find/build?mode=web").then(res => {
-        if (res.data == true) {
-          alert("Success!");
-          this.hasDb = true;
-        } else {
-          alert("Something went wrong. Please try again.")
-        }
-        this.processing = '';
-      }).catch(error => {
-        if (error.response.data.code === 5001) {
-          this.processing = '';
-          // 5001 表示网络异常
-          alert(error.response.data.msg);
-        }
       });
     },
 
@@ -578,9 +630,11 @@ export default {
         alert("Please enter something...");
       } else if (!this.hasDb && this.searchMode === 'web') {
         // 如果数据库中没有数据，且 search mode 为 web，就提示：
-        alert("No Data to Search. Please Generate Website Data.")
+        alert("No Data to Search. Please Generate Bookmark Data.")
       } else if (!this.hasUserData && this.searchMode === 'user') {
         alert("No Data to Search. Please Generate User Data.")
+      } else if (!this.hasTags && this.searchMode === 'tag') {
+        alert("No Data to Search. Please Generate Tag Data.");
       } else {
         if (this.keyword !== keyword) {
           currentPage = 1;
@@ -595,7 +649,7 @@ export default {
         // 重新搜索的时候，删除错误信息
         this.errorMsg = '';
 
-        this.axios.get("/find/search", {
+        this.axios.get("/search", {
           params: {
             "currentPage": currentPage,
             "keyword": keyword,
@@ -632,7 +686,7 @@ export default {
       this.inputMsg = ''
     },
     load() {
-      this.axios.get("/find/load").then(res => {
+      this.axios.get("/search/load").then(res => {
         this.trending = res.data.trendingList;
         this.hasDb = res.data.dataStatus;
         this.hasNewUpdate = res.data.hasNewUpdate;
@@ -651,7 +705,16 @@ export default {
     window.onload = function () {
       document.getElementById("myFindBtn").click();
     }
-    this.load();
+    let currentPage = this.$route.query.currentPage;
+    let keyword = this.$route.query.keyword;
+    if (currentPage !== null && keyword !== null) {
+      this.searchMode = 'tag';
+      this.currentPage = currentPage;
+      this.keyword = keyword;
+      this.searchRequest(keyword, currentPage);
+    } else {
+      this.load();
+    }
   }
 }
 </script>
