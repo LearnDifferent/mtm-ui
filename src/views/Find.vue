@@ -2,7 +2,7 @@
   <div>
     <!-- 切换搜索模式 -->
     <v-tabs
-        v-show="!showBookmarks"
+        v-show="!isSpecialMode"
         fixed-tabs
         background-color="#474a4d"
         color="white"
@@ -28,53 +28,67 @@
       </v-tab>
     </v-tabs>
 
-    <!-- 不查看 Bookmarks，返回搜索页面 -->
-    <v-btn block v-show="showBookmarks" class="text-none" color="#d0af4c" @click="backToSearch">
+    <!-- 不查看特殊页面，返回搜索页面 -->
+    <v-btn
+        block
+        v-show="isSpecialMode"
+        class="text-none"
+        :color="searchingTag && items.length === 0 ? '#c53d43' : '#d0af4c'"
+        @click="backToSearch"
+    >
       <v-icon left>
         mdi-keyboard-backspace
       </v-icon>
-      You are now viewing {{ showBookmarks }}'s bookmarks. Click here to go back.
+      <div v-show="showBookmarks">
+        You are now viewing {{ showBookmarks }}'s bookmarks. Click here to go back.
+      </div>
+      <div v-show="searchingTag && items.length > 0">
+        Viewing bookmarks associated with "{{ searchingTag }}". Note that some bookmarks are private. Click here to go back.
+      </div>
+      <div v-show="searchingTag && items.length === 0">
+        These bookmarks are private. You can click here to go back.
+      </div>
     </v-btn>
 
     <v-container fill-height>
 
       <!-- 提示更新网页搜索的数据库 -->
       <AlertWhenDataHasChanges
-          v-show="hasNewUpdate && hasDb && searchMode === 'web' && !showBookmarks"
+          v-show="hasNewUpdate && hasDb && searchMode === 'web' && !isSpecialMode"
           :update-data="genDb"
       />
 
       <!-- 提示更新用户搜索的数据库 -->
       <AlertWhenDataHasChanges
-          v-show="hasNewUserUpdate && hasUserData && searchMode === 'user' && !showBookmarks"
+          v-show="hasNewUserUpdate && hasUserData && searchMode === 'user' && !isSpecialMode"
           :update-data="updateUserData"
       />
 
       <!-- 提示更新 Tag 搜索的数据库 -->
       <AlertWhenDataHasChanges
-          v-show="hasNewTagUpdate && hasTags && searchMode === 'tag' && !showBookmarks"
+          v-show="hasNewTagUpdate && hasTags && searchMode === 'tag' && !isSpecialMode"
           :update-data="updateTagData"
       />
 
       <!-- 没有网页数据的时候，提示生成数据 -->
       <AlertWhenNoData
-          v-show="!hasDb && searchMode === 'web' && !showBookmarks"
+          v-show="!hasDb && searchMode === 'web' && !isSpecialMode"
           :update-data="genDb"
           :search-mode="searchMode"/>
 
       <!-- 没有用户数据的时候，提示生成数据 -->
       <AlertWhenNoData
-          v-show="!hasUserData && searchMode === 'user' && !showBookmarks"
+          v-show="!hasUserData && searchMode === 'user' && !isSpecialMode"
           :update-data="updateUserData"
           :search-mode="searchMode"/>
 
       <!-- 没有 tag 数据的时候，提示生成数据 -->
       <AlertWhenNoData
-          v-show="!hasTags && searchMode === 'tag' && !showBookmarks"
+          v-show="!hasTags && searchMode === 'tag' && !isSpecialMode"
           :update-data="updateTagData"
           :search-mode="searchMode"/>
 
-      <div style="margin-top: 1%" v-show="!showBookmarks">
+      <div style="margin-top: 1%" v-show="!isSpecialMode">
         <!-- 显示网页热搜按钮 -->
         <v-btn
             v-show="searchMode === 'web'"
@@ -132,7 +146,7 @@
       <ProcessingLinear :processing="processing"/>
 
       <!--搜索框-->
-      <v-row style="margin-top: 1%" v-show="!showBookmarks">
+      <v-row style="margin-top: 1%" v-show="!isSpecialMode">
         <v-col>
           <v-text-field
               id="inputField"
@@ -156,7 +170,7 @@
       <SearchingLinear v-show="isSearching"/>
 
       <!-- 热搜数据 -->
-      <div class="text-center" v-show="this.showTrending && searchMode === 'web' && !showBookmarks">
+      <div class="text-center" v-show="this.showTrending && searchMode === 'web' && !isSpecialMode">
         <v-row>
           <v-col
               class="text-center"
@@ -217,7 +231,7 @@
               cols="12"
           >
             <!-- 用户搜索结果 -->
-            <v-card v-show="searchMode==='user' && !showBookmarks">
+            <v-card v-show="searchMode==='user' && !isSpecialMode">
               <UserInfoList :user="item" v-show="searchMode==='user'"></UserInfoList>
               <v-card-actions>
                 <v-btn class="text-none" color="#e198b4" @click="checkoutBookmarks(item.userName, item.webCount)">
@@ -230,18 +244,18 @@
             </v-card>
 
             <!-- 网页搜索结果 -->
-            <WebsiteSearchResults :item="item" v-show="searchMode==='web' || showBookmarks"/>
+            <WebsiteSearchResults :item="item" v-show="searchMode==='web' || isSpecialMode"/>
 
             <!-- tag 搜索结果 -->
             <v-row dense>
               <v-col class="text-center">
                 <span>
                   <v-chip
-                      v-show="searchMode==='tag' && !showBookmarks"
+                      v-show="searchMode==='tag' && !isSpecialMode"
                       class="ma-2"
                       color="#e95464"
                       text-color="white"
-                      @click="goToTagSearchPage(item.tag)"
+                      @click="openTagSearch(item.tag, 1)"
                   >
                     {{ item.tag }} ({{ item.number }})
                   </v-chip>
@@ -280,6 +294,11 @@ export default {
   components: {
     SearchingLinear,
     ProcessingLinear, WebsiteSearchResults, AlertWhenDataHasChanges, AlertWhenNoData, UserInfoList
+  },
+  computed: {
+    isSpecialMode() {
+      return this.showBookmarks || this.searchingTag;
+    }
   },
   name: "Find",
   data: () => ({
@@ -376,21 +395,28 @@ export default {
     searchMode: 'web',
     // 查看 bookmarks，value 为用户名
     showBookmarks: null,
+    // 正在被搜索的 tag
+    searchingTag: null,
   }),
 
   methods: {
-    // 搜索该标签的所有网页数据
-    goToTagSearchPage(searchingTag) {
-      let data = {
-        keyword: this.keyword,
-        currentPage: this.currentPage
-      };
-      this.$router.push({
-        name: 'tag-search',
+
+    openTagSearch(searchingTag, currentPage) {
+      this.searchingTag = searchingTag;
+      this.tagSearching(currentPage);
+    },
+    tagSearching(currentPage) {
+      // 点击上面的按钮，返回的是 searchingTag = null
+      this.axios.get("/tag/search/" + this.searchingTag, {
         params: {
-          searchingTag: searchingTag,
-          formerItem: data,
-          placeToGoBack: 'findPageSearchTag'
+          currentPage: currentPage
+        }
+      }).then(res => {
+        this.items = res.data.bookmarks;
+        this.totalPage = res.data.totalPages;
+      }).catch((error) => {
+        if (error.response.data.code === 2013) {
+          alert("No Bookmarks associated with this tag");
         }
       });
     },
@@ -588,9 +614,10 @@ export default {
       });
     },
 
-    // 取消查看 bookmarks，返回搜索
+    // 返回搜索页面
     backToSearch() {
       this.showBookmarks = null;
+      this.searchingTag = null;
       this.resetData();
     },
 
@@ -617,6 +644,9 @@ export default {
       if (this.showBookmarks) {
         // 在 showBookmarks 模式下
         this.checkOutUserBookmarks(currentPage);
+      } else if (this.searchingTag) {
+        // 搜索标签中
+        this.tagSearching(currentPage);
       } else {
         this.searchRequest(keyword, currentPage);
       }
@@ -705,16 +735,7 @@ export default {
     window.onload = function () {
       document.getElementById("myFindBtn").click();
     }
-    let currentPage = this.$route.query.currentPage;
-    let keyword = this.$route.query.keyword;
-    if (currentPage !== null && keyword !== null) {
-      this.searchMode = 'tag';
-      this.currentPage = currentPage;
-      this.keyword = keyword;
-      this.searchRequest(keyword, currentPage);
-    } else {
-      this.load();
-    }
+    this.load();
   }
 }
 </script>
