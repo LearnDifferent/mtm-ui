@@ -151,7 +151,7 @@ import moment from "moment";
 export default {
   name: "FilterWebsiteData",
   data: () => ({
-    // 用于筛选：有 userName 和 webCount 的列表
+    // 用于筛选：有 userName 和 bookmarkNumber 的列表
     userToSelect: [],
     // Filter 相关内容：
     // 展示筛选器
@@ -166,7 +166,7 @@ export default {
         sortable: false,
         value: 'userName',
       },
-      {text: 'Bookmark(s)', value: 'webCount'},
+      {text: 'Bookmark(s)', value: 'bookmarkNumber'},
     ],
     // 用于搜索：
     search: '',

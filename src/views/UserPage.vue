@@ -74,7 +74,7 @@ export default {
     },
     // 获取通知
     getNotify() {
-      this.axios.get("/notify").then(res => {
+      this.axios.get("/notification").then(res => {
         this.notice = res.data.data;
       });
     },

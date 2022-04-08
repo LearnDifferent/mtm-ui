@@ -243,7 +243,7 @@ export default {
     },
     // 加载收藏的网页
     getMyWebsData(currentPage) {
-      this.axios.get("/my-page/bookmarks", {
+      this.axios.get("/bookmark/get/user", {
         params: {
           "currentPage": currentPage,
         }
@@ -256,8 +256,7 @@ export default {
           this.getMyWebsData(this.currentPage);
         }
 
-        // 网页数据
-        this.items = res.data.myBookmarks;
+        this.items = res.data.bookmarks;
 
         if (this.items.length === 0) {
           alert("No Bookmarks");
@@ -306,7 +305,7 @@ export default {
 
     // 获取新的回复消息数量
     getNewReplyNotification() {
-      this.axios.get("/notify/reply/new").then(res => {
+      this.axios.get("/notification/reply/new").then(res => {
         if (res.data.code === 200) {
           this.newNotificationCount = res.data.data;
         }
@@ -315,7 +314,7 @@ export default {
 
     // Get Current User's Role Change Notification
     getRoleChange() {
-      this.axios.get("/notify/role-changed").then(res => {
+      this.axios.get("/notification/role-changed").then(res => {
         if (res.data.code === 200) {
           this.roleChangeMsg = res.data.data;
         } else if (res.data.code === 2002) {
@@ -329,7 +328,7 @@ export default {
     // clear the role change notification
     clearRoleChangeMsg() {
       if (confirm("Clear this message")) {
-        this.axios.delete("/notify/role-changed");
+        this.axios.delete("/notification/role-changed");
         this.roleChangeMsg = '';
       }
     }

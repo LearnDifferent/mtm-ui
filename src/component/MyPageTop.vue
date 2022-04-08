@@ -156,7 +156,7 @@ export default {
         oldPassword: this.oldPassword,
         newPassword: this.newPassword
       }
-      this.axios.post("/user/changePwd", submitData).then(res => {
+      this.axios.post("/user/change-password", submitData).then(res => {
         alert(res.data.msg);
         this.oldPassword = '';
         this.newPassword = '';

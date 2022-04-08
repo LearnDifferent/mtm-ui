@@ -167,14 +167,10 @@ export default {
           currentPage: this.currentPage
         }
       }).then(res => {
-        if (res.data.code === 200) {
-          let array = res.data.data;
-          let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
-          if (hasNewValue === true) {
-            this.items = array;
-          }
-        } else {
-          alert("No Bookmarks associated with this tag");
+        let array = res.data;
+        let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
+        if (hasNewValue === true) {
+          this.items = array;
         }
       }).catch((error) => {
         if (error.response.data.code === 2013) {

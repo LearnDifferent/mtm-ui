@@ -28,7 +28,7 @@
     <div v-show="addToSearch" style="margin-bottom: 1%">
       <a @click="goToSearchPage">
         <v-icon left>mdi-alert-circle-outline</v-icon>
-        This Bookmark will be searchable on Search Page
+        This bookmark will be searchable on Search Page
       </a>
     </div>
     <div>

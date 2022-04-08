@@ -234,10 +234,10 @@
             <v-card v-show="searchMode==='user' && !isSpecialMode">
               <UserInfoList :user="item" v-show="searchMode==='user'"></UserInfoList>
               <v-card-actions>
-                <v-btn class="text-none" color="#e198b4" @click="checkoutBookmarks(item.userName, item.webCount)">
+                <v-btn class="text-none" color="#e198b4" @click="checkoutBookmarks(item.userName, item.bookmarkNumber)">
                   <v-icon left>mdi-bookmark-outline</v-icon>
                   {{
-                    item.webCount > 0 ? 'View Bookmarks (' + item.webCount + ')' : 'No Bookmarks'
+                    item.bookmarkNumber > 0 ? 'View Bookmarks (' + item.bookmarkNumber + ')' : 'No Bookmarks'
                   }}
                 </v-btn>
               </v-card-actions>
@@ -631,7 +631,7 @@ export default {
     },
     // 查看该用户收藏的网页
     checkOutUserBookmarks(currentPage) {
-      this.axios.get("/bookmark/get/" + this.showBookmarks, {
+      this.axios.get("/bookmark/get/user/" + this.showBookmarks, {
         params: {currentPage: currentPage}
       }).then(res => {
         this.items = res.data.bookmarks;

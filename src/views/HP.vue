@@ -98,6 +98,7 @@
                       :is-public="item.isPublic"
                       :web-id="item.webId"
                       :user-name="item.userName"
+                      :id="item.webId"
                   />
 
                   <BookmarkViewButton :item="item"/>
@@ -334,6 +335,7 @@ export default {
     },
     // 进入主页，获取信息
     loadHome(currentPage) {
+      this.items = [];
       this.axios.get("/home", {
         params: {
           "currentPage": currentPage,

@@ -50,7 +50,7 @@ export default {
   components: {ToTopButton, BackToHomeButton, WebsiteSearchResults, FilterWebsiteData},
   data: () => ({
     items: [],
-    // 用于筛选：有 userName 和 webCount 的列表
+    // 用于筛选：有 userName 和 bookmarkNumber 的列表
     userToSelect: [],
     // 默认展示 10 条，每次加 10
     filterLoad: 10,
@@ -66,10 +66,8 @@ export default {
 
     // 获取可供筛选的用户信息
     loadAllUser() {
-      this.axios.get("/home/filter").then(res => {
-        if (res.data.code === 200) {
-          this.userToSelect = res.data.data;
-        }
+      this.axios.get("/user").then(res => {
+        this.userToSelect = res.data;
       });
     },
 
@@ -97,7 +95,7 @@ export default {
 
       this.axios.post("/home/filter", data).then(res => {
         // 网页数据
-        let webs = res.data.data;
+        let webs = res.data;
         this.items = webs;
         // 网页数据的数量
         let count = webs.length;

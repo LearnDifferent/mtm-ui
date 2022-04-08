@@ -65,7 +65,7 @@ export default {
     // 删除所有通知
     delNotify() {
       if (confirm("Remove All System Notifications?")) {
-        this.axios.delete("/notify").then(res => {
+        this.axios.delete("/notification").then(res => {
           if (res.data.code == 200) {
             alert("Deleted");
           } else {
@@ -80,7 +80,7 @@ export default {
       if (this.noticeCon.trim() == '') {
         alert("Please enter something..");
       } else {
-        this.axios.get("/notify/send/" + this.noticeCon).then(res => {
+        this.axios.get("/notification/send/" + this.noticeCon).then(res => {
           alert(res.data.msg);
         });
         this.noticeCon = '';

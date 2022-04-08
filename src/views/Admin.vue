@@ -340,14 +340,10 @@ export default {
     },
     getUsers() {
       this.axios.get("/admin/users?currentPage=" + this.currentPage).then(res => {
-        if (res.data.code === 200) {
-          let array = res.data.data;
-          let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
-          if (hasNewValue === true) {
-            this.users = array;
-          }
-        } else {
-          alert("Something went wrong...");
+        let array = res.data;
+        let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
+        if (hasNewValue === true) {
+          this.users = array;
         }
       }).catch((error) => {
         if (error.response.data.code === 2009) {

@@ -88,15 +88,13 @@ export default {
     // 获取新消息数量
     getNewNotification() {
       // 查看是否查看了最新的系统消息
-      this.axios.get("/notify/read").then(res=>{
-        if (res.data.code === 200) {
-          this.hasReadNewSystemNotification = res.data.data;
-        }
+      this.axios.get("/notification/read").then(res => {
+        this.hasReadNewSystemNotification = res.data.code === 200;
       });
 
       // 如果已经查看了新的系统通知，再看看有没有新的回复通知
       if (this.hasReadNewSystemNotification == true) {
-        this.axios.get("/notify/reply/new").then(res => {
+        this.axios.get("/notification/reply/new").then(res => {
           if (res.data.code === 200) {
             this.newNotificationCount = res.data.data;
           }

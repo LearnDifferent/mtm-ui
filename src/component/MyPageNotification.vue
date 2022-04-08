@@ -56,7 +56,7 @@
                   <v-icon color="#d3cbc6" small>
                     mdi-clock-outline
                   </v-icon>
-                  {{ notification.creationTime | dateFormat('YYYY-MM-DD HH:mm')}}
+                  {{ notification.creationTime | dateFormat('YYYY-MM-DD HH:mm') }}
                 </span>
               </v-list-item-title>
             </v-list-item-content>
@@ -218,18 +218,13 @@ export default {
 
       // 让 size + 10
       this.size = this.size + 10;
-      this.axios.get("/notify/reply", {
+      this.axios.get("/notification/reply", {
         params: {
           "lastIndex": this.size
         }
       }).then(res => {
-        let code = res.data.code;
-        if (code === 200) {
-          this.notificationList = res.data.data;
-          this.countNotifications = this.notificationList.length;
-        } else {
-          alert("Something went wrong... Please try again later.")
-        }
+        this.notificationList = res.data;
+        this.countNotifications = this.notificationList.length;
       }).catch(error => {
         let code = error.response.data.code;
         if (code === 2013) {
@@ -286,7 +281,7 @@ export default {
     // 删除该通知
     deleteReplyNotification(index, notificationData) {
       if (confirm("Are you sure you want to delete it?")) {
-        this.axios.post("/notify/reply/delete", notificationData).then(res => {
+        this.axios.post("/notification/reply/delete", notificationData).then(res => {
           // 删除数组中的元素
           this.notificationList.splice(index, 1);
           // 重置数据
@@ -310,13 +305,7 @@ export default {
           webId: webId
         }
       }).then(res => {
-        let code = res.data.code;
-        if (code === 200) {
-          this.websiteData = res.data.data;
-        } else {
-          alert("Something went wrong..");
-          this.websiteData = '';
-        }
+        this.websiteData = res.data;
       }).catch(error => {
         let code = error.response.data.code;
 
