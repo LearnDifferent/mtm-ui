@@ -339,7 +339,7 @@ export default {
       this.getUsers();
     },
     getUsers() {
-      this.axios.get("/admin/users?currentPage=" + this.currentPage).then(res => {
+      this.axios.get("/user/all?currentPage=" + this.currentPage).then(res => {
         let array = res.data;
         let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
         if (hasNewValue === true) {
@@ -432,15 +432,11 @@ export default {
     },
     // 获取数据库中的被阅读过的网页的数据
     getVisitedBookmarks() {
-      this.axios.get("/admin/visited-bookmarks?currentPage=" + this.currentPage).then(res => {
-        if (res.data.code === 200) {
-          let array = res.data.data;
-          let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
-          if (hasNewValue === true) {
-            this.visitedBookmarks = array;
-          }
-        } else {
-          alert("Something went wrong.");
+      this.axios.get("/bookmark/visited-bookmarks?currentPage=" + this.currentPage).then(res => {
+        let array = res.data;
+        let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
+        if (hasNewValue === true) {
+          this.visitedBookmarks = array;
         }
       }).catch((error) => {
         if (error.response.data.code === 2009) {

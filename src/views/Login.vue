@@ -229,8 +229,8 @@ export default {
       let verifyToken = this.getRandomStr();
       localStorage.setItem("verifyToken", verifyToken);
 
-      this.axios.get("/verify/getVerImg?time=" + new Date().getTime(), {
-        params: {verifyToken: verifyToken}
+      this.axios.get("/verification/code?time=" + new Date().getTime(), {
+        params: {token: verifyToken}
       }).then(resp => {
         this.verCode = resp.data;
       });

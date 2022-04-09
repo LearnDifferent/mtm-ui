@@ -315,11 +315,7 @@ export default {
         }).then(res => {
           if (res.data.code === 3001) {
             // 3001 表示删除成功
-            alert(res.data.msg);
-            this.items.splice(arrayIndex, 1);
-            if (this.items.length === 0) {
-              this.loadHome(this.currentPage);
-            }
+            this.loadHome(this.currentPage);
           } else {
             alert(res.data.msg);
           }
