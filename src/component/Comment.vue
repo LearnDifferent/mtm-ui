@@ -553,7 +553,7 @@ export default {
         params: {
           webId: this.webId,
           load: load,
-          isDesc: this.isDesc,
+          order: this.isDesc ? "desc" : "asc",
           replyToCommentId: replyToCommentId
         }
       }).then(res => {

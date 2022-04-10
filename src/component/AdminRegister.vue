@@ -97,7 +97,7 @@
                         <br><br>
                         <span style="color: grey">
                             *If you want to know how this application send invitation code via email, checkout the
-                            <a href="https://github.com/LearnDifferent/mtm/blob/master/src/main/java/com/github/learndifferent/mtm/service/impl/InvitationCodeServiceImpl.java"
+                            <a href="https://github.com/LearnDifferent/mtm/blob/master/src/main/java/com/github/learndifferent/mtm/service/impl/VerificationServiceImpl.java"
                                target="_blank">source code on GitHub</a>.
                           </span>
                         <br>
@@ -186,7 +186,7 @@
           <v-icon left>
             mdi-account-outline
           </v-icon>
-          You can click here to Log Out Current Account
+          Click here to log out current account
         </v-chip>
       </div>
 
@@ -272,10 +272,10 @@ export default {
       let invitationToken = this.getRandomStr();
       localStorage.setItem("invitationToken", invitationToken);
 
-      this.axios.get("/invitation", {
+      this.axios.get("/admin/invitation", {
         params: {
           email: this.email,
-          invitationToken: invitationToken
+          token: invitationToken
         }
       }).then(res => {
         alert("Sent. Please check your Email.");
@@ -294,7 +294,7 @@ export default {
 
     // 点击此处退出登陆
     clickToLogout() {
-      if (confirm("Are you sure you want to Sign Out?")) {
+      if (confirm("Are you sure you want to sign out?")) {
         this.axios.get("/log/out").then(res => {
           if (res.data.code === 200) {
             alert("Bye~")
@@ -318,8 +318,8 @@ export default {
       let verifyToken = this.getRandomStr();
       localStorage.setItem("verifyToken", verifyToken);
 
-      this.axios.get("/verify/getVerImg?time=" + new Date().getTime(), {
-        params: {verifyToken: verifyToken}
+      this.axios.get("/verification/code?time=" + new Date().getTime(), {
+        params: {token: verifyToken}
       }).then(resp => {
         this.verCode = resp.data;
       });
@@ -334,12 +334,12 @@ export default {
         password: this.password,
         role: "admin"
       }
-      this.axios.post("/user/create", submitData, {
+      this.axios.post("/user", submitData, {
         params: {
           code: this.code,
           role: "admin",
           invitationCode: this.adminCode,
-          verifyToken: localStorage.getItem("verifyToken"),
+          token: localStorage.getItem("verifyToken"),
           invitationToken: localStorage.getItem("invitationToken")
         }
       }).then(res => {
@@ -361,12 +361,11 @@ export default {
         // 2004 表示用户已存在
         // 2007 表示验证码错误
         // 2008 表示邀请码错误
-        // 3014 表示没有传入角色
         // 3003 表示用户名只能为英文和数字，出现其他的字符就报错
         // 3004 和 3005 表示用户名太长和密码太长
         // 3006 和 3007 表示用户名和密码为空
         let code = error.response.data.code;
-        if (code === 2004 || 2007 || 2008 || 3014
+        if (code === 2004 || 2007 || 2008
             || 3003 || 3004 || 3005 || 3006 || 3007) {
           this.status = error.response.data.msg;
         }

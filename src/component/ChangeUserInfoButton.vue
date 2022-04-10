@@ -72,7 +72,7 @@ export default {
 
     // 退出登陆
     logout() {
-      if (confirm("Are you sure you want to Sign Out?")) {
+      if (confirm("Are you sure you want to sign out?")) {
         this.axios.get("/log/out").then(res => {
           if (res.data.code === 200) {
             alert("Good Bye " + this.currentUsername)

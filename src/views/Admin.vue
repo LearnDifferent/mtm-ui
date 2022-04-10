@@ -339,7 +339,7 @@ export default {
       this.getUsers();
     },
     getUsers() {
-      this.axios.get("/user/all?currentPage=" + this.currentPage).then(res => {
+      this.axios.get("/user?currentPage=" + this.currentPage).then(res => {
         let array = res.data;
         let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
         if (hasNewValue === true) {
@@ -402,10 +402,13 @@ export default {
     },
     // 获取 logs
     getLogs() {
-      this.axios.get("/admin/logs", {
+      let requestPath = "/admin/logs";
+      if (this.isReadFromDb) {
+        requestPath += "/no-cache"
+      }
+      this.axios.get(requestPath, {
         params: {
           currentPage: this.currentPage,
-          isReadFromDb: this.isReadFromDb
         }
       }).then(res => {
         if (res.data.code === 200) {

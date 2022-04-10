@@ -44,6 +44,7 @@ import FilterWebsiteData from "@/component/FilterWebsiteData";
 import WebsiteSearchResults from "@/component/WebsiteSearchResults";
 import BackToHomeButton from "@/component/BackToHomeButton";
 import ToTopButton from "@/component/ToTopButton";
+import moment from "moment";
 
 export default {
   name: "FilterPage",
@@ -63,10 +64,9 @@ export default {
     ifDesc: false,
   }),
   methods: {
-
     // 获取可供筛选的用户信息
     loadAllUser() {
-      this.axios.get("/user").then(res => {
+      this.axios.post("/user/usernames-and-bookmarks").then(res => {
         this.userToSelect = res.data;
       });
     },
@@ -87,13 +87,29 @@ export default {
     filterSendRequest() {
       let data = {
         usernames: this.usernames,
-        datetimeList: this.dates,
-        load: this.filterLoad,
-        isOrderByUsername: !this.ifOrderByTime,
-        isDesc: this.ifDesc
       };
+      let fromTime = null;
+      let toTime = null;
 
-      this.axios.post("/home/filter", data).then(res => {
+      let firstTime = this.dates[0];
+      if (firstTime !== undefined) {
+        fromTime = moment(firstTime).valueOf();
+      }
+
+      let secondTime = this.dates[1];
+      if (secondTime !== undefined) {
+        toTime = moment(secondTime).valueOf();
+      }
+
+      this.axios.post("/home/filter", data, {
+        params: {
+          fromTimestamp: fromTime,
+          toTimestamp: toTime,
+          load: this.filterLoad,
+          orderField: this.ifOrderByTime ? "creation_time" : "user_name",
+          order: this.ifDesc ? "desc" : "asc"
+        }
+      }).then(res => {
         // 网页数据
         let webs = res.data;
         this.items = webs;

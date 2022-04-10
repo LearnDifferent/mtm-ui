@@ -109,12 +109,11 @@ export default {
       this.analyseError = '';
       this.saveWebMsg = "Saving this Web Page. Please wait......";
       this.isLoading = true;
-
       this.axios.get("/bookmark",{
         params:{
           url: this.newWebUrl,
-          beInEs: this.addToSearch,
-          isPublic: this.publicPrivacy
+          mode: this.addToSearch ? 1 : 0,
+          privacy: this.publicPrivacy ? 'public' : 'private'
         }
       }).then(res => {
 
