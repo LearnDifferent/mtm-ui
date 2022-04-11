@@ -64,7 +64,7 @@
         size="60"
         :color="user.role === 'admin' ? '#e6b422' : 'black lighten-1'"
     >
-      <span class="white--text headline">{{ user.userName.charAt(0) }}</span>
+      <span class="white--text headline">{{ user.userName.charAt(0).trim() }}</span>
     </v-list-item-avatar>
   </v-list-item>
 </template>

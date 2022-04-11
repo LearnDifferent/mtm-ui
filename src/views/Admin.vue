@@ -284,9 +284,6 @@ export default {
         if (error.response.data.code === 2009) {
           // 代码 2009 表示没有权限，此时获取验证码来注册管理员
           this.getVCode();
-        } else if (error.response.data.code === 2005) {
-          // 2005 表示没有登陆
-          this.$router.push("/login")
         } else {
           alert(error.response.data.msg);
         }

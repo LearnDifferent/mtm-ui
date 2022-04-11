@@ -224,10 +224,6 @@ export default {
         this.user = res.data.user;
         this.ip = res.data.ip;
         this.totalNotifications = res.data.totalReplyNotifications;
-      }).catch((error) => {
-        if (error.response.data.code === 2005) {
-          this.$router.push("/login")
-        }
       });
     },
 
@@ -265,10 +261,6 @@ export default {
         // 让页面返回顶部
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
-      }).catch((error) => {
-        if (error.response.data.code === 2005) {
-          this.$router.push("/login")
-        }
       }).finally(() => {
         this.trueMarkedWebsFalseNotifications = true;
       });

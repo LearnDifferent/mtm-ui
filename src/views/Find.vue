@@ -721,9 +721,7 @@ export default {
         this.hasDb = res.data.dataStatus;
         this.hasNewUpdate = res.data.hasNewUpdate;
       }).catch((error) => {
-        if (error.response.data.code === 2005) {
-          this.$router.push("/login")
-        } else if (error.response.data.code === 5001) {
+        if (error.response.data.code === 5001) {
           alert("Unable to connect to Search Engine.");
         } else {
           alert("Something went wrong. Can't load this page.")

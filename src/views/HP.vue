@@ -352,10 +352,6 @@ export default {
         // 让页面返回顶部
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
-      }).catch((error) => {
-        if (error.response.data.code === 2005) {
-          this.$router.push("/login");
-        }
       });
     },
 
