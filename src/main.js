@@ -4,7 +4,6 @@ import router from './router';
 import vuetify from './plugins/vuetify';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
-import Login from "@/views/Login";
 import moment from 'moment';
 import DatetimePicker from 'vuetify-datetime-picker';
 
@@ -32,9 +31,18 @@ axios.interceptors.request.use(
         return Promise.reject(error)
     }
 );
+axios.interceptors.response.use(resp => {
+    return resp
+}, error => {
+    let code = error.response.data.code;
+    if (code === 2005) {
+        return router.push("/login");
+    }
+    return Promise.reject(error);
+});
 
 new Vue({
     router,
     vuetify,
     render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');
