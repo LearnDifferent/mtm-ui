@@ -470,8 +470,8 @@ export default {
           }
         }).catch(error => {
           if (error.response.data.code === 2009) {
-            alert("You are now Login as Guest. Guest can't delete this tag.\n\n" +
-                "Please Login as Normal User or Admin to delete.");
+            alert("You are now login as Guest: Guest can't delete trending searches\n\n" +
+                "Please login as Standard User or Admin to delete trending searches");
           } else {
             alert("Something went wrong. Please try again later.")
           }
@@ -490,8 +490,8 @@ export default {
         }
       }).catch(error => {
         if (error.response.data.code === 2009) {
-          alert("You are now Login as Guest and Guest can't delete trending searches.\n\n" +
-              "Please Login as Normal User or Admin to delete.");
+          alert("You are now login as Guest: Guest can't delete trending searches\n\n" +
+              "Please login as Standard User or Admin to delete trending searches");
         } else {
           alert("Something went wrong. Please try again later.");
         }

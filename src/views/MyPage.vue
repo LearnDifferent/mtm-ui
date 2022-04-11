@@ -220,7 +220,7 @@ export default {
 
     // 加载用户信息
     getPersonalInfo() {
-      this.axios.get("/my-page").then(res => {
+      this.axios.get("/user").then(res => {
         this.user = res.data.user;
         this.ip = res.data.ip;
         this.totalNotifications = res.data.totalReplyNotifications;
@@ -305,7 +305,7 @@ export default {
 
     // 获取新的回复消息数量
     getNewReplyNotification() {
-      this.axios.get("/notification/reply/new").then(res => {
+      this.axios.get("/notification/count").then(res => {
         if (res.data.code === 200) {
           this.newNotificationCount = res.data.data;
         }

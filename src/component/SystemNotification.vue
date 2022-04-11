@@ -27,7 +27,7 @@ export default {
   methods:{
     // 是否还未查看新的系统通知
     hasNewSystemNotification() {
-      this.axios.get("/notification/read").then(res => {
+      this.axios.get("/system/read").then(res => {
         this.hasReadNewSystemNotification = res.data.code === 200;
       });
     },

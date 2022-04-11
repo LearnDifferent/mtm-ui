@@ -5,10 +5,16 @@
     </v-expansion-panel-header>
 
     <v-expansion-panel-content style="font-size: small">
-      Note: Everyone has the permission to send system notifications
+      *Every user has the ability to send notifications
     </v-expansion-panel-content>
     <v-expansion-panel-content style="font-size: small">
-      Note: The limit for system notifications is 20
+      *Users with Admin privilege have the ability to send push notifications
+    </v-expansion-panel-content>
+    <v-expansion-panel-content style="font-size: small">
+      *Guest can't delete system notifications
+    </v-expansion-panel-content>
+    <v-expansion-panel-content style="font-size: small">
+      *The limit for system notifications is 20
     </v-expansion-panel-content>
 
     <v-expansion-panel-content>
@@ -56,7 +62,7 @@
 <script>
 export default {
   name: 'SendNotificationPanel',
-  data:()=>({
+  data: () => ({
     // 通知相关
     noticeCon: '',
 
@@ -65,11 +71,16 @@ export default {
     // 删除所有通知
     delNotify() {
       if (confirm("Remove All System Notifications?")) {
-        this.axios.delete("/notification").then(res => {
+        this.axios.delete("/system").then(res => {
           if (res.data.code == 200) {
             alert("Deleted");
           } else {
             alert("Please wait a minute before you try again");
+          }
+        }).catch(error=>{
+          if (error.response.data.code === 2009) {
+            alert("You are now login as Guest: Guest can't delete system notifications\n\n" +
+                "Please login as Standard User or Admin to delete system notifications");
           }
         });
       }
@@ -80,7 +91,9 @@ export default {
       if (this.noticeCon.trim() == '') {
         alert("Please enter something..");
       } else {
-        this.axios.get("/notification/send/" + this.noticeCon).then(res => {
+        this.axios.get("/system/send", {
+          params: {message: this.noticeCon}
+        }).then(res => {
           alert(res.data.msg);
         });
         this.noticeCon = '';

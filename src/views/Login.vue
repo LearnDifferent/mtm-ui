@@ -180,10 +180,10 @@ export default {
         password: this.password,
       }
 
-      this.axios.post("/log/in", data, {
+      this.axios.post("/verification/login", data, {
         params: {
           code: this.code,
-          verifyToken: localStorage.getItem("verifyToken"),
+          token: localStorage.getItem("verifyToken"),
         }
       }).then(res => {
         if (res.data.code === 200) {

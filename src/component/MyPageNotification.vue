@@ -218,7 +218,7 @@ export default {
 
       // 让 size + 10
       this.size = this.size + 10;
-      this.axios.get("/notification/reply", {
+      this.axios.get("/notification", {
         params: {
           "lastIndex": this.size
         }
@@ -281,7 +281,7 @@ export default {
     // 删除该通知
     deleteReplyNotification(index, notificationData) {
       if (confirm("Are you sure you want to delete it?")) {
-        this.axios.post("/notification/reply/delete", notificationData).then(res => {
+        this.axios.post("/notification", notificationData).then(res => {
           // 删除数组中的元素
           this.notificationList.splice(index, 1);
           // 重置数据

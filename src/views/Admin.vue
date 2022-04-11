@@ -277,7 +277,7 @@ export default {
       let verifyToken = this.getRandomStr();
       localStorage.setItem("verifyToken", verifyToken);
 
-      this.axios.get("/admin").then(res => {
+      this.axios.get("/verification").then(res => {
         // result code 为 200 表示是 admin
         this.isAdmin = res.data.code === 200;
       }).catch((error) => {
@@ -339,7 +339,7 @@ export default {
       this.getUsers();
     },
     getUsers() {
-      this.axios.get("/user?currentPage=" + this.currentPage).then(res => {
+      this.axios.get("/user/all?currentPage=" + this.currentPage).then(res => {
         let array = res.data;
         let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
         if (hasNewValue === true) {
@@ -402,7 +402,7 @@ export default {
     },
     // 获取 logs
     getLogs() {
-      let requestPath = "/admin/logs";
+      let requestPath = "/system/logs";
       if (this.isReadFromDb) {
         requestPath += "/no-cache"
       }

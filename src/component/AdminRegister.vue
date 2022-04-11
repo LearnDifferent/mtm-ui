@@ -272,7 +272,7 @@ export default {
       let invitationToken = this.getRandomStr();
       localStorage.setItem("invitationToken", invitationToken);
 
-      this.axios.get("/admin/invitation", {
+      this.axios.get("/verification/invitation", {
         params: {
           email: this.email,
           token: invitationToken
@@ -295,7 +295,7 @@ export default {
     // 点击此处退出登陆
     clickToLogout() {
       if (confirm("Are you sure you want to sign out?")) {
-        this.axios.get("/log/out").then(res => {
+        this.axios.get("/verification/logout").then(res => {
           if (res.data.code === 200) {
             alert("Bye~")
             this.showClickToLogout = false;

@@ -163,7 +163,7 @@ export default {
         this.showChangePwd = false;
         // 成功修改密码会返回 2014
         if (res.data.code == 2014) {
-          this.axios.get("/log/out").then(res => {
+          this.axios.get("/verification/logout").then(res => {
             if (res.data.code === 200) {
               this.$router.push("/login");
               alert("Please Login again with the new password.");
