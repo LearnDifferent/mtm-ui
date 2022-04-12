@@ -104,7 +104,7 @@ export default {
     // 退出登陆
     logoutNow() {
       if (confirm("Are you sure you want to sign out?")) {
-        this.axios.get("/verification/logout").then(res => {
+        this.axios.get("/logout").then(res => {
           if (res.data.code === 200) {
             alert("Good Bye")
             this.$router.push("/login");

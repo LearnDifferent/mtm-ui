@@ -180,7 +180,7 @@ export default {
         password: this.password,
       }
 
-      this.axios.post("/verification/login", data, {
+      this.axios.post("/login", data, {
         params: {
           code: this.code,
           token: localStorage.getItem("verifyToken"),

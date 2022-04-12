@@ -277,7 +277,7 @@ export default {
       let verifyToken = this.getRandomStr();
       localStorage.setItem("verifyToken", verifyToken);
 
-      this.axios.get("/verification").then(res => {
+      this.axios.get("/user/admin").then(res => {
         // result code 为 200 表示是 admin
         this.isAdmin = res.data.code === 200;
       }).catch((error) => {
