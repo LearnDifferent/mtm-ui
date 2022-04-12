@@ -43,7 +43,8 @@
         You are now viewing {{ showBookmarks }}'s bookmarks. Click here to go back.
       </div>
       <div v-show="searchingTag && items.length > 0">
-        Viewing bookmarks associated with "{{ searchingTag }}". Note that some bookmarks are private. Click here to go back.
+        Viewing bookmarks associated with "{{ searchingTag }}". Note that some bookmarks are private. Click here to go
+        back.
       </div>
       <div v-show="searchingTag && items.length === 0">
         These bookmarks are private. You can click here to go back.
@@ -164,6 +165,33 @@
           </p>
           <p v-show="errorMsg" style="color: red">{{ errorMsg }}</p>
         </v-col>
+      </v-row>
+      <!-- Tag Range -->
+      <v-row justify="center" v-show="searchMode === 'tag' && inputMsg">
+        <v-col
+            cols="6"
+            md="3"
+        >
+          <v-text-field
+              @keyup.enter="searchRequest(inputMsg, 1)"
+              v-model="rangeFrom"
+              :rules="numberRule"
+              label="Range (From)"
+          ></v-text-field>
+        </v-col>
+
+        <v-col
+            cols="6"
+            md="3"
+        >
+          <v-text-field
+              @keyup.enter="searchRequest(inputMsg, 1)"
+              v-model="rangeTo"
+              :rules="numberRule"
+              label="Range (To)"
+          ></v-text-field>
+        </v-col>
+
       </v-row>
 
       <!-- SearchingLinear -->
@@ -325,6 +353,14 @@ export default {
     showTrending: true,
     // 是否正在搜索
     isSearching: false,
+    // 筛选 tag 数据
+    rangeFrom: '',
+    rangeTo: '',
+    // 验证正数
+    numberRule: [
+      v => /^([0-9]*[1-9][0-9]*)?$/.test(v)
+          || "Please enter a positive number"
+    ],
     // 操作搜索数据库相关
     // 搜索网页时的选项
     tiles: [
@@ -432,6 +468,8 @@ export default {
       this.currentPage = 0;
       this.totalPage = 1;
       this.isSearching = false;
+      this.rangeFrom = '';
+      this.rangeTo = '';
     },
 
     // 切换搜索模式
@@ -683,7 +721,9 @@ export default {
           params: {
             "currentPage": currentPage,
             "keyword": keyword,
-            "mode": this.searchMode
+            "mode": this.searchMode,
+            "rangeTo": this.rangeTo,
+            "rangeFrom": this.rangeFrom,
           }
         }).then(resp => {
           this.items = resp.data.data.paginatedResults;
@@ -712,8 +752,7 @@ export default {
       }
     },
     clearMessage(keyword) {
-      this.placeholderMsg = keyword
-      this.inputMsg = ''
+      this.placeholderMsg = keyword;
     },
     load() {
       this.axios.get("/search/load").then(res => {
