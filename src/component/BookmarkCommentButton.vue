@@ -26,7 +26,7 @@ export default {
       this.$emit("openComment", webId);
     },
     countComment() {
-      this.axios.get("/comment/get/" + this.item.webId).then(res => {
+      this.axios.get("/comment/get/number/" + this.item.webId).then(res => {
         if (res.data.code === 200) {
           this.commentCount = res.data.data;
         }

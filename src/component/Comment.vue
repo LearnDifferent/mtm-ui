@@ -103,10 +103,11 @@
           v-for="(c,index) in comments"
           cols="12"
       >
-        <!-- 编辑评论时，围成圈 -->
+        <!-- 编辑评论或展示历史时，围成圈 -->
         <div
-            :style="editOrReplyCommentId == c.commentId ?
-            'border-radius: 25px;margin-top: 2%;border: 2px solid #82ae46;padding: 20px;' : ''"
+            :style="editOrReplyCommentId == c.commentId || historyCommentId === c.commentId
+            ? 'border-radius: 25px;margin-top: 2%;border: 2px solid #82ae46;padding: 20px;'
+            : ''"
         >
           <!-- 展示评论 -->
           <v-card
@@ -126,6 +127,22 @@
                 >
                   <v-icon left>mdi-reply</v-icon>
                   Reply
+                </v-btn>
+
+                <v-divider
+                    class="mx-2"
+                    vertical
+                ></v-divider>
+
+                <v-btn
+                    x-small
+                    class="text-none"
+                    color="#5c9291"
+                    @click="getHistory(c.commentId)"
+                    rounded
+                >
+                  <v-icon left>mdi-calendar-clock</v-icon>
+                  History
                 </v-btn>
 
                 <v-divider
@@ -198,6 +215,36 @@
             </v-card-text>
           </v-card>
 
+          <!-- 展示评论历史 -->
+          <div v-show="historyCommentId === c.commentId">
+            <v-btn
+                large
+                block
+                class="text-none"
+                color="#80989b"
+                @click="historyCommentId = -1"
+                style="margin-top: 2%"
+            >
+              <v-icon left>
+                mdi-keyboard-backspace
+              </v-icon>
+              Viewing Edit History. Click Here to Close.
+            </v-btn>
+            <v-card
+                style="margin-top: 2%"
+                v-for="h in commentHistory"
+                color="#8b968d"
+                :id="'comment-history-' + c.commentId"
+            >
+              <v-card-text>
+                <p>
+                  <span style="color: #5a544b">{{ h.creationTime | dateFormat }}</span>
+                </p>
+                <p>{{ h.comment }}</p>
+              </v-card-text>
+            </v-card>
+          </div>
+
           <div style="margin-top: 2%" v-show="editOrReplyCommentId == c.commentId">
             <!-- 编辑已有的评论，或回复评论 -->
             <v-textarea
@@ -231,7 +278,7 @@
             <!-- 取消发送回复或重新编辑的评论 -->
             <v-btn
                 class="text-none"
-                color="#f2c9ac"
+                color="#ee827c"
                 outlined
                 @click="openEditCommentOrReply('',-1)"
             >
@@ -311,6 +358,10 @@ export default {
     commentCount: 0,
     // 突出该条评论
     prominentCommentId: -1,
+    // 正在查看该评论的历史
+    historyCommentId: -1,
+    // 历史列表
+    commentHistory: [],
   }),
 
   props: {
@@ -342,7 +393,7 @@ export default {
   methods: {
     // 获取评论总数
     countComment() {
-      this.axios.get("/comment/get/" + this.realWebId).then(res => {
+      this.axios.get("/comment/get/number/" + this.realWebId).then(res => {
         if (res.data.code === 200) {
           this.commentCount = res.data.data;
         }
@@ -377,9 +428,9 @@ export default {
       // 更新展示的数据（参数 true 表示正在回退）
       this.resetDataAndGetComments(true);
     },
-    // 根据评论 ID，获取评论数据
+    // Get a comment 根据评论 ID，获取评论数据
     getCommentByIdForGoingBack(commentId) {
-      this.axios.get("/comment/get", {
+      this.axios.get("/comment", {
         params: {commentId: commentId}
       }).then(res => {
         let code = res.data.code;
@@ -549,9 +600,8 @@ export default {
         // 获取所有
         load = -1;
       }
-      this.axios.get("/comment", {
+      this.axios.get("/comment/get/" + this.webId, {
         params: {
-          webId: this.webId,
           load: load,
           order: this.isDesc ? "desc" : "asc",
           replyToCommentId: replyToCommentId
@@ -665,7 +715,20 @@ export default {
         let selector = '#comment-' + id;
         document.querySelector(selector).scrollIntoView(true)
       }, 500);
+    },
+
+    // get comment history
+    getHistory(commentId) {
+      let data = {
+        commentId: commentId,
+        webId: this.realWebId
+      }
+      this.axios.post("/comment/history", data).then(res => {
+        this.commentHistory = res.data;
+        this.historyCommentId = commentId;
+      });
     }
+
   },
 }
 </script>
