@@ -142,7 +142,7 @@
                     rounded
                 >
                   <v-icon left>mdi-calendar-clock</v-icon>
-                  History
+                  Edit History
                 </v-btn>
 
                 <v-divider
@@ -431,7 +431,7 @@ export default {
     // Get a comment 根据评论 ID，获取评论数据
     getCommentByIdForGoingBack(commentId) {
       this.axios.get("/comment", {
-        params: {commentId: commentId}
+        params: {commentId: commentId, webId: this.realWebId}
       }).then(res => {
         let code = res.data.code;
         if (code === 200) {
@@ -724,8 +724,13 @@ export default {
         webId: this.realWebId
       }
       this.axios.post("/comment/history", data).then(res => {
-        this.commentHistory = res.data;
-        this.historyCommentId = commentId;
+        let code = res.data.code;
+        if (code === 200) {
+          this.commentHistory = res.data.data;
+          this.historyCommentId = commentId;
+        } else {
+          alert("This comment has not been edited");
+        }
       });
     }
 
