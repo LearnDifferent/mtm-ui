@@ -135,10 +135,11 @@
                 ></v-divider>
 
                 <v-btn
+                    v-show="c.history.length > 0"
                     x-small
                     class="text-none"
                     color="#5c9291"
-                    @click="getHistory(c.commentId)"
+                    @click="getHistory(c.commentId, c.history)"
                     rounded
                 >
                   <v-icon left>mdi-calendar-clock</v-icon>
@@ -718,22 +719,10 @@ export default {
     },
 
     // get comment history
-    getHistory(commentId) {
-      let data = {
-        commentId: commentId,
-        webId: this.realWebId
-      }
-      this.axios.post("/comment/history", data).then(res => {
-        let code = res.data.code;
-        if (code === 200) {
-          this.commentHistory = res.data.data;
-          this.historyCommentId = commentId;
-        } else {
-          alert("This comment has not been edited");
-        }
-      });
-    }
-
+    getHistory(commentId, commentHistory) {
+      this.historyCommentId = commentId;
+      this.commentHistory = commentHistory;
+    },
   },
 }
 </script>
