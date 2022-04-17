@@ -83,28 +83,19 @@
                       <div>
                           <span>
                             <b>
-                            *Click the <a @click="sendEmail">SEND</a> button and you will get the invitation code.
+                            *Click the <a @click="sendEmail">SEND</a> button and you will get the invitation code immediately.
                             </b>
                           </span>
                         <br><br>
                         <span style="color: grey">
-                            *There are limits for sending too many emails, so I don't set up email account to send the invitation code.
-                          </span>
-                        <br>
-                        <span style="color: grey">
-                            *That means <b>you will not get any email because I didn't set the mail sending function up</b>.
+                            *This application can send invitation code via email. However, the email service is not configured because it's easy to reach the sending limits if the application sends too many emails, which means <b>you will not get any email</b>.
                           </span>
                         <br><br>
                         <span style="color: grey">
-                            *If you want to know how this application send invitation code via email, checkout the
-                            <a href="https://github.com/LearnDifferent/mtm/blob/master/src/main/java/com/github/learndifferent/mtm/service/impl/VerificationServiceImpl.java"
-                               target="_blank">source code on GitHub</a>.
-                          </span>
-                        <br>
-                        <span style="color: grey">
-                            *If you are a developer, you can clone this
-                            <a href="https://github.com/LearnDifferent/mtm" target="_blank">
-                              repository</a> , set up your own email account and run the project to test the mail sending function.
+                            *You can configure your own SMTP server if you want this application to send real emails.
+                            <a href="https://github.com/LearnDifferent/mtm#email-service" target="_blank">
+                               Click here to learn how.
+                            </a>
                           </span>
                       </div>
                     </v-card-text>
@@ -349,8 +340,8 @@ export default {
         } else if (res.data.code === 200) {
           // 200 表示成功
           this.status = '<b>Success!</b><br>' +
-              'New Admin account has been registered.<br>' +
-              'You can Login as Admin after logging out current account.';
+              'New admin account has been registered.<br>' +
+              'You can login as admin after logging out current account.';
           this.alertColor = 'green';
           this.showClickToLogout = true;
         } else {
