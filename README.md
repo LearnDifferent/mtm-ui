@@ -6,6 +6,12 @@
 npm install
 ```
 
+### Configuration
+
+Modify the `target` in [vue.config.js](./vue.config.js) from `'http://web:80'` to `'http://localhost:80'`.
+
+> The [backend server](https://github.com/LearnDifferent/mtm) is running on [localhost:80](http://localhost:80) and the [frontend client](https://github.com/LearnDifferent/mtm-ui) is running on [localhost:3000](http://localhost:3000)
+
 ### Compiles and hot-reloads for development
 
 ```bash
