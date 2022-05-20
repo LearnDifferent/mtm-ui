@@ -11,7 +11,7 @@
         dot
     >
       <v-icon left>
-        mdi-bell-ring-outline
+        mdi-earth
       </v-icon>
       System Notifications
     </v-badge>

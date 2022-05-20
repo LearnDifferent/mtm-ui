@@ -59,6 +59,25 @@
       ></v-divider>
 
       <SystemNotification :get-system-notifications="getSystemNotifications"/>
+
+      <v-divider
+          class="mx-2"
+          vertical
+      ></v-divider>
+
+      <v-btn
+          v-show="isNotificationOff !== null"
+          class="text-none text-center"
+          :color="isNotificationOff ? '#006e54' : 'red'"
+          outlined
+          @click="turnOnTurnOffNotifications"
+      >
+        <v-icon left>
+          {{ isNotificationOff ? 'mdi-bell-ring-outline' : 'mdi-bell-off' }}
+        </v-icon>
+        {{ isNotificationOff ? 'Unmute Notifications' : 'Mute Notifications' }}
+      </v-btn>
+
     </div>
 
     <MyPageNotification
@@ -182,6 +201,9 @@ export default {
   },
   name: "MyPage",
   data: () => ({
+    // 是否关闭了通知
+    isNotificationOff: null,
+
     // User Role 变化的通知
     roleChangeMsg: '',
     // 收藏的网页
@@ -323,6 +345,30 @@ export default {
         this.axios.delete("/notification/role-changed");
         this.roleChangeMsg = '';
       }
+    },
+
+    // turn on / off notifications
+    turnOnTurnOffNotifications() {
+      let msg = this.isNotificationOff ? "Do you want to unmute notifications?"
+          : "Do you want to mute notifications?";
+      if (confirm(msg)) {
+        this.axios.get("/notification/mute/switch");
+        alert("Success");
+        location.reload();
+      }
+    },
+
+    // 是否打开了通知
+    checkIfNotificationOff() {
+      this.axios.get("/notification/mute").then(res=>{
+        let code = res.data.code;
+        if (code === 200) {
+          this.isNotificationOff = true;
+        }
+        if (code === 500) {
+          this.isNotificationOff = false;
+        }
+      })
     }
   },
 
@@ -334,6 +380,7 @@ export default {
     this.getPersonalInfo();
     this.getNewReplyNotification();
     this.getRoleChange();
+    this.checkIfNotificationOff();
 
     let currentPage = this.$route.query.currentPage;
     if (currentPage !== null && currentPage > 0) {
