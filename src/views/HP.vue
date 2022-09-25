@@ -31,9 +31,9 @@
             cols="12"
         >
           <v-card
-              @mouseenter="onThisWebData = item.webId"
+              @mouseenter="onThisWebData = item.id"
               @mouseleave="onThisWebData = -1"
-              :id="item.webId"
+              :id="item.id"
           >
             <div class="d-flex flex-no-wrap justify-space-between">
               <div>
@@ -43,7 +43,7 @@
 
                   <div
                       v-show="item.userName"
-                      @mouseover="showExcludeUserBtn = item.webId"
+                      @mouseover="showExcludeUserBtn = item.id"
                       @mouseleave="showExcludeUserBtn = -1"
                   >
                     <v-chip
@@ -57,7 +57,7 @@
                       </v-icon>
                       <span
                           @click="toUser(item.userName)"
-                          :style="onThisWebData == item.webId ? 'color: black' : 'color: grey' "
+                          :style="onThisWebData == item.id ? 'color: black' : 'color: grey' "
                       >
                       {{ item.userName }}
                     </span>
@@ -65,7 +65,7 @@
                       <v-btn
                           icon
                           small
-                          v-show="showExcludeUserBtn == item.webId"
+                          v-show="showExcludeUserBtn == item.id"
                           color="pink"
                           @click="dontShowUser(item.userName)"
                       >
@@ -96,29 +96,29 @@
                   <BookmarkPrivacy
                       v-show="currentUser==item.userName"
                       :is-public="item.isPublic"
-                      :web-id="item.webId"
+                      :web-id="item.id"
                       :user-name="item.userName"
-                      :id="item.webId"
+                      :id="item.id"
                   />
 
                   <BookmarkViewButton :item="item"/>
 
                   <BookmarkCommentButton
                       @openComment="openComment"
-                      :key="item.webId"
+                      :key="item.id"
                       :item="item"
                       :show-comment="showComment"/>
 
-                  <BookmarkTagButton :key="item.webId" :item="item"
+                  <BookmarkTagButton :key="item.id" :item="item"
                                      :current-user="currentUser"
                                      :previous-page-num="currentPage"
                                      previous-page="home"/>
 
                   <v-chip
-                      v-show="currentUser == item.userName && onThisWebData == item.webId"
+                      v-show="currentUser == item.userName && onThisWebData == item.id"
                       color="red"
                       outlined
-                      @click="delWeb(item.webId, i)"
+                      @click="delWeb(item.id, i)"
                       style="margin-right: 3px"
                   >
                     <v-icon left>
@@ -127,7 +127,7 @@
                     Delete
                   </v-chip>
 
-                  <BookmarkTime v-show="onThisWebData == item.webId"
+                  <BookmarkTime v-show="onThisWebData == item.id"
                                 :creationTime="item.createTime"/>
 
                 </v-card-actions>
@@ -139,9 +139,9 @@
           </v-card>
 
           <!-- 评论区 -->
-          <div v-show="showComment == item.webId">
+          <div v-show="showComment == item.id">
             <Comment
-                :realWebId="item.webId"
+                :realWebId="item.id"
                 :webId="showComment"
                 :currentUsername="currentUser"
             ></Comment>
@@ -213,10 +213,10 @@ export default {
     // 当前用户
     currentUser: '',
 
-    // 存放遍历的 website 的数据：webId,userName,url,img,title,desc
+    // 存放遍历的 website 的数据：id,userName,url,img,title,desc
     // （还可能有 count 数据和是否公开 isPublic）
     items: '',
-    // 显示该 webId 的评论
+    // 显示该 id 的评论
     showComment: -1,
     // 是否现实刷新信息
     refreshShow: false,
@@ -356,11 +356,11 @@ export default {
     },
 
     // 打开评论
-    openComment(webId) {
-      if (this.showComment == webId) {
-        webId = -1;
+    openComment(bookmarkId) {
+      if (this.showComment == bookmarkId) {
+        bookmarkId = -1;
       }
-      this.showComment = webId;
+      this.showComment = bookmarkId;
     },
 
     // 此用户保存已经存放在数据库内的网页

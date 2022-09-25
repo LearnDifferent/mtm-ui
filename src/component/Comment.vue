@@ -388,6 +388,7 @@ export default {
   },
 
   created() {
+    console.log(this.realWebId);
     this.countComment();
   },
 

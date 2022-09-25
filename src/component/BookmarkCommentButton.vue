@@ -2,11 +2,11 @@
   <v-chip
       color="#84a2d4"
       outlined
-      @click="openCommentOutside(item.webId)"
+      @click="openCommentOutside(item.id)"
       style="margin-right: 3px"
   >
     <v-icon left>
-      {{ showComment == item.webId ? 'mdi-comment-remove-outline' : 'mdi-comment-outline' }}
+      {{ showComment == item.id ? 'mdi-comment-remove-outline' : 'mdi-comment-outline' }}
     </v-icon>
     Comment {{ commentCount > 0 ? '(' + commentCount + ')' : '' }}
   </v-chip>
@@ -22,11 +22,12 @@ export default {
     showComment: {}
   },
   methods:{
-    openCommentOutside(webId) {
-      this.$emit("openComment", webId);
+    openCommentOutside(id) {
+      this.$emit("openComment", id);
     },
     countComment() {
-      this.axios.get("/comment/get/number/" + this.item.webId).then(res => {
+      console.log(this.item.id);
+      this.axios.get("/comment/get/number/" + this.item.id).then(res => {
         if (res.data.code === 200) {
           this.commentCount = res.data.data;
         }

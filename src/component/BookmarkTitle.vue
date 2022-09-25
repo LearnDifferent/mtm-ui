@@ -16,7 +16,7 @@ export default {
     // 打开 view 详情
     view(item) {
       this.axios.get("/view/count", {
-        params: {webId: item.webId}
+        params: {webId: item.id}
       }).then(res => {
         let msg = "Title: " + item.title + "\n"
             + "URL: " + item.url + "\n"
@@ -39,16 +39,16 @@ export default {
         msg += "Do you want to open this website?";
 
         if (confirm(msg)) {
-          this.jump(item.url, item.webId);
+          this.jump(item.url, item.id);
         }
       }).catch((err) => {
-        this.jump(item.url, item.webId);
+        this.jump(item.url, item.id);
       });
     },
     // 跳转页面
-    jump(url, webId) {
+    jump(url, id) {
       window.open(url, '_blank');
-      this.axios.get("/view?webId=" + webId);
+      this.axios.get("/view?webId=" + id);
     },
   },
   props: {

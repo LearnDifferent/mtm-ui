@@ -233,11 +233,11 @@ export default {
 
   methods: {
     // 打开评论
-    openComment(webId) {
-      if (this.showComment == webId) {
-        webId = -1;
+    openComment(bookmarkId) {
+      if (this.showComment == bookmarkId) {
+        bookmarkId = -1;
       }
-      this.showComment = webId;
+      this.showComment = bookmarkId;
     },
 
     // 加载用户信息
