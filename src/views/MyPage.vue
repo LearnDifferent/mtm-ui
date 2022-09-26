@@ -94,7 +94,7 @@
             :key="i"
             cols="12"
         >
-          <v-card :id="item.webId">
+          <v-card :id="item.id">
             <div class="d-flex flex-no-wrap justify-space-between">
               <div>
                 <BookmarkTitle :item="item"/>
@@ -103,7 +103,7 @@
 
                   <BookmarkPrivacy
                       :is-public="item.isPublic"
-                      :web-id="item.webId"
+                      :web-id="item.id"
                       :user-name="item.userName"
                   />
 
@@ -111,11 +111,11 @@
 
                   <BookmarkCommentButton
                       @openComment="openComment"
-                      :key="item.webId"
+                      :key="item.id"
                       :item="item"
                       :show-comment="showComment"/>
 
-                  <BookmarkTagButton :key="item.webId" :item="item"
+                  <BookmarkTagButton :key="item.id" :item="item"
                                      :current-user="user.userName"
                                      :previous-page-num="currentPage"
                                      previous-page="mypage"/>
@@ -123,7 +123,7 @@
                   <v-chip
                       color="red"
                       outlined
-                      @click="delWeb(item.webId, i)"
+                      @click="delWeb(item.id, i)"
                       style="margin-right: 3px"
                   >
                     <v-icon left>
@@ -142,9 +142,9 @@
           </v-card>
 
           <!-- 评论区 -->
-          <div v-show="showComment == item.webId">
+          <div v-show="showComment == item.id">
             <Comment
-                :realWebId="item.webId"
+                :realWebId="item.id"
                 :webId="showComment"
                 :currentUsername="user.userName"
             ></Comment>
@@ -289,11 +289,11 @@ export default {
     },
 
     // 删除收藏的网页
-    delWeb(webId, arrayIndex) {
+    delWeb(id, arrayIndex) {
       if (confirm("Are you sure you want to delete it?")) {
         this.axios.delete("/bookmark", {
           params: {
-            "webId": webId
+            "webId": id
           }
         }).then(res => {
           if (res.data.code === 3001) {
