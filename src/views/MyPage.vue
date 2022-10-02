@@ -293,7 +293,7 @@ export default {
       if (confirm("Are you sure you want to delete it?")) {
         this.axios.delete("/bookmark", {
           params: {
-            "webId": id
+            "id": id
           }
         }).then(res => {
           if (res.data.code === 3001) {

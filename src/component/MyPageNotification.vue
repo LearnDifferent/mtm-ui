@@ -299,10 +299,10 @@ export default {
       this.getWebsiteDataAndContinue(index, notificationData);
     },
     getWebsiteDataAndContinue(index, notificationData) {
-      let webId = notificationData.webId;
+      let id = notificationData.webId;
       this.axios.get("/bookmark/get", {
         params: {
-          webId: webId
+          id: id
         }
       }).then(res => {
         this.websiteData = res.data;

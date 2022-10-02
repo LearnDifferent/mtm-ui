@@ -45,7 +45,7 @@ export default {
   },
 
   created() {
-    this.axios.get("/tag/one?webId=" + this.item.id).then(res => {
+    this.axios.get("/tag/one?bookmarkId=" + this.item.id).then(res => {
       if (res.data.code === 200) {
         this.tagName = res.data.data;
       }

@@ -272,7 +272,7 @@ export default {
       if (confirm("Do you want to delete this tag?")) {
         this.axios.delete("/tag", {
           params: {
-            webId: this.item.webId,
+            bookmarkId: this.item.id,
             tagName: tag
           }
         }).then(res => {
@@ -299,7 +299,7 @@ export default {
       }
       this.axios.get("/tag/apply", {
         params: {
-          webId: this.item.webId,
+          bookmarkId: this.item.id,
           tag: tag
         }
       }).then(res => {
@@ -324,7 +324,7 @@ export default {
     getTags() {
       this.axios.get("/tag", {
         params: {
-          webId: this.item.webId,
+          bookmarkId: this.item.id,
           currentPage: this.currentPage
         }
       }).then(res => {

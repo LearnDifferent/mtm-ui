@@ -26,13 +26,13 @@ export default {
   },
   methods: {
     // 更新网页数据的隐私设置
-    changePrivacy(webId, userName, isPublic) {
+    changePrivacy(id, userName, isPublic) {
       let publicOrPrivate = isPublic ? "private" : "public";
       if (confirm("Are you sure you want to make it "
           + publicOrPrivate + " ?")) {
         this.axios.get("/bookmark/privacy", {
           params: {
-            "webId": webId
+            "id": id
           }
         }).then(res => {
           if (res.data.code === 200 || res.data.code === 500) {

@@ -306,11 +306,11 @@ export default {
       this.refreshShow = false;
     },
     // 删除收藏的网页
-    delWeb(webId, arrayIndex) {
+    delWeb(id, arrayIndex) {
       if (confirm("Are you sure you want to delete it?")) {
         this.axios.delete("/bookmark", {
           params: {
-            "webId": webId
+            "id": id
           }
         }).then(res => {
           if (res.data.code === 3001) {
