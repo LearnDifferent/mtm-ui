@@ -96,7 +96,7 @@
       <!-- 显示通知 -->
       <div v-show="showNotification==='notify' + i">
 
-        <v-card :id="websiteData.webId">
+        <v-card :id="websiteData.id">
           <div class="d-flex flex-no-wrap justify-space-between">
             <div>
               <v-card-title
@@ -160,7 +160,8 @@
         <comment
             ref="commentArea"
             :current-username="currentUsername"
-            :web-id="notification.webId"
+            :real-web-id="notification.bookmarkId"
+            :web-id="notification.bookmarkId"
         ></comment>
 
       </div>
@@ -243,7 +244,7 @@ export default {
     // 打开 view 详情
     view(item) {
       this.axios.get("/view/count", {
-        params: {webId: item.webId}
+        params: {webId: item.id}
       }).then(res => {
         let msg = "Title: " + item.title + "\n"
             + "URL: " + item.url + "\n"
@@ -266,16 +267,16 @@ export default {
         msg += "Do you want to open this website?";
 
         if (confirm(msg)) {
-          this.jump(item.url, item.webId);
+          this.jump(item.url, item.id);
         }
       }).catch((err) => {
-        this.jump(item.url, item.webId);
+        this.jump(item.url, item.id);
       });
     },
     // 跳转页面
-    jump(url, webId) {
+    jump(url, id) {
       window.open(url, '_blank');
-      this.axios.get("/view?webId=" + webId);
+      this.axios.get("/view?webId=" + id);
     },
 
     // 删除该通知
@@ -299,7 +300,7 @@ export default {
       this.getWebsiteDataAndContinue(index, notificationData);
     },
     getWebsiteDataAndContinue(index, notificationData) {
-      let id = notificationData.webId;
+      let id = notificationData.bookmarkId;
       this.axios.get("/bookmark/get", {
         params: {
           id: id

@@ -388,7 +388,6 @@ export default {
   },
 
   created() {
-    console.log(this.realWebId);
     this.countComment();
   },
 
@@ -614,7 +613,6 @@ export default {
           // 获取数据
           this.comments = res.data.data;
 
-          console.log(this.comments);
           // 获取数据条数
           let count = this.comments.length;
 
