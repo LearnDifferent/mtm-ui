@@ -335,7 +335,12 @@ export default {
       }
     },
     checkCommentDataAndContinue(index, notificationData) {
-      this.axios.get("/comment/get?commentId=" + notificationData.commentId).then(res => {
+      this.axios.get("/comment",{
+        params:{
+          commentId: notificationData.commentId,
+          bookmarkId: notificationData.bookmarkId
+        }
+      }).then(res => {
         if (res.data.code !== 200) {
           // 不等于 200 说明该评论不存在
           alert("The comment does not exist");
@@ -350,11 +355,18 @@ export default {
             this.$refs.commentArea[index].openCommentFromOutside(true, notificationData.commentId);
           }
         }
+      }).catch(resp => {
+        console.log(resp.response.data);
       });
     },
     checkReplyDataAndContinue(index, notificationData) {
       // 获取 replyToCommentId 的评论数据，也就是"被回复的评论"，用于传递值
-      this.axios.get("/comment/get?commentId=" + notificationData.replyToCommentId).then(res => {
+      this.axios.get("/comment", {
+        params:{
+          commentId: notificationData.replyToCommentId,
+          bookmarkId: notificationData.bookmarkId
+        }
+      }).then(res => {
         if (res.data.code === 200) {
           // 200，说明存在
           // 赋值，并传递

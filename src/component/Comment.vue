@@ -394,7 +394,7 @@ export default {
   methods: {
     // 获取评论总数
     countComment() {
-      this.axios.get("/comment/get/number/" + this.realWebId).then(res => {
+      this.axios.get("/comment/bookmark/" + this.realWebId).then(res => {
         if (res.data.code === 200) {
           this.commentCount = res.data.data;
         }
@@ -432,7 +432,7 @@ export default {
     // Get a comment 根据评论 ID，获取评论数据
     getCommentByIdForGoingBack(commentId) {
       this.axios.get("/comment", {
-        params: {commentId: commentId, webId: this.realWebId}
+        params: {commentId: commentId, bookmarkId: this.realWebId}
       }).then(res => {
         let code = res.data.code;
         if (code === 200) {
@@ -483,8 +483,10 @@ export default {
     // 重新编辑评论，或回复评论
     sendEditCommentOrReply(data) {
       if (this.trueEditFalseReply) {
+        // todo 后续将 commentId 修改为 id
+        data.id = data.commentId;
         // 给 data 加上 webId 属性
-        data.webId = this.webId;
+        data.bookmarkId = this.webId;
         // 替换为新的评论内容
         data.comment = this.editOrReplyCommentValue;
         // 重新编辑评论
@@ -530,11 +532,11 @@ export default {
       });
     },
     // 删除评论
-    deleteComment(commentId, arrayIndex) {
+    deleteComment(id, arrayIndex) {
       if (confirm("Are you sure you want to delete this comment?")) {
         this.axios.delete("/comment", {
           params: {
-            commentId: commentId,
+            id: id,
           }
         }).then(res => {
           if (res.data.code == 200) {
@@ -601,8 +603,9 @@ export default {
         // 获取所有
         load = -1;
       }
-      this.axios.get("/comment/get/" + this.webId, {
+      this.axios.get("/comment/bookmark", {
         params: {
+          id: this.webId,
           load: load,
           order: this.isDesc ? "desc" : "asc",
           replyToCommentId: replyToCommentId
@@ -657,11 +660,11 @@ export default {
       }
     },
     // 发送评论
-    sendComment(comment, webId, replyToCommentId) {
+    sendComment(comment, bookmarkId, replyToCommentId) {
       this.axios.get("/comment/create", {
         params: {
           comment: comment,
-          webId: webId,
+          bookmarkId: bookmarkId,
           replyToCommentId: replyToCommentId
         }
       }).then(res => {
