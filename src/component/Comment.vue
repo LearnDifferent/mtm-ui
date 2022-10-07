@@ -483,7 +483,6 @@ export default {
     // 重新编辑评论，或回复评论
     sendEditCommentOrReply(data) {
       if (this.trueEditFalseReply) {
-        // todo 后续将 commentId 修改为 id
         data.id = data.commentId;
         // 给 data 加上 webId 属性
         data.bookmarkId = this.webId;
@@ -590,7 +589,7 @@ export default {
       let replyToCommentId = null;
       if (this.replyToThisCommentContent != null) {
         // 获取回复这条评论的回复
-        replyToCommentId = this.replyToThisCommentContent.commentId;
+        replyToCommentId = this.replyToThisCommentContent.id;
       }
 
       if (this.replyToThisCommentContent != null && isGoingBack === true) {
