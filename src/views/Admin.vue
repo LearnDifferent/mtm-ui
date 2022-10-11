@@ -175,10 +175,10 @@
                 <tbody>
                 <tr
                     v-for="item in visitedBookmarks"
-                    :key="item.webId"
+                    :key="item.bookmarkId"
                 >
                   <td>{{ item.views }}</td>
-                  <td>{{ item.webId }}</td>
+                  <td>{{ item.bookmarkId }}</td>
                   <td>
                     <a :href="item.url" target="_blank">{{ item.title }}</a>
                   </td>
@@ -188,7 +188,7 @@
                         class="text-none"
                         x-small
                         :color="item.isPublic ? 'green' : 'red'"
-                        @click="changePrivacy(item.webId, item.userName, item.isPublic)"
+                        @click="changePrivacy(item.bookmarkId, item.userName, item.isPublic)"
                     >
                       {{ item.isPublic ? 'Public' : 'Private' }}
                     </v-btn>
