@@ -244,7 +244,7 @@ export default {
     // 跳转页面
     jump(url, webId) {
       window.open(url, '_blank');
-      this.axios.get("/view?webId=" + webId);
+      this.axios.get("/view?bookmarkId=" + webId);
     },
 
     // 回到之前的页面

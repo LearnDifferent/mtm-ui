@@ -48,7 +48,7 @@ export default {
     // 跳转页面
     jump(url, id) {
       window.open(url, '_blank');
-      this.axios.get("/view?webId=" + id);
+      this.axios.get("/view?bookmarkId=" + id);
     },
   },
   props: {
