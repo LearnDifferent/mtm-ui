@@ -18,7 +18,7 @@ export default {
     // 打开 view 详情
     view(item) {
       this.axios.get("/view/count", {
-        params: {webId: item.id}
+        params: {bookmarkId: item.id}
       }).then(res => {
         let msg = "Title: " + item.title + "\n"
             + "URL: " + item.url + "\n"
