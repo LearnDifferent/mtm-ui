@@ -105,15 +105,15 @@
       >
         <!-- 编辑评论或展示历史时，围成圈 -->
         <div
-            :style="editOrReplyCommentId == c.commentId || historyCommentId === c.commentId
+            :style="editOrReplyCommentId == c.id || historyCommentId === c.id
             ? 'border-radius: 25px;margin-top: 2%;border: 2px solid #82ae46;padding: 20px;'
             : ''"
         >
           <!-- 展示评论 -->
           <v-card
-              :color="prominentCommentId===c.commentId ? '#ee827c' : '#e7e7eb'"
-              :id="'comment-' + c.commentId"
-              @mouseover="onThisComment = c.commentId"
+              :color="prominentCommentId===c.id ? '#ee827c' : '#e7e7eb'"
+              :id="'comment-' + c.id"
+              @mouseover="onThisComment = c.id"
           >
             <v-card-text>
               <p>
@@ -122,7 +122,7 @@
                     x-small
                     class="text-none"
                     color="#6c848d"
-                    @click="openEditCommentOrReply(c.comment, c.commentId, false)"
+                    @click="openEditCommentOrReply(c.comment, c.id, false)"
                     rounded
                 >
                   <v-icon left>mdi-reply</v-icon>
@@ -139,7 +139,7 @@
                     x-small
                     class="text-none"
                     color="#5c9291"
-                    @click="getHistory(c.commentId, c.history)"
+                    @click="getHistory(c.id, c.history)"
                     rounded
                 >
                   <v-icon left>mdi-calendar-clock</v-icon>
@@ -169,7 +169,7 @@
 
                 <!-- 打开重新编辑评论的按钮 -->
                 <v-divider
-                    v-show="currentUsername == c.username && onThisComment == c.commentId"
+                    v-show="currentUsername == c.username && onThisComment == c.id"
                     class="mx-2"
                     vertical
                 ></v-divider>
@@ -177,8 +177,8 @@
                     x-small
                     class="text-none"
                     color="#82ae46"
-                    v-show="currentUsername == c.username && onThisComment == c.commentId"
-                    @click="openEditCommentOrReply(c.comment, c.commentId, true)"
+                    v-show="currentUsername == c.username && onThisComment == c.id"
+                    @click="openEditCommentOrReply(c.comment, c.id, true)"
                     rounded
                 >
                   <v-icon left>mdi-tooltip-edit-outline</v-icon>
@@ -187,7 +187,7 @@
 
                 <!-- 删除按钮（只能删除自己的评论） -->
                 <v-divider
-                    v-show="currentUsername == c.username && onThisComment == c.commentId"
+                    v-show="currentUsername == c.username && onThisComment == c.id"
                     class="mx-2"
                     vertical
                 ></v-divider>
@@ -195,8 +195,8 @@
                     x-small
                     class="text-none"
                     color="#e83929"
-                    v-show="currentUsername == c.username && onThisComment == c.commentId"
-                    @click="deleteComment(c.commentId, index)"
+                    v-show="currentUsername == c.username && onThisComment == c.id"
+                    @click="deleteComment(c.id, index)"
                     rounded
                 >
                   <v-icon left>mdi-delete-outline</v-icon>
@@ -217,7 +217,7 @@
           </v-card>
 
           <!-- 展示评论历史 -->
-          <div v-show="historyCommentId === c.commentId">
+          <div v-show="historyCommentId === c.id">
             <v-btn
                 large
                 block
@@ -235,7 +235,7 @@
                 style="margin-top: 2%"
                 v-for="h in commentHistory"
                 color="#8b968d"
-                :id="'comment-history-' + c.commentId"
+                :id="'comment-history-' + c.id"
             >
               <v-card-text>
                 <p>
@@ -246,7 +246,7 @@
             </v-card>
           </div>
 
-          <div style="margin-top: 2%" v-show="editOrReplyCommentId == c.commentId">
+          <div style="margin-top: 2%" v-show="editOrReplyCommentId == c.id">
             <!-- 编辑已有的评论，或回复评论 -->
             <v-textarea
                 :label="trueEditFalseReply ? 'Edit Comment' : 'Reply to a Comment'"
@@ -423,16 +423,16 @@ export default {
     },
     // 从回复中，返回上一级后，重新获取 comments 数据
     goBackFromReplies() {
-      let commentId = this.replyToThisCommentContent.replyToCommentId;
+      let id = this.replyToThisCommentContent.replyToCommentId;
       // 更新被回复的评论
-      this.getCommentByIdForGoingBack(commentId);
+      this.getCommentByIdForGoingBack(id);
       // 更新展示的数据（参数 true 表示正在回退）
       this.resetDataAndGetComments(true);
     },
     // Get a comment 根据评论 ID，获取评论数据
-    getCommentByIdForGoingBack(commentId) {
+    getCommentByIdForGoingBack(id) {
       this.axios.get("/comment", {
-        params: {commentId: commentId, bookmarkId: this.realWebId}
+        params: {id: id, bookmarkId: this.realWebId}
       }).then(res => {
         let code = res.data.code;
         if (code === 200) {
@@ -483,8 +483,7 @@ export default {
     // 重新编辑评论，或回复评论
     sendEditCommentOrReply(data) {
       if (this.trueEditFalseReply) {
-        data.id = data.commentId;
-        // 给 data 加上 webId 属性
+        // 给 data 加上 bookmarkId 属性
         data.bookmarkId = this.webId;
         // 替换为新的评论内容
         data.comment = this.editOrReplyCommentValue;
@@ -498,7 +497,7 @@ export default {
         // 获取发送评论的用户名
         let username = this.currentUsername;
         // 获取回复
-        let replyToCommentId = data.commentId;
+        let replyToCommentId = data.id;
         // 发送回复
         this.sendComment(comment, webId, replyToCommentId);
       }
@@ -720,8 +719,8 @@ export default {
     },
 
     // get comment history
-    getHistory(commentId, commentHistory) {
-      this.historyCommentId = commentId;
+    getHistory(id, commentHistory) {
+      this.historyCommentId = id;
       this.commentHistory = commentHistory;
     },
   },
