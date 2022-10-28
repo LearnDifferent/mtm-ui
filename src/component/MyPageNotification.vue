@@ -337,7 +337,7 @@ export default {
     checkCommentDataAndContinue(index, notificationData) {
       this.axios.get("/comment",{
         params:{
-          commentId: notificationData.commentId,
+          id: notificationData.commentId,
           bookmarkId: notificationData.bookmarkId
         }
       }).then(res => {
@@ -363,7 +363,7 @@ export default {
       // 获取 replyToCommentId 的评论数据，也就是"被回复的评论"，用于传递值
       this.axios.get("/comment", {
         params:{
-          commentId: notificationData.replyToCommentId,
+          id: notificationData.replyToCommentId,
           bookmarkId: notificationData.bookmarkId
         }
       }).then(res => {
