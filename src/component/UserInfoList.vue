@@ -24,7 +24,7 @@
             :background-color="user.hasOwnProperty('highlightedFields')
             && (user.highlightedFields[0] === 'userId'
              || user.highlightedFields[1] === 'userId') ? '#f3f3f3' : ''"
-            :value="user.userId"
+            :value="user.id"
         ></v-textarea>
       </v-list-item-title>
 

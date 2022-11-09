@@ -79,9 +79,9 @@
                 <tbody>
                 <tr
                     v-for="item in users"
-                    :key="item.userId"
+                    :key="item.id"
                 >
-                  <td>{{ item.userId }}</td>
+                  <td>{{ item.id }}</td>
                   <td>{{ item.userName }}</td>
                   <td>{{ item.createTime | dateFormat }}</td>
                   <td>
@@ -89,7 +89,7 @@
                         class="text-none"
                         x-small
                         :color="item.role === 'admin' ? '#ecc960' : item.role === 'user' ? 'green' : 'white'"
-                        @click="changeUserRole(item.userId, item.userName, item.role)"
+                        @click="changeUserRole(item.id, item.userName, item.role)"
                     >
                       {{ item.role === 'admin' ? 'Admin' : item.role === 'user' ? 'User' : 'Guest' }}
                     </v-btn>
