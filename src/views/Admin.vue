@@ -379,7 +379,7 @@ export default {
     sendChangeUserRoleRequest(userId, newRole) {
       this.axios.get("/user/role", {
         params: {
-          userId: userId,
+          id: userId,
           newRole: newRole
         }
       }).then(res => {
