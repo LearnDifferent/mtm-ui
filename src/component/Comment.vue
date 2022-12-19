@@ -418,6 +418,8 @@ export default {
       this.replyMode = true;
       // 设置被回复的评论的信息
       this.replyToThisCommentContent = data;
+      console.log(111);
+      console.log(data);
       // 重新获取评论（此时为该评论的回复）
       this.resetDataAndGetComments(false, getAllReplies);
     },
