@@ -8,7 +8,12 @@
         :loading="isLoading"
     >
       <v-card-title class="justify-center">
-        Sign In
+        <div v-if="isAdminPage" style="color: #f7b977">
+          Administer Login
+        </div>
+        <div v-else>
+          Sign In
+        </div>
       </v-card-title>
       <v-form
           ref="form"
@@ -100,7 +105,7 @@
         <div style="text-align:center;margin-bottom: 10px">
           <v-btn
               :disabled="!valid || isLoading"
-              color="success"
+              :color="isAdminPage ? '#e49e61' : '#a8e6cf'"
               class="mr-4 text-none"
               @click="validate"
           >
@@ -109,17 +114,37 @@
 
           <v-btn
               :disabled="isLoading"
-              color="error"
+              :color="isAdminPage ? '#e9546b' : '#ffaaa5'"
               class="mr-4 text-none"
               @click="reset"
           >
             Clear
           </v-btn>
         </div>
-        <div style="text-align:center;">
-          <a href="javascript:void(0);" style="color: grey;" @click="createAccount">
-            Create an account
-          </a>
+        <div style="text-align:center; margin-top: 1%">
+          <div v-if="!isAdminPage">
+            <a href="javascript:void(0);" style="color: grey;" @click="createAccount">
+              Create an account
+            </a>
+          </div>
+          <div v-if="isAdminPage">
+            <a href="javascript:void(0);" style="color: #e0815e;" @click="createAdmin">
+              Admin Registration
+            </a>
+          </div>
+
+          <div style="margin: 1%">
+            <div v-if="!isAdminPage">
+              <v-btn x-large text color="#f7b977" class="mr-4 text-none" @click="changeLoginPage">
+                Administer Login
+              </v-btn>
+            </div>
+            <div v-if="isAdminPage">
+              <v-btn x-large text color="#595857" class="mr-4 text-none" @click="changeLoginPage">
+                User Login
+              </v-btn>
+            </div>
+          </div>
         </div>
       </v-form>
       <v-progress-linear
@@ -131,6 +156,8 @@
           style="margin-top: 4px"
       ></v-progress-linear>
     </v-card>
+
+
   </v-container>
 </template>
 
@@ -167,7 +194,9 @@ export default {
     // 信息
     status: '',
     // 正在处理登陆信息
-    processing: false
+    processing: false,
+    // 是否为管理员的登陆界面
+    isAdminPage: false,
   }),
 
   methods: {
@@ -208,9 +237,17 @@ export default {
         this.isLoading = false;
       });
     },
+    // 切换登陆界面
+    changeLoginPage() {
+      this.isAdminPage = !this.isAdminPage;
+    },
     // 跳转到注册页面
     createAccount() {
       this.$router.push("/register");
+    },
+    // 跳转到注册管理员页面
+    createAdmin() {
+      this.$router.push("/admin-register");
     },
     // 清除表单的内容
     reset() {

@@ -19,6 +19,7 @@ import TagSearchPage from "@/component/TagSearchPage";
 import AllTags from "@/component/AllTags";
 import FilterPage from "@/component/FilterPage";
 import PopularBookmarks from "@/component/PopularBookmarks";
+import AdminRegister from "@/component/AdminRegister";
 
 Vue.use(VueRouter)
 
@@ -26,6 +27,7 @@ const routes = [
     {path: '/', redirect: '/home'},
     {path: "/login", component: Login},
     {path: "/register", component: Register},
+    {path: "/admin-register", component: AdminRegister},
     {path: "/admin", component: Admin},
     {path: "/home", component: HP},
     {path: "/mypage", component: MyPage},
