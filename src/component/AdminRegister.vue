@@ -1,208 +1,217 @@
 <template>
-  <v-card
-      style="margin-top: 1%"
-      class="mx-auto"
-      max-width="50%"
-      outlined
-      :loading="isLoading"
-  >
-    <v-card-title class="justify-center">
-      Admin Registration
-    </v-card-title>
-    <v-form
-        ref="form"
-        v-model="valid"
-        lazy-validation
+  <v-container style="max-height: 30%;margin-top: 10%">
+    <v-card
+        class="mx-auto"
+        max-width="40%"
+        max-height="50%"
+        outlined
+        :loading="isLoading"
     >
-      <div style="margin-left: 20px;margin-right: 20px;margin-top: 10px">
-        <v-text-field
-            v-model="name"
-            :counter="30"
-            :rules="nameRules"
-            label="Username"
-            required
-            :loading="isLoading"
-            @keyup.enter="validate"
-        ></v-text-field>
-      </div>
-      <div style="margin-left: 20px;margin-right: 20px">
-        <v-text-field
-            v-model="password"
-            :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="show1 ? 'text' : 'password'"
-            :rules="pwdRules"
-            name="input-10-1"
-            label="Password"
-            hint="At least 8 characters"
-            counter
-            :loading="isLoading"
-            @click:append="show1 = !show1"
-            @keyup.enter="validate"
-        ></v-text-field>
-      </div>
-      <div style="margin-left: 20px;margin-right: 20px">
-        <v-text-field
-            v-model="adminCode"
-            label="Invitation Code"
-            :rules="adminRule"
-        >
-          <template v-slot:append>
-            <template>
-              <v-row justify="center" style="margin-right: 1px">
-                <v-dialog
-                    v-model="dialog"
-                    persistent
-                    max-width="600px"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                        class="text-none"
-                        color="grey darken-1"
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                    >
-                      Get Code
-                    </v-btn>
-                  </template>
-                  <v-card>
-                    <v-card-title>
-                      <span class="headline">Send invitation code to Email</span>
-                    </v-card-title>
-                    <v-card-text>
-                      <v-container>
-                        <v-row>
-                          <v-col>
-                            <v-text-field
-                                label="Email"
-                                v-model="email"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                      <div>
+      <v-card-title class="justify-center" style="color: #f7b977">
+        Admin Registration
+      </v-card-title>
+      <v-form
+          ref="form"
+          v-model="valid"
+          lazy-validation
+      >
+        <div style="margin-left: 20px;margin-right: 20px;margin-top: 10px">
+          <v-text-field
+              v-model="name"
+              :counter="30"
+              :rules="nameRules"
+              label="Username"
+              required
+              :loading="isLoading"
+              @keyup.enter="validate"
+          ></v-text-field>
+        </div>
+        <div style="margin-left: 20px;margin-right: 20px">
+          <v-text-field
+              v-model="password"
+              :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="show1 ? 'text' : 'password'"
+              :rules="pwdRules"
+              name="input-10-1"
+              label="Password"
+              hint="At least 8 characters"
+              counter
+              :loading="isLoading"
+              @click:append="show1 = !show1"
+              @keyup.enter="validate"
+          ></v-text-field>
+        </div>
+        <div style="margin-left: 20px;margin-right: 20px">
+          <v-text-field
+              v-model="adminCode"
+              label="Invitation Code"
+              :rules="adminRule"
+          >
+            <template v-slot:append>
+              <template>
+                <v-row justify="center" style="margin-right: 1px">
+                  <v-dialog
+                      v-model="dialog"
+                      persistent
+                      max-width="600px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                          class="text-none"
+                          color="grey darken-1"
+                          dark
+                          v-bind="attrs"
+                          v-on="on"
+                      >
+                        Get Code
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">Send invitation code to Email</span>
+                      </v-card-title>
+                      <v-card-text>
+                        <v-container>
+                          <v-row>
+                            <v-col>
+                              <v-text-field
+                                  label="Email"
+                                  v-model="email"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                        <div>
                           <span>
                             <b>
                             *Click the <a @click="sendEmail">SEND</a> button and you will get the invitation code immediately.
                             </b>
                           </span>
-                        <br><br>
-                        <span style="color: grey">
+                          <br><br>
+                          <span style="color: grey">
                             *This application can send invitation code via email. However, the email service is not configured because it's easy to reach the sending limits if the application sends too many emails, which means <b>you will not get any email</b>.
                           </span>
-                        <br><br>
-                        <span style="color: grey">
+                          <br><br>
+                          <span style="color: grey">
                             *You can configure your own SMTP server if you want this application to send real emails.
                             <a href="https://github.com/LearnDifferent/mtm#email-service" target="_blank">
                                Click here to learn how.
                             </a>
                           </span>
-                      </div>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn
-                          color="red"
-                          text
-                          @click="dialog = false"
-                      >
-                        <span style="font-weight: lighter">Close</span>
-                      </v-btn>
-                      <v-btn
-                          color="grey darken-1"
-                          text
-                          @click="sendEmail"
-                      >
-                        <span style="font-weight: bolder"><b>Send</b></span>
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-              </v-row>
+                        </div>
+                      </v-card-text>
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="red"
+                            text
+                            @click="dialog = false"
+                        >
+                          <span style="font-weight: lighter">Close</span>
+                        </v-btn>
+                        <v-btn
+                            color="grey darken-1"
+                            text
+                            @click="sendEmail"
+                        >
+                          <span style="font-weight: bolder"><b>Send</b></span>
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-row>
+              </template>
             </template>
-          </template>
-        </v-text-field>
-      </div>
-      <div style="margin-left: 20px;margin-right: 20px">
-        <v-text-field
-            v-model="code"
-            :rules="verification"
-            label="Verification Code"
-            required
-            :loading="isLoading"
-            @keyup.enter="validate"
-        >
-          <template v-slot:append>
-            <a href="javascript:void(0);" @click="getVCode">
-              <v-fade-transition leave-absolute>
-                <v-progress-circular
-                    v-if="loading"
-                    size="24"
-                    color="info"
-                    indeterminate
-                ></v-progress-circular>
-                <img
-                    v-else
-                    width="80px"
-                    height="30px"
-                    :src="verCode"
-                    alt="verification code"
-                    style="margin-bottom: 3px"
-                >
-              </v-fade-transition>
+          </v-text-field>
+        </div>
+        <div style="margin-left: 20px;margin-right: 20px">
+          <v-text-field
+              v-model="code"
+              :rules="verification"
+              label="Verification Code"
+              required
+              :loading="isLoading"
+              @keyup.enter="validate"
+          >
+            <template v-slot:append>
+              <a href="javascript:void(0);" @click="getVCode">
+                <v-fade-transition leave-absolute>
+                  <v-progress-circular
+                      v-if="loading"
+                      size="24"
+                      color="info"
+                      indeterminate
+                  ></v-progress-circular>
+                  <img
+                      v-else
+                      width="80px"
+                      height="30px"
+                      :src="verCode"
+                      alt="verification code"
+                      style="margin-bottom: 3px"
+                  >
+                </v-fade-transition>
+              </a>
+            </template>
+          </v-text-field>
+        </div>
+        <br>
+        <div v-show="status"
+             style="text-align:center;margin-left: 20px;margin-right: 20px;margin-bottom: 3px;margin-top: 3px">
+          <v-alert
+              v-model="alert"
+              close-text="Close Alert"
+              v-bind:color="alertColor"
+              outlined
+              dense
+          >
+            <span v-html="status"></span>
+          </v-alert>
+          <v-chip
+              class="ma-2"
+              color="red"
+              outlined
+              pill
+              @click="clickToLogout"
+              v-show="showClickToLogout"
+          >
+            <v-icon left>
+              mdi-account-outline
+            </v-icon>
+            Click here to log out current account
+          </v-chip>
+        </div>
+
+        <div style="text-align:center">
+          <div style="margin-bottom: 10px">
+            <v-btn
+                :disabled="!valid || isLoading"
+                color="#69b076"
+                class="mr-4 text-none"
+                @click="validate"
+                v-show="!showClickToLogout"
+            >
+              Create new Admin account
+            </v-btn>
+          </div>
+          <div style="margin-bottom: 2px">
+            <a href="javascript:void(0);" style="color: #e6b422" @click="goToAdminSignInPage">
+              Sign in to your Admin console
             </a>
-          </template>
-        </v-text-field>
-      </div>
-      <br>
-      <div v-show="status"
-           style="text-align:center;margin-left: 20px;margin-right: 20px;margin-bottom: 3px;margin-top: 3px">
-        <v-alert
-            v-model="alert"
-            close-text="Close Alert"
-            v-bind:color="alertColor"
-            outlined
-            dense
-        >
-          <span v-html="status"></span>
-        </v-alert>
-        <v-chip
-            class="ma-2"
-            color="red"
-            outlined
-            pill
-            @click="clickToLogout"
-            v-show="showClickToLogout"
-        >
-          <v-icon left>
-            mdi-account-outline
-          </v-icon>
-          Click here to log out current account
-        </v-chip>
-      </div>
+          </div>
+        </div>
 
-      <div style="text-align:center;margin-bottom: 10px">
-        <v-btn
-            :disabled="!valid || isLoading"
-            color="success"
-            class="mr-4 text-none"
-            @click="validate"
-            v-show="!showClickToLogout"
-        >
-          Create new Admin account
-        </v-btn>
-      </div>
-
-    </v-form>
-    <v-progress-linear
-        v-show="isLoading"
-        color="primary"
-        indeterminate
-        rounded
-        height="6"
-        style="margin-top: 4px"
-    ></v-progress-linear>
-  </v-card>
+      </v-form>
+      <v-progress-linear
+          v-show="isLoading"
+          color="primary"
+          indeterminate
+          rounded
+          height="6"
+          style="margin-top: 4px"
+      ></v-progress-linear>
+    </v-card>
+  </v-container>
 </template>
 <script>
 export default {
@@ -258,6 +267,15 @@ export default {
   }),
 
   methods: {
+    // 跳转到管理员登陆页面
+    goToAdminSignInPage() {
+      this.$router.push({
+        path: 'login',
+        query: {
+          isAdminPage: 'true',
+        }
+      });
+    },
     // 发送邮件
     sendEmail() {
       let invitationToken = this.getRandomStr();

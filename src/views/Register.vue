@@ -103,7 +103,7 @@
         <div style="text-align:center;margin-bottom: 10px" v-show="!showJumpToLogin">
           <v-btn
               :disabled="!valid || isLoading"
-              color="success"
+              color="#93ca76"
               class="mr-4 text-none"
               @click="validate"
           >

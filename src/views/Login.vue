@@ -240,6 +240,11 @@ export default {
     // 切换登陆界面
     changeLoginPage() {
       this.isAdminPage = !this.isAdminPage;
+
+      this.name = this.isAdminPage ? '' : 'Guest';
+      this.password = this.isAdminPage ? '' : 'github.com/LearnDifferent/mtm';
+      this.isAdminPage ? this.reset() : () => {
+      };
     },
     // 跳转到注册页面
     createAccount() {
@@ -277,6 +282,10 @@ export default {
   created() {
     // 加载页面之前就获取验证码
     this.getVCode();
+    let isAdminPage = this.$route.query.isAdminPage;
+    if (isAdminPage === 'true') {
+      this.changeLoginPage()
+    }
   }
 }
 </script>
