@@ -155,9 +155,8 @@
             </template>
           </v-text-field>
         </div>
-        <br>
         <div v-show="status"
-             style="text-align:center;margin-left: 20px;margin-right: 20px;margin-bottom: 3px;margin-top: 3px">
+             style="text-align:center;margin: 5px 20px 3px;">
           <v-alert
               v-model="alert"
               close-text="Close Alert"
@@ -166,30 +165,30 @@
               dense
           >
             <span v-html="status"></span>
+            <v-chip
+                class="ma-2"
+                color="#028760"
+                outlined
+                pill
+                @click="goToAdminSignInPage"
+                v-show="shouldShowAdminLogin"
+            >
+              <v-icon left>
+                mdi-account-outline
+              </v-icon>
+              Click here to Login as Admin
+            </v-chip>
           </v-alert>
-          <v-chip
-              class="ma-2"
-              color="red"
-              outlined
-              pill
-              @click="clickToLogout"
-              v-show="showClickToLogout"
-          >
-            <v-icon left>
-              mdi-account-outline
-            </v-icon>
-            Click here to log out current account
-          </v-chip>
         </div>
 
         <div style="text-align:center">
           <div style="margin-bottom: 10px">
             <v-btn
                 :disabled="!valid || isLoading"
-                color="#69b076"
+                color="#7ebea5"
                 class="mr-4 text-none"
                 @click="validate"
-                v-show="!showClickToLogout"
+                v-show="!shouldShowAdminLogin"
             >
               Create new Admin account
             </v-btn>
@@ -262,8 +261,8 @@ export default {
     status: '',
     // 提示的颜色
     alertColor: '#8E2323',
-    // 是否显示退出登陆按钮
-    showClickToLogout: false
+    // 是否显示登陆管理员按钮
+    shouldShowAdminLogin: false
   }),
 
   methods: {
@@ -300,20 +299,6 @@ export default {
         this.dialog = false;
       });
     },
-
-    // 点击此处退出登陆
-    clickToLogout() {
-      if (confirm("Are you sure you want to sign out?")) {
-        this.axios.get("/logout").then(res => {
-          if (res.data.code === 200) {
-            alert("Bye~")
-            this.showClickToLogout = false;
-            this.$router.push("/login");
-          }
-        });
-      }
-    },
-
     // 获取随机字符串
     getRandomStr() {
       let text = "";
@@ -358,10 +343,9 @@ export default {
         } else if (res.data.code === 200) {
           // 200 表示成功
           this.status = '<b>Success!</b><br>' +
-              'New admin account has been registered.<br>' +
-              'You can login as admin after logging out current account.';
+              'New admin account has been registered.<br>';
           this.alertColor = 'green';
-          this.showClickToLogout = true;
+          this.shouldShowAdminLogin = true;
         } else {
           // 其他情况，打印信息
           this.status = res.data.msg;
