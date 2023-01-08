@@ -16,32 +16,40 @@
 
       <v-spacer></v-spacer>
       <div class="d-flex justify-center">
+        <!-- 用户浏览界面 -->
+        <div v-show="!isAdminPanel">
+          <v-tabs
+              center-active
+              color="dark"
+          >
+            <v-tab id="myHomeBtn" @click="changePage('/home')">
+              <v-icon left>mdi-home</v-icon>
+              Home
+            </v-tab>
 
-        <v-tabs
-            center-active
-            color="dark"
-        >
-          <v-tab id="myHomeBtn" @click="changePage('/home')">
-            <v-icon left>mdi-home</v-icon>
-            Home
-          </v-tab>
+            <v-tab id="myFindBtn" @click="changePage('/find')">
+              <v-icon left>mdi-magnify</v-icon>
+              Search
+            </v-tab>
 
-          <v-tab id="myFindBtn" @click="changePage('/find')">
-            <v-icon left>mdi-magnify</v-icon>
-            Search
-          </v-tab>
+            <v-tab id="myUserBtn" @click="changePage('/user')">
+              <v-badge
+                  :value="hasReadNewSystemNotification == false || newNotificationCount > 0"
+                  color="red"
+                  dot
+              >
+                <v-icon left>mdi-account</v-icon>
+                User
+              </v-badge>
+            </v-tab>
+          </v-tabs>
+        </div>
 
-          <v-tab id="myUserBtn" @click="changePage('/user')">
-            <v-badge
-                :value="hasReadNewSystemNotification == false || newNotificationCount > 0"
-                color="red"
-                dot
-            >
-              <v-icon left>mdi-account</v-icon>
-              User
-            </v-badge>
-          </v-tab>
-        </v-tabs>
+        <!-- 管理员界面 -->
+        <div v-show="isAdminPanel" style="color: #f7b977">
+          Admin Panel
+        </div>
+
       </div>
 
       <div class="text-center d-flex order-last">
@@ -56,12 +64,13 @@
             mdi-logout
           </v-icon>
         </v-btn>
+
       </div>
 
       <v-spacer></v-spacer>
     </v-app-bar>
     <v-main>
-      <router-view/>
+      <router-view @setIsAdminPanel="setIsAdminPanel"/>
     </v-main>
   </v-app>
 </template>
@@ -73,17 +82,26 @@ export default {
   data: () => ({
     hasReadNewSystemNotification: true,
     newNotificationCount: 0,
+    isAdminPanel: false,
   }),
 
   components: {},
 
   methods: {
-    // 切换页面
+    // 跳转页面
     changePage(page) {
       this.$router.push({path: page});
       if (page !== '/user') {
         this.getNewNotification();
       }
+    },
+    /**
+     * 当页面为管理员面板时，隐藏切换标签
+     *
+     * @param isAdminPanel true 表示当前页面为管理员面板
+     */
+    setIsAdminPanel(isAdminPanel) {
+      this.isAdminPanel = isAdminPanel;
     },
     // 获取新消息数量
     getNewNotification() {

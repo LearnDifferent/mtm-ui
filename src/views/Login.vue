@@ -223,6 +223,7 @@ export default {
           localStorage.setItem('tokenName', tokenName);
           // 因为可能在其他标签页内登陆，所以使用点击的方式跳转
           document.getElementById("myHomeBtn").click();
+          this.$emit('setIsAdminPanel', this.isAdminPage);
         }
       }).catch(error => {
         if (error.response.data.code === 2006) {
@@ -282,10 +283,13 @@ export default {
   created() {
     // 加载页面之前就获取验证码
     this.getVCode();
+    // 获取是否为管理员登陆界面
     let isAdminPage = this.$route.query.isAdminPage;
     if (isAdminPage === 'true') {
       this.changeLoginPage()
     }
+    // 切换 bar 为非管理员界面的 bar
+    this.$emit('setIsAdminPanel', false);
   }
 }
 </script>
