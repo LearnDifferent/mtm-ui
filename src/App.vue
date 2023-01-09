@@ -38,7 +38,7 @@
                   color="red"
                   dot
               >
-                <v-icon left>mdi-account</v-icon>
+                <v-icon left>mdi-account-box-outline</v-icon>
                 User
               </v-badge>
             </v-tab>
@@ -70,7 +70,7 @@
       <v-spacer></v-spacer>
     </v-app-bar>
     <v-main>
-      <router-view @setIsAdminPanel="setIsAdminPanel"/>
+      <router-view @setIsAdminPanel="goToAdminPanelIfTrue"/>
     </v-main>
   </v-app>
 </template>
@@ -96,12 +96,15 @@ export default {
       }
     },
     /**
-     * 当页面为管理员面板时，隐藏切换标签
+     * 当页面为管理员面板时，隐藏 tabs，并跳转到管理员页面
      *
      * @param isAdminPanel true 表示当前页面为管理员面板
      */
-    setIsAdminPanel(isAdminPanel) {
+    goToAdminPanelIfTrue(isAdminPanel) {
       this.isAdminPanel = isAdminPanel;
+      if (this.isAdminPanel) {
+        this.$router.push("/admin");
+      }
     },
     // 获取新消息数量
     getNewNotification() {
