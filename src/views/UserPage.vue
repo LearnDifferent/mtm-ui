@@ -119,7 +119,7 @@
                     <BookmarkTagButton :key="item.id" :item="item"
                                        :current-user="user.userName"
                                        :previous-page-num="currentPage"
-                                       previous-page="mypage"/>
+                                       previous-page="user"/>
 
                     <v-chip
                         color="red"
@@ -318,6 +318,8 @@ export default {
 
         if (this.items.length === 0) {
           alert("No Bookmarks");
+        } else {
+          this.currentPage = currentPage;
         }
 
         // 让页面返回顶部

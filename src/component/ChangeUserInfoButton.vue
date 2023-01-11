@@ -1,21 +1,6 @@
 <template>
   <v-card-actions>
     <v-row no-gutters>
-      <v-col order="first">
-        <v-btn
-            class="text-none"
-            outlined
-            rounded
-            text
-            color="pink"
-            @click="logout"
-        >
-          <v-icon left>
-            mdi-logout
-          </v-icon>
-          Sign Out
-        </v-btn>
-      </v-col>
       <v-col>
         <v-btn
             class="text-none"
@@ -31,7 +16,7 @@
           Delete My Account
         </v-btn>
       </v-col>
-      <v-col order="last">
+      <v-col>
         <v-btn
             class="text-none"
             outlined
@@ -70,17 +55,6 @@ export default {
       }
     },
 
-    // 退出登陆
-    logout() {
-      if (confirm("Are you sure you want to sign out?")) {
-        this.axios.get("/logout").then(res => {
-          if (res.data.code === 200) {
-            alert("Good Bye " + this.currentUsername)
-            this.$router.push("/login");
-          }
-        });
-      }
-    },
   },
 }
 </script>

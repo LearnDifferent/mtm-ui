@@ -53,18 +53,15 @@
       </div>
 
       <div class="text-center d-flex order-last">
-        <v-btn
-            dark
-            icon
-            small
-            color="red darken-2"
-            @click="logoutNow()"
+        <a
+            style="color: #e45e32; text-decoration:none;"
+            href="javascript:void(0);"
+            @click="logoutNow"
         >
-          <v-icon>
-            mdi-logout
-          </v-icon>
-        </v-btn>
-
+        <span>
+          Sign Out <v-icon dense color="#e45e32"> mdi-logout </v-icon>
+        </span>
+        </a>
       </div>
 
       <v-spacer></v-spacer>
