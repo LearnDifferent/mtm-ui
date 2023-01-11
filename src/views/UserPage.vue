@@ -148,6 +148,7 @@
                   :realWebId="item.id"
                   :webId="showComment"
                   :currentUsername="user.userName"
+                  :key="item.id"
               ></Comment>
             </div>
 
