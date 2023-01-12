@@ -425,7 +425,7 @@ export default {
 
     let currentPage = this.$route.query.currentPage;
     if (currentPage !== null && currentPage > 0) {
-      this.getMyWebsData(currentPage);
+      this.getMyWebsData(parseInt(currentPage));
     }
   }
 }

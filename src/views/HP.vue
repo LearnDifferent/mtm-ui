@@ -396,7 +396,7 @@ export default {
 
     let currentPage = this.$route.query.currentPage;
     if (currentPage !== null && currentPage > 1) {
-      this.currentPage = currentPage;
+      this.currentPage = parseInt(currentPage);
     }
     this.loadHome(this.currentPage);
   }
