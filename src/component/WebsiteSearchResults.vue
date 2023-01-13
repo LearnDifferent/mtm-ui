@@ -154,7 +154,6 @@ export default {
   },
 
   methods: {
-
     // 切换页面
     changePage(count) {
       if (count === -1 && this.currentPage === 1) {
@@ -175,8 +174,8 @@ export default {
         return true;
       }
     },
+    // 无更多数据
     noMoreData() {
-
       if (this.currentPage > 1) {
         // 页面如果不是 1 的话，就 -1
         this.currentPage -= 1;
@@ -262,7 +261,7 @@ export default {
         params: {
           searchingTag: searchingTag,
           formerItem: this.item,
-          placeToGoBack: 'bookmark'
+          placeToGoBack: this.previousPage
         }
       });
     },

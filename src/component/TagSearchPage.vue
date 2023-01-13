@@ -93,18 +93,13 @@ export default {
     goBack() {
       let placeToGoBack = this.placeToGoBack;
       // 回到 bookmark 的 tags 页面
-      if (placeToGoBack === 'bookmark') {
-        this.backToBookmarkWithTags();
-      }
       if (placeToGoBack === 'all tags' || placeToGoBack === 'popular tags') {
         // 回到所有标签页面
         this.$router.push({
           path: 'all-tags',
           query: {showMode: placeToGoBack}
         });
-      }
-
-      if (placeToGoBack === 'findPageSearchTag') {
+      } else if (placeToGoBack === 'findPageSearchTag') {
         // 回到所有标签页面
         this.$router.push({
           path: 'find',
@@ -113,8 +108,9 @@ export default {
             currentPage: this.formerItem.currentPage
           }
         });
+      } else {
+        this.backToBookmarkWithTags();
       }
-
     },
     backToBookmarkWithTags() {
       this.$router.push({
@@ -122,7 +118,7 @@ export default {
         params: {
           item: this.formerItem,
           tagMode: true,
-          previousPage: 'home',
+          previousPage: this.placeToGoBack,
         }
       });
     },
