@@ -261,7 +261,8 @@ export default {
         params: {
           searchingTag: searchingTag,
           formerItem: this.item,
-          placeToGoBack: this.previousPage
+          placeToGoBack: this.previousPage,
+          previousPageNum: this.previousPageNum,
         }
       });
     },

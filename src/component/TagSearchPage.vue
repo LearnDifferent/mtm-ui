@@ -119,6 +119,7 @@ export default {
           item: this.formerItem,
           tagMode: true,
           previousPage: this.placeToGoBack,
+          previousPageNum: this.previousPageNum,
         }
       });
     },
@@ -183,6 +184,7 @@ export default {
     searchingTag: {},
     formerItem: {},
     placeToGoBack: {},
+    previousPageNum: {},
   },
 
   watch: {
