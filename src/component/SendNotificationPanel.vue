@@ -5,15 +5,6 @@
     </v-expansion-panel-header>
 
     <v-expansion-panel-content style="font-size: small">
-      *Every user has the ability to send notifications
-    </v-expansion-panel-content>
-    <v-expansion-panel-content style="font-size: small">
-      *Users with Admin privilege have the ability to send push notifications
-    </v-expansion-panel-content>
-    <v-expansion-panel-content style="font-size: small">
-      *Guest can't delete system notifications
-    </v-expansion-panel-content>
-    <v-expansion-panel-content style="font-size: small">
       *The limit for system notifications is 20
     </v-expansion-panel-content>
 
@@ -28,33 +19,44 @@
           @keyup.enter="toSendNotify"
       ></v-textarea>
       <v-btn
-          color="success"
+          color="#c4edde"
           class="mr-4 text-none"
-          @click="sendNotify"
+          @click="sendNotify(1)"
       >
         <v-icon left>
           mdi-send
         </v-icon>
-        Send
+        Send Notification
       </v-btn>
       <v-btn
+          color="#7ac7c4"
+          class="mr-4 text-none"
+          @click="sendNotify(0)"
+      >
+        <v-icon left>
+          mdi-send
+        </v-icon>
+        Send Push Notification
+      </v-btn>
+      <v-btn
+          color="#c9d6df"
           class="mr-4 text-none"
           @click="getSystemNotifications"
       >
         <v-icon left>
           mdi-email-open-outline
         </v-icon>
-        View System Notifications
+        View Notifications
       </v-btn>
       <v-btn
-          color="error"
+          color="#f73859"
           class="mr-4 text-none"
           @click="delNotify"
       >
         <v-icon left>
           mdi-delete
         </v-icon>
-        Delete All System Notifications
+        Delete Notifications
       </v-btn>
     </v-expansion-panel-content>
   </v-expansion-panel>
@@ -87,12 +89,15 @@ export default {
     },
 
     // 发送通知
-    sendNotify() {
+    sendNotify(priority) {
       if (this.noticeCon.trim() == '') {
         alert("Please enter something..");
       } else {
         this.axios.get("/system/send", {
-          params: {message: this.noticeCon}
+          params: {
+            message: this.noticeCon,
+            priority: priority
+          }
         }).then(res => {
           alert(res.data.msg);
         });
@@ -101,7 +106,7 @@ export default {
     },
     // 回车发送通知
     toSendNotify() {
-      this.sendNotify();
+      this.sendNotify(1);
     },
 
   },
