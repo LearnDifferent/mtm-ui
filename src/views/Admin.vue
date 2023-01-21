@@ -509,6 +509,8 @@ export default {
   },
 
   created() {
+    // 切换上方 bar 为管理员面板
+    this.$emit('setIsAdminPanel', true);
     this.checkAdmin();
   }
 }
