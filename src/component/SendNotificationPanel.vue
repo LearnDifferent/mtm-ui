@@ -41,7 +41,7 @@
       <v-btn
           color="#c9d6df"
           class="mr-4 text-none"
-          @click="getSystemNotifications"
+          @click="getNotify"
       >
         <v-icon left>
           mdi-email-open-outline
@@ -58,6 +58,8 @@
         </v-icon>
         Delete Notifications
       </v-btn>
+      <!-- 显示通知 -->
+      <div v-html="notifications"></div>
     </v-expansion-panel-content>
   </v-expansion-panel>
 </template>
@@ -67,7 +69,8 @@ export default {
   data: () => ({
     // 通知相关
     noticeCon: '',
-
+    // 所有通知
+    notifications: '',
   }),
   methods: {
     // 删除所有通知
@@ -79,7 +82,7 @@ export default {
           } else {
             alert("Please wait a minute before you try again");
           }
-        }).catch(error=>{
+        }).catch(error => {
           if (error.response.data.code === 2009) {
             alert("You are now login as Guest: Guest can't delete system notifications\n\n" +
                 "Please login as Standard User or Admin to delete system notifications");
@@ -87,7 +90,12 @@ export default {
         });
       }
     },
-
+    // 获取通知
+    getNotify() {
+      this.axios.get("/system").then(res => {
+        this.notifications = res.data.data;
+      });
+    },
     // 发送通知
     sendNotify(priority) {
       if (this.noticeCon.trim() == '') {
@@ -110,8 +118,7 @@ export default {
     },
 
   },
-  props: {
-    getSystemNotifications: {},
-  }
+
+
 }
 </script>
