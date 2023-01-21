@@ -34,19 +34,9 @@
           @click="sendNotify(0)"
       >
         <v-icon left>
-          mdi-send
+          mdi-hand-pointing-right
         </v-icon>
         Send Push Notification
-      </v-btn>
-      <v-btn
-          color="#c9d6df"
-          class="mr-4 text-none"
-          @click="getNotify"
-      >
-        <v-icon left>
-          mdi-email-open-outline
-        </v-icon>
-        View Notifications
       </v-btn>
       <v-btn
           color="#f73859"
@@ -87,6 +77,9 @@ export default {
             alert("You are now login as Guest: Guest can't delete system notifications\n\n" +
                 "Please login as Standard User or Admin to delete system notifications");
           }
+        }).finally(() => {
+          // 更新通知
+          this.getNotify();
         });
       }
     },
@@ -100,17 +93,21 @@ export default {
     sendNotify(priority) {
       if (this.noticeCon.trim() == '') {
         alert("Please enter something..");
-      } else {
-        this.axios.get("/system/send", {
-          params: {
-            message: this.noticeCon,
-            priority: priority
-          }
-        }).then(res => {
-          alert(res.data.msg);
-        });
-        this.noticeCon = '';
+        return;
       }
+      this.axios.get("/system/send", {
+        params: {
+          message: this.noticeCon,
+          priority: priority
+        }
+      }).then(res => {
+        alert(res.data.msg);
+      }).finally(() => {
+        // 更新发送的内容
+        this.noticeCon = '';
+        // 更新通知
+        this.getNotify();
+      });
     },
     // 回车发送通知
     toSendNotify() {
@@ -119,6 +116,9 @@ export default {
 
   },
 
-
+  created() {
+    // 进入页面就获取系统通知
+    this.getNotify();
+  }
 }
 </script>
