@@ -3,7 +3,7 @@
 
     <v-expansion-panels style="margin-top: 1%">
 
-      <SendNotificationPanel :get-system-notifications="getSystemNotifications"/>
+      <SendNotificationPanel/>
 
       <!-- logs -->
       <v-expansion-panel @click="openLogs">
@@ -502,10 +502,6 @@ export default {
 
     },
 
-  },
-
-  props: {
-    getSystemNotifications: {},
   },
 
   created() {
