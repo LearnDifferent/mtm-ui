@@ -3,7 +3,7 @@
 
     <v-expansion-panels style="margin-top: 1%">
 
-      <SendNotificationPanel/>
+      <AdminNotification/>
 
       <!-- logs -->
       <v-expansion-panel @click="openLogs">
@@ -233,12 +233,12 @@
 <script>
 
 import AdminRegisterNotification from "@/component/AdminRegisterNotification";
-import SendNotificationPanel from "@/component/SendNotificationPanel";
+import AdminNotification from "@/component/AdminNotification";
 import LogsCard from "@/component/LogsCard";
 
 export default {
   name: "Admin",
-  components: {LogsCard, SendNotificationPanel, AdminRegisterNotification},
+  components: {LogsCard, AdminNotification, AdminRegisterNotification},
   data: () => ({
     // current page
     currentPage: 1,

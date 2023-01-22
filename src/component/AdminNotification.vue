@@ -55,7 +55,7 @@
 </template>
 <script>
 export default {
-  name: 'SendNotificationPanel',
+  name: 'AdminNotification',
   data: () => ({
     // 通知相关
     noticeCon: '',
