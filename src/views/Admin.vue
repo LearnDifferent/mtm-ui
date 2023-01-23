@@ -6,44 +6,7 @@
       <AdminNotification/>
 
       <!-- logs -->
-      <v-expansion-panel @click="openLogs">
-        <v-expansion-panel-header>
-          <h3>View Logs {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content v-if="isAdmin===true">
-          <v-switch
-              v-model="isReadFromDb"
-              color="green"
-              :label="isReadFromDb ? 'Get logs from database directly'
-              : 'Get logs from database and and cache memory'"
-          ></v-switch>
-          <LogsCard :logs="logs"/>
-
-          <!-- pagination -->
-          <div
-              style="text-align: center;
-              margin-top: 3px"
-          >
-            <v-btn small rounded @click="changePage(-1, 'getLogs')">
-              <v-icon>mdi-skip-previous</v-icon>
-            </v-btn>
-            <input
-                :placeholder="currentPage"
-                readonly="readonly"
-                style="width:30px;height:30px;text-align: center;border: solid grey;"
-            >
-            <v-btn small rounded @click="changePage(1, 'getLogs')">
-              <v-icon>mdi-skip-next</v-icon>
-            </v-btn>
-          </div>
-          <!-- pagination -->
-
-        </v-expansion-panel-content>
-
-        <!-- 提示注册 Admin -->
-        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
-
-      </v-expansion-panel>
+      <AdminLog :is-admin="isAdmin" :key="key"  />
 
       <!-- users -->
       <v-expansion-panel @click="openUsers">
@@ -234,11 +197,11 @@
 
 import AdminRegisterNotification from "@/component/AdminRegisterNotification";
 import AdminNotification from "@/component/AdminNotification";
-import LogsCard from "@/component/LogsCard";
+import AdminLog from "@/component/AdminLog";
 
 export default {
   name: "Admin",
-  components: {LogsCard, AdminNotification, AdminRegisterNotification},
+  components: {AdminLog, AdminNotification, AdminRegisterNotification},
   data: () => ({
     // current page
     currentPage: 1,
@@ -250,15 +213,10 @@ export default {
     // 管理员注册组件的 key
     key: 1,
 
-    // logs
-    logs: [],
     // 用户
     users: [],
     // 网页 ID 及其阅读数
     visitedBookmarks: [],
-
-    // True if data is read from database directly
-    isReadFromDb: false,
   }),
 
   methods: {
@@ -390,39 +348,6 @@ export default {
         alert(res.data.msg);
       }).catch((error) => {
         alert(error.response.data.msg);
-      });
-    },
-
-    openLogs() {
-      this.resetPageData();
-      this.getLogs();
-    },
-    // 获取 logs
-    getLogs() {
-      let requestPath = "/system/logs";
-      if (this.isReadFromDb) {
-        requestPath += "/no-cache"
-      }
-      this.axios.get(requestPath, {
-        params: {
-          currentPage: this.currentPage,
-        }
-      }).then(res => {
-        if (res.data.code === 200) {
-          let array = res.data.data;
-          let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
-          if (hasNewValue === true) {
-            this.logs = array;
-          }
-        } else {
-          alert("Something went wrong...");
-        }
-      }).catch((error) => {
-        if (error.response.data.code === 2009) {
-          this.isAdmin = false;
-        } else {
-          alert(error.response.data.msg);
-        }
       });
     },
 
