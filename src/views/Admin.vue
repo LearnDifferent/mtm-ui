@@ -1,195 +1,238 @@
 <template>
-  <v-container>
 
-    <v-expansion-panels style="margin-top: 1%">
+  <v-card
+      class="mx-auto overflow-hidden"
+      height="100%"
+  >
+    <v-app-bar
+        color="#ffaa64"
+        dark
+    >
+      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
 
-      <AdminNotification/>
+      <v-toolbar-title>Title</v-toolbar-title>
+    </v-app-bar>
 
-      <!-- logs -->
-      <AdminLog :is-admin="isAdmin" :key="key"  />
+    <v-navigation-drawer
+        v-model="drawer"
+        absolute
+        temporary
+    >
+      <v-list
+          nav
+          dense
+      >
+        <v-list-item-group
+            v-model="group"
+            active-class="orange--text text--accent-4"
+        >
+          <v-list-item>
+            <v-list-item-title>System Notifications</v-list-item-title>
+          </v-list-item>
 
-      <!-- users -->
-      <v-expansion-panel @click="openUsers">
-        <v-expansion-panel-header>
-          <h3>List All Users {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content v-if="isAdmin===true">
-          <v-card>
-            <v-card-title>
-              Users
-            </v-card-title>
-            <v-simple-table
-                fixed-header
-                height="500px"
-            >
-              <template v-slot:default>
-                <thead>
-                <tr>
-                  <th class="text-left">
-                    ID
-                  </th>
-                  <th class="text-left">
-                    Username
-                  </th>
-                  <th class="text-left">
-                    Creation Time
-                  </th>
-                  <th class="text-left">
-                    Role (Edit)
-                  </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr
-                    v-for="item in users"
-                    :key="item.id"
+          <v-list-item>
+            <v-list-item-title>Logs</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title>Users</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title>Visited Bookmarks</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-navigation-drawer>
+
+        <v-expansion-panels style="margin-top: 1%">
+
+          <AdminNotification/>
+
+          <!-- logs -->
+          <AdminLog :is-admin="isAdmin" :key="key"  />
+
+          <!-- users -->
+          <v-expansion-panel @click="openUsers">
+            <v-expansion-panel-header>
+              <h3>List All Users {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content v-if="isAdmin===true">
+              <v-card>
+                <v-card-title>
+                  Users
+                </v-card-title>
+                <v-simple-table
+                    fixed-header
+                    height="500px"
                 >
-                  <td>{{ item.id }}</td>
-                  <td>{{ item.userName }}</td>
-                  <td>{{ item.createTime | dateFormat }}</td>
-                  <td>
-                    <v-btn
-                        class="text-none"
-                        x-small
-                        :color="item.role === 'admin' ? '#ecc960' : item.role === 'user' ? 'green' : 'white'"
-                        @click="changeUserRole(item.id, item.userName, item.role)"
+                  <template v-slot:default>
+                    <thead>
+                    <tr>
+                      <th class="text-left">
+                        ID
+                      </th>
+                      <th class="text-left">
+                        Username
+                      </th>
+                      <th class="text-left">
+                        Creation Time
+                      </th>
+                      <th class="text-left">
+                        Role (Edit)
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr
+                        v-for="item in users"
+                        :key="item.id"
                     >
-                      {{ item.role === 'admin' ? 'Admin' : item.role === 'user' ? 'User' : 'Guest' }}
-                    </v-btn>
-                  </td>
-                </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card>
+                      <td>{{ item.id }}</td>
+                      <td>{{ item.userName }}</td>
+                      <td>{{ item.createTime | dateFormat }}</td>
+                      <td>
+                        <v-btn
+                            class="text-none"
+                            x-small
+                            :color="item.role === 'admin' ? '#ecc960' : item.role === 'user' ? 'green' : 'white'"
+                            @click="changeUserRole(item.id, item.userName, item.role)"
+                        >
+                          {{ item.role === 'admin' ? 'Admin' : item.role === 'user' ? 'User' : 'Guest' }}
+                        </v-btn>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-card>
 
-          <!-- pagination -->
-          <div
-              style="text-align: center;
-              margin-top: 3px"
-          >
-            <v-btn small rounded @click="changePage(-1, 'getUsers')">
-              <v-icon>mdi-skip-previous</v-icon>
-            </v-btn>
-            <input
-                :placeholder="currentPage"
-                readonly="readonly"
-                style="width:30px;height:30px;text-align: center;border: solid grey;"
-            >
-            <v-btn small rounded @click="changePage(1, 'getUsers')">
-              <v-icon>mdi-skip-next</v-icon>
-            </v-btn>
-          </div>
-          <!-- pagination -->
-
-        </v-expansion-panel-content>
-
-        <!-- 提示注册 Admin -->
-        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
-      </v-expansion-panel>
-
-      <!-- Visited Bookmarks -->
-      <v-expansion-panel @click="openVisitedBookmarks">
-        <v-expansion-panel-header>
-          <h3>List All Visited Bookmarks {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content style="font-size: small" v-if="isAdmin===true">
-          Data will be updated every 12 hours. You can
-          <a @click="updateViews">
-            click here to
-            <v-btn class="text-none" color="#93ca76" x-small>
-              <v-icon x-small>
-                mdi-refresh
-              </v-icon>
-              Update Immediately
-            </v-btn>
-          </a>
-        </v-expansion-panel-content>
-        <v-expansion-panel-content v-if="isAdmin===true">
-          <v-card>
-            <v-card-title>
-              All Visited Bookmarks
-              <v-spacer></v-spacer>
-            </v-card-title>
-            <v-simple-table
-                fixed-header
-                height="500px"
-            >
-              <template v-slot:default>
-                <thead>
-                <tr>
-                  <th class="text-left">
-                    Views
-                  </th>
-                  <th class="text-left">
-                    ID
-                  </th>
-                  <th class="text-left">
-                    Title
-                  </th>
-                  <th class="text-left">
-                    Username
-                  </th>
-                  <th class="text-left">
-                    Privacy (Edit)
-                  </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr
-                    v-for="item in visitedBookmarks"
-                    :key="item.bookmarkId"
+              <!-- pagination -->
+              <div
+                  style="text-align: center;
+                  margin-top: 3px"
+              >
+                <v-btn small rounded @click="changePage(-1, 'getUsers')">
+                  <v-icon>mdi-skip-previous</v-icon>
+                </v-btn>
+                <input
+                    :placeholder="currentPage"
+                    readonly="readonly"
+                    style="width:30px;height:30px;text-align: center;border: solid grey;"
                 >
-                  <td>{{ item.views }}</td>
-                  <td>{{ item.bookmarkId }}</td>
-                  <td>
-                    <a :href="item.url" target="_blank">{{ item.title }}</a>
-                  </td>
-                  <td>{{ item.userName }}</td>
-                  <td>
-                    <v-btn
-                        class="text-none"
-                        x-small
-                        :color="item.isPublic ? 'green' : 'red'"
-                        @click="changePrivacy(item.bookmarkId, item.userName, item.isPublic)"
+                <v-btn small rounded @click="changePage(1, 'getUsers')">
+                  <v-icon>mdi-skip-next</v-icon>
+                </v-btn>
+              </div>
+              <!-- pagination -->
+
+            </v-expansion-panel-content>
+
+            <!-- 提示注册 Admin -->
+            <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
+          </v-expansion-panel>
+
+          <!-- Visited Bookmarks -->
+          <v-expansion-panel @click="openVisitedBookmarks">
+            <v-expansion-panel-header>
+              <h3>List All Visited Bookmarks {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content style="font-size: small" v-if="isAdmin===true">
+              Data will be updated every 12 hours. You can
+              <a @click="updateViews">
+                click here to
+                <v-btn class="text-none" color="#93ca76" x-small>
+                  <v-icon x-small>
+                    mdi-refresh
+                  </v-icon>
+                  Update Immediately
+                </v-btn>
+              </a>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content v-if="isAdmin===true">
+              <v-card>
+                <v-card-title>
+                  All Visited Bookmarks
+                  <v-spacer></v-spacer>
+                </v-card-title>
+                <v-simple-table
+                    fixed-header
+                    height="500px"
+                >
+                  <template v-slot:default>
+                    <thead>
+                    <tr>
+                      <th class="text-left">
+                        Views
+                      </th>
+                      <th class="text-left">
+                        ID
+                      </th>
+                      <th class="text-left">
+                        Title
+                      </th>
+                      <th class="text-left">
+                        Username
+                      </th>
+                      <th class="text-left">
+                        Privacy (Edit)
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr
+                        v-for="item in visitedBookmarks"
+                        :key="item.bookmarkId"
                     >
-                      {{ item.isPublic ? 'Public' : 'Private' }}
-                    </v-btn>
-                  </td>
-                </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card>
+                      <td>{{ item.views }}</td>
+                      <td>{{ item.bookmarkId }}</td>
+                      <td>
+                        <a :href="item.url" target="_blank">{{ item.title }}</a>
+                      </td>
+                      <td>{{ item.userName }}</td>
+                      <td>
+                        <v-btn
+                            class="text-none"
+                            x-small
+                            :color="item.isPublic ? 'green' : 'red'"
+                            @click="changePrivacy(item.bookmarkId, item.userName, item.isPublic)"
+                        >
+                          {{ item.isPublic ? 'Public' : 'Private' }}
+                        </v-btn>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+              </v-card>
 
-          <!-- pagination -->
-          <div
-              style="text-align: center;
-              margin-top: 3px"
-          >
-            <v-btn small rounded @click="changePage(-1, 'getVisitedBookmarks')">
-              <v-icon>mdi-skip-previous</v-icon>
-            </v-btn>
-            <input
-                :placeholder="currentPage"
-                readonly="readonly"
-                style="width:30px;height:30px;text-align: center;border: solid grey;"
-            >
-            <v-btn small rounded @click="changePage(1, 'getVisitedBookmarks')">
-              <v-icon>mdi-skip-next</v-icon>
-            </v-btn>
-          </div>
-          <!-- pagination -->
+              <!-- pagination -->
+              <div
+                  style="text-align: center;
+                  margin-top: 3px"
+              >
+                <v-btn small rounded @click="changePage(-1, 'getVisitedBookmarks')">
+                  <v-icon>mdi-skip-previous</v-icon>
+                </v-btn>
+                <input
+                    :placeholder="currentPage"
+                    readonly="readonly"
+                    style="width:30px;height:30px;text-align: center;border: solid grey;"
+                >
+                <v-btn small rounded @click="changePage(1, 'getVisitedBookmarks')">
+                  <v-icon>mdi-skip-next</v-icon>
+                </v-btn>
+              </div>
+              <!-- pagination -->
 
-        </v-expansion-panel-content>
+            </v-expansion-panel-content>
 
-        <!-- 提示注册 Admin -->
-        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
-      </v-expansion-panel>
+            <!-- 提示注册 Admin -->
+            <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
+          </v-expansion-panel>
 
-    </v-expansion-panels>
-
-  </v-container>
+        </v-expansion-panels>
+  </v-card>
 
 </template>
 
@@ -203,6 +246,10 @@ export default {
   name: "Admin",
   components: {AdminLog, AdminNotification, AdminRegisterNotification},
   data: () => ({
+    // 是否打开侧边抽屉
+    drawer: false,
+    // 侧边抽屉相关
+    group: null,
     // current page
     currentPage: 1,
 
