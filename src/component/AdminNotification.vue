@@ -1,57 +1,69 @@
 <template>
-  <v-expansion-panel>
-    <v-expansion-panel-header>
-      <h3>Send System Notifications</h3>
-    </v-expansion-panel-header>
+  <div style="margin: 20px">
+    <v-card
+        class="mx-auto"
+    >
+      <v-card-title>
+        Send System Notifications
+      </v-card-title>
 
-    <v-expansion-panel-content style="font-size: small">
-      *The limit for system notifications is 20
-    </v-expansion-panel-content>
+      <v-card-subtitle>
+        The limit for system notifications is 20
+      </v-card-subtitle>
 
-    <v-expansion-panel-content>
-      <v-textarea
-          name="input-7-1"
-          filled
-          color="grey"
-          label="Notification Editor"
-          auto-grow
-          v-model="noticeCon"
-          @keyup.enter="toSendNotify"
-      ></v-textarea>
-      <v-btn
-          color="#c4edde"
-          class="mr-4 text-none"
-          @click="sendNotify(1)"
-      >
-        <v-icon left>
-          mdi-send
-        </v-icon>
-        Send Notification
-      </v-btn>
-      <v-btn
-          color="#7ac7c4"
-          class="mr-4 text-none"
-          @click="sendNotify(0)"
-      >
-        <v-icon left>
-          mdi-hand-pointing-right
-        </v-icon>
-        Send Push Notification
-      </v-btn>
-      <v-btn
-          color="#f73859"
-          class="mr-4 text-none"
-          @click="delNotify"
-      >
-        <v-icon left>
-          mdi-delete
-        </v-icon>
-        Delete Notifications
-      </v-btn>
-      <!-- 显示通知 -->
+      <v-card-text>
+        <v-textarea
+            name="input-7-1"
+            filled
+            color="grey"
+            label="Notification Editor"
+            auto-grow
+            v-model="noticeCon"
+            @keyup.enter="toSendNotify"
+        ></v-textarea>
+
+        <v-btn
+            color="#c4edde"
+            class="mr-4 text-none"
+            @click="sendNotify(1)"
+        >
+          <v-icon left>
+            mdi-send
+          </v-icon>
+          Send Notification
+        </v-btn>
+        <v-btn
+            color="#7ac7c4"
+            class="mr-4 text-none"
+            @click="sendNotify(0)"
+        >
+          <v-icon left>
+            mdi-hand-pointing-right
+          </v-icon>
+          Send Push Notification
+        </v-btn>
+        <v-btn
+            color="#f73859"
+            class="mr-4 text-none"
+            @click="delNotify"
+        >
+          <v-icon left>
+            mdi-delete
+          </v-icon>
+          Delete Notifications
+        </v-btn>
+      </v-card-text>
+
+    </v-card>
+    <!-- 显示通知 -->
+    <v-alert
+        outlined
+        style="margin-top: 20px"
+    >
       <div v-html="notifications"></div>
-    </v-expansion-panel-content>
-  </v-expansion-panel>
+    </v-alert>
+
+  </div>
 </template>
 <script>
 export default {
