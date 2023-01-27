@@ -19,6 +19,7 @@ import AllTags from "@/component/AllTags";
 import FilterPage from "@/component/FilterPage";
 import PopularBookmarks from "@/component/PopularBookmarks";
 import AdminRegister from "@/component/AdminRegister";
+import AdminNotification from "@/component/AdminNotification";
 
 Vue.use(VueRouter)
 
@@ -26,8 +27,14 @@ const routes = [
     {path: '/', redirect: '/home'},
     {path: "/login", component: Login},
     {path: "/register", component: Register},
+    {
+        path: "/admin",
+        component: Admin,
+        children: [
+            {path: "admin-notification", component: AdminNotification},
+        ]
+    },
     {path: "/admin-register", component: AdminRegister},
-    {path: "/admin", component: Admin},
     {path: "/home", component: HP},
     {path: "/find", component: Find},
     {path: "/delete/:username", component: DeletingPage},
