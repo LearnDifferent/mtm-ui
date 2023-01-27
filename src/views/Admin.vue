@@ -279,41 +279,32 @@ export default {
     // 切换页面
     changePage(link, title) {
       // 切换页面前，检查是否为管理员
-      this.checkAdmin();
-      // 切换页面
-      this.$router.push(link);
-      // 切换标题
-      this.pageTitle = title;
-    },
-
-    // 获取随机字符串
-    getRandomStr() {
-      let text = "";
-      let pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      for (let i = 0; i < 10; i++)
-        text += pool.charAt(Math.floor(Math.random() * pool.length));
-      return text;
-    },
-
-    // 检查是否为管理员
-    checkAdmin() {
-      // 切换上方 bar 为管理员面板
-      this.$emit('setIsAdminPanel', true);
-
-      let verifyToken = this.getRandomStr();
-      localStorage.setItem("verifyToken", verifyToken);
-
       this.axios.get("/user/admin").then(res => {
-        // result code 为 200 表示是 admin
-        this.isAdmin = res.data.code === 200;
+        // 如果是管理员：
+        // 切换标题
+        this.pageTitle = title;
+        // 切换上方 bar 为管理员面板
+        this.$emit('setIsAdminPanel', true);
+        // 切换页面
+        this.$router.push(link);
       }).catch((error) => {
         if (error.response.data.code === 2009) {
-          // 代码 2009 表示没有权限，此时获取验证码来注册管理员
-          this.getVCode();
+          // 如果不管理员，就退出当前账号
+          this.axios.get("/logout");
+          // 代码 2009 表示没有权限，此时跳转到登陆页面
+          alert("Please Login as Admin!");
         } else {
           alert(error.response.data.msg);
         }
+        // 如果不是管理员，跳转到管理员登陆界面
+        this.$router.push({
+          path: '/login',
+          query: {
+            isAdminPage: 'true',
+          }
+        });
       });
+
     },
 
     // 切换页面
