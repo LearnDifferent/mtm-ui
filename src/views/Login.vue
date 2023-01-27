@@ -9,7 +9,7 @@
     >
       <v-card-title class="justify-center">
         <div v-if="isAdminPage" style="color: #f7b977">
-          Administer Login
+          Administrator Login
         </div>
         <div v-else>
           Sign In
@@ -136,7 +136,7 @@
           <div style="margin: 1%">
             <div v-if="!isAdminPage">
               <v-btn x-large text color="#f7b977" class="mr-4 text-none" @click="changeLoginPage">
-                Administer Login
+                Administrator Login
               </v-btn>
             </div>
             <div v-if="isAdminPage">
@@ -213,6 +213,7 @@ export default {
         params: {
           code: this.code,
           token: localStorage.getItem("verifyToken"),
+          isAdmin: this.isAdminPage,
         }
       }).then(res => {
         if (res.data.code === 200) {
@@ -233,6 +234,10 @@ export default {
         if (error.response.data.code === 2007) {
           // 2007 表示验证码错误
           this.status = error.response.data.msg;
+        }
+        if (error.response.data.code === 2009) {
+          // 2009 表示不是管理员
+          this.status = 'You are not the Administer';
         }
       }).finally(() => {
         this.isLoading = false;
