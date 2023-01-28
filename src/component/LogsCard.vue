@@ -5,7 +5,6 @@
     </v-card-title>
     <v-simple-table
         fixed-header
-        height="500px"
     >
       <template v-slot:default>
         <thead>

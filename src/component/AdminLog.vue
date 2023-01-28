@@ -1,42 +1,39 @@
 <template>
-  <v-expansion-panel @click="openLogs">
-    <v-expansion-panel-header>
-      <h3>View Logs {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
-    </v-expansion-panel-header>
-    <v-expansion-panel-content v-if="isAdmin===true">
-      <v-switch
-          v-model="isReadFromDb"
-          color="green"
-          :label="isReadFromDb ? 'Get logs from database directly'
+
+  <div style="margin: 20px;
+    border-radius: 25px;
+    border: 2px solid grey;
+    padding: 20px;">
+
+    <v-switch
+        @click="reloadLogs"
+        v-model="isReadFromDb"
+        color="green"
+        :label="isReadFromDb ? 'Get logs from database directly'
               : 'Get logs from database and and cache memory'"
-      ></v-switch>
-      <LogsCard :logs="logs"/>
+    ></v-switch>
 
-      <!-- pagination -->
-      <div
-          style="text-align: center;
-              margin-top: 3px"
+    <LogsCard :logs="logs"/>
+
+    <!-- pagination -->
+    <div
+        style="text-align: center; margin-top: 8px"
+    >
+      <v-btn small rounded @click="movePage(-1)">
+        <v-icon>mdi-skip-previous</v-icon>
+      </v-btn>
+      <input
+          :placeholder="currentPage"
+          readonly="readonly"
+          style="width:30px;height:30px;text-align: center;border: solid grey;"
       >
-        <v-btn small rounded @click="changePage(-1, 'getLogs')">
-          <v-icon>mdi-skip-previous</v-icon>
-        </v-btn>
-        <input
-            :placeholder="currentPage"
-            readonly="readonly"
-            style="width:30px;height:30px;text-align: center;border: solid grey;"
-        >
-        <v-btn small rounded @click="changePage(1, 'getLogs')">
-          <v-icon>mdi-skip-next</v-icon>
-        </v-btn>
-      </div>
-      <!-- pagination -->
+      <v-btn small rounded @click="movePage(1)">
+        <v-icon>mdi-skip-next</v-icon>
+      </v-btn>
+    </div>
+    <!-- pagination -->
 
-    </v-expansion-panel-content>
-
-    <!-- 提示注册 Admin -->
-    <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
-
-  </v-expansion-panel>
+  </div>
 </template>
 <script>
 import AdminRegisterNotification from "@/component/AdminRegisterNotification"
@@ -54,32 +51,19 @@ export default {
     logs: [],
   }),
   methods: {
+    // 重新载入数据
+    reloadLogs() {
+      this.currentPage = 1;
+      this.getLogs();
+    },
     // 切换页面
-    changePage(count, mode) {
+    movePage(count) {
       if (count === -1 && this.currentPage === 1) {
         // 页面不能 <1
         return;
       }
       this.currentPage += count;
-      if (mode === 'getLogs') {
-        this.getLogs();
-      }
-      if (mode === 'getUsers') {
-        this.getUsers();
-      }
-      if (mode === 'getVisitedBookmarks') {
-        this.getVisitedBookmarks();
-      }
-
-    },
-    openLogs() {
-      this.resetPageData();
       this.getLogs();
-    },
-    // 重制页面数据
-    resetPageData() {
-      this.key++;
-      this.currentPage = 1;
     },
     // 限定最大页数，并返回是否有新的数据
     maxPageCheckAndReturnArrayHasNewValue(array) {
@@ -127,9 +111,10 @@ export default {
 
 
   },
-  props: {
-    isAdmin: {},
-    key: {},
+
+  created() {
+    this.getLogs();
   }
+
 }
 </script>
