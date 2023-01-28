@@ -20,6 +20,7 @@ import FilterPage from "@/component/FilterPage";
 import PopularBookmarks from "@/component/PopularBookmarks";
 import AdminRegister from "@/component/AdminRegister";
 import AdminNotification from "@/component/AdminNotification";
+import AdminLog from "@/component/AdminLog";
 
 Vue.use(VueRouter)
 
@@ -32,6 +33,7 @@ const routes = [
         component: Admin,
         children: [
             {path: "admin-notification", component: AdminNotification},
+            {path: "admin-log", component: AdminLog},
         ]
     },
     {path: "/admin-register", component: AdminRegister},

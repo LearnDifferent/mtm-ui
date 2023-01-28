@@ -34,7 +34,7 @@
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item>
+          <v-list-item @click="changePage('/admin/admin-log', 'System Logs')">
             <v-list-item-title>Logs</v-list-item-title>
           </v-list-item>
 
@@ -52,11 +52,6 @@
     <router-view></router-view>
     <!-- 临时不显示 -->
     <v-expansion-panels v-show="false" style="margin-top: 1%">
-
-      <AdminNotification/>
-
-      <!-- logs -->
-      <AdminLog :is-admin="isAdmin" :key="key"/>
 
       <!-- users -->
       <v-expansion-panel @click="openUsers">
