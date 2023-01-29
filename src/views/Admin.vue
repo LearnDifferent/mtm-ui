@@ -39,7 +39,7 @@
           </v-list-item>
 
           <v-list-item>
-            <v-list-item-title>Users</v-list-item-title>
+            <v-list-item-title @click="changePage('/admin/admin-user', 'List All Users')">All Users</v-list-item-title>
           </v-list-item>
 
           <v-list-item>
@@ -52,86 +52,6 @@
     <router-view></router-view>
     <!-- 临时不显示 -->
     <v-expansion-panels v-show="false" style="margin-top: 1%">
-
-      <!-- users -->
-      <v-expansion-panel @click="openUsers">
-        <v-expansion-panel-header>
-          <h3>List All Users {{ isAdmin ? "" : " (Please Login as Admin)" }}</h3>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content v-if="isAdmin===true">
-          <v-card>
-            <v-card-title>
-              Users
-            </v-card-title>
-            <v-simple-table
-                fixed-header
-                height="500px"
-            >
-              <template v-slot:default>
-                <thead>
-                <tr>
-                  <th class="text-left">
-                    ID
-                  </th>
-                  <th class="text-left">
-                    Username
-                  </th>
-                  <th class="text-left">
-                    Creation Time
-                  </th>
-                  <th class="text-left">
-                    Role (Edit)
-                  </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr
-                    v-for="item in users"
-                    :key="item.id"
-                >
-                  <td>{{ item.id }}</td>
-                  <td>{{ item.userName }}</td>
-                  <td>{{ item.createTime | dateFormat }}</td>
-                  <td>
-                    <v-btn
-                        class="text-none"
-                        x-small
-                        :color="item.role === 'admin' ? '#ecc960' : item.role === 'user' ? 'green' : 'white'"
-                        @click="changeUserRole(item.id, item.userName, item.role)"
-                    >
-                      {{ item.role === 'admin' ? 'Admin' : item.role === 'user' ? 'User' : 'Guest' }}
-                    </v-btn>
-                  </td>
-                </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card>
-
-          <!-- pagination -->
-          <div
-              style="text-align: center;
-                  margin-top: 3px"
-          >
-            <v-btn small rounded @click="changePage(-1, 'getUsers')">
-              <v-icon>mdi-skip-previous</v-icon>
-            </v-btn>
-            <input
-                :placeholder="currentPage"
-                readonly="readonly"
-                style="width:30px;height:30px;text-align: center;border: solid grey;"
-            >
-            <v-btn small rounded @click="changePage(1, 'getUsers')">
-              <v-icon>mdi-skip-next</v-icon>
-            </v-btn>
-          </div>
-          <!-- pagination -->
-
-        </v-expansion-panel-content>
-
-        <!-- 提示注册 Admin -->
-        <AdminRegisterNotification :is-admin="isAdmin" :key="key"/>
-      </v-expansion-panel>
 
       <!-- Visited Bookmarks -->
       <v-expansion-panel @click="openVisitedBookmarks">
@@ -257,15 +177,12 @@ export default {
     // current page
     currentPage: 1,
 
-
     // 管理员相关
     isAdmin: false,
 
     // 管理员注册组件的 key
     key: 1,
 
-    // 用户
-    users: [],
     // 网页 ID 及其阅读数
     visitedBookmarks: [],
   }),
@@ -302,25 +219,6 @@ export default {
 
     },
 
-    // 切换页面
-    changePage1(count, mode) {
-      if (count === -1 && this.currentPage === 1) {
-        // 页面不能 <1
-        return;
-      }
-      this.currentPage += count;
-      if (mode === 'getLogs') {
-        this.getLogs();
-      }
-      if (mode === 'getUsers') {
-        this.getUsers();
-      }
-      if (mode === 'getVisitedBookmarks') {
-        this.getVisitedBookmarks();
-      }
-
-    },
-
     // 限定最大页数，并返回是否有新的数据
     maxPageCheckAndReturnArrayHasNewValue(array) {
       if (array === null || array.length === 0) {
@@ -343,67 +241,6 @@ export default {
       this.currentPage = 1;
     },
 
-    openUsers() {
-      this.resetPageData();
-      this.getUsers();
-    },
-    getUsers() {
-      this.axios.get("/user/all?currentPage=" + this.currentPage).then(res => {
-        let array = res.data;
-        let hasNewValue = this.maxPageCheckAndReturnArrayHasNewValue(array);
-        if (hasNewValue === true) {
-          this.users = array;
-        }
-      }).catch((error) => {
-        if (error.response.data.code === 2009) {
-          this.isAdmin = false;
-        } else {
-          alert(error.response.data.msg);
-        }
-      });
-    },
-    // 修改用户角色
-    changeUserRole(userId, userName, role) {
-
-      if (role === 'guest') {
-        alert("You don't have permission to modify the Guest");
-        return;
-      }
-      let msg;
-      let newRole;
-      if (role === 'admin') {
-        msg = "Do you want to Downgrade '" + userName
-            + "' from Admin to Standard User?";
-        newRole = 'user';
-      } else if (role === 'user') {
-        msg = "Do you want to Upgrade '" + userName
-            + "' from Standard User to Admin?";
-        newRole = 'admin';
-      } else {
-        alert("You don't have permission to modify this user")
-        return;
-      }
-
-      if (confirm(msg)) {
-        this.sendChangeUserRoleRequest(userId, newRole);
-      }
-    },
-    sendChangeUserRoleRequest(userId, newRole) {
-      this.axios.get("/user/role", {
-        params: {
-          id: userId,
-          newRole: newRole
-        }
-      }).then(res => {
-        if (res.data.code === 200) {
-          // 成功的话，刷新列表
-          this.getUsers();
-        }
-        alert(res.data.msg);
-      }).catch((error) => {
-        alert(error.response.data.msg);
-      });
-    },
 
     openVisitedBookmarks() {
       this.resetPageData();
