@@ -22,6 +22,7 @@ import AdminRegister from "@/component/AdminRegister";
 import AdminNotification from "@/component/AdminNotification";
 import AdminLog from "@/component/AdminLog";
 import AdminUser from "@/component/AdminUser";
+import AdminBookmark from "@/component/AdminBookmark";
 
 Vue.use(VueRouter)
 
@@ -36,6 +37,7 @@ const routes = [
             {path: "admin-notification", component: AdminNotification},
             {path: "admin-log", component: AdminLog},
             {path: "admin-user", component: AdminUser},
+            {path: "admin-bookmark", component: AdminBookmark},
         ]
     },
     {path: "/admin-register", component: AdminRegister},
