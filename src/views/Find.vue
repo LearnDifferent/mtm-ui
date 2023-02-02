@@ -146,7 +146,7 @@
       <!-- 进度条 -->
       <ProcessingLinear :processing="processing"/>
 
-      <!--搜索框-->
+      <!-- 搜索框 -->
       <v-row style="margin-top: 1%" v-show="!isSpecialMode">
         <v-col>
           <v-text-field
@@ -166,6 +166,26 @@
           <p v-show="errorMsg" style="color: red">{{ errorMsg }}</p>
         </v-col>
       </v-row>
+
+      <!-- 切换搜索引擎 -->
+      <v-row justify="center">
+          <v-radio-group
+              v-model="searchEngine"
+              row
+          >
+            <v-radio
+                label="Elasticsearch"
+                value="es"
+                color="#f98b60"
+            ></v-radio>
+            <v-radio
+                label="MySQL"
+                value="mysql"
+                color="#ffc057"
+            ></v-radio>
+          </v-radio-group>
+      </v-row>
+
       <!-- Tag Range -->
       <v-row justify="center" v-show="searchMode === 'tag' && inputMsg">
         <v-col
@@ -330,6 +350,8 @@ export default {
   },
   name: "Find",
   data: () => ({
+    // MySQL 和 Elasticsearch 的选项条
+    searchEngine: 'es',
     // 是否隐藏更多选项
     hidden: true,
     inputMsg: '',
