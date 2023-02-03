@@ -169,21 +169,22 @@
 
       <!-- 切换搜索引擎 -->
       <v-row justify="center">
-          <v-radio-group
-              v-model="searchEngine"
-              row
-          >
-            <v-radio
-                label="Elasticsearch"
-                value="es"
-                color="#f98b60"
-            ></v-radio>
-            <v-radio
-                label="MySQL"
-                value="mysql"
-                color="#ffc057"
-            ></v-radio>
-          </v-radio-group>
+        <v-radio-group
+            v-model="searchEngine"
+            row
+        >
+          <v-radio
+              label="Elasticsearch"
+              value="es"
+              color="#f98b60"
+              :disabled="!isElasticsearchAlive"
+          ></v-radio>
+          <v-radio
+              label="MySQL"
+              value="mysql"
+              color="#ffc057"
+          ></v-radio>
+        </v-radio-group>
       </v-row>
 
       <!-- Tag Range -->
@@ -352,6 +353,8 @@ export default {
   data: () => ({
     // MySQL 和 Elasticsearch 的选项条
     searchEngine: 'es',
+    // Elasticsearch 是否可以连接，true 表示可以连接
+    isElasticsearchAlive: true,
     // 是否隐藏更多选项
     hidden: true,
     inputMsg: '',
@@ -783,7 +786,11 @@ export default {
         this.hasNewUpdate = res.data.hasNewUpdate;
       }).catch((error) => {
         if (error.response.data.code === 5001) {
-          alert("Unable to connect to Search Engine.");
+          // 5001 表示无法连接 Elasticsearch
+          // Elasticsearch 为无法连接状态
+          this.isElasticsearchAlive = false;
+          // 搜索引擎设定为 MySQL
+          this.searchEngine = 'mysql';
         } else {
           alert("Something went wrong. Can't load this page.")
         }
