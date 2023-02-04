@@ -148,7 +148,22 @@
 
       <!-- 搜索框 -->
       <v-row style="margin-top: 1%" v-show="!isSpecialMode">
-        <v-col>
+        <v-col cols="12">
+          <!-- 提示 Elasticsearch 不可用-->
+          <div v-show="!isElasticsearchAlive">
+            <v-alert
+                outlined
+                dense
+                color="#ffbe00"
+                type="info"
+                icon="mdi-lan-disconnect"
+                dismissible
+            >
+              Elasticsearch is not available
+            </v-alert>
+          </div>
+        </v-col>
+        <v-col cols="12">
           <v-text-field
               id="inputField"
               v-model="inputMsg"
