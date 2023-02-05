@@ -10,6 +10,7 @@
             rows="1"
             :value="user.userName"
             :background-color="user.hasOwnProperty('highlightedFields')
+            && user.highlightedFields !== null
              && (user.highlightedFields[0] === 'userName'
              || user.highlightedFields[1] === 'userName')? '#f3f3f3' : ''"
         ></v-textarea>
@@ -22,6 +23,7 @@
             readonly
             rows="1"
             :background-color="user.hasOwnProperty('highlightedFields')
+            && user.highlightedFields !== null
             && (user.highlightedFields[0] === 'userId'
              || user.highlightedFields[1] === 'userId') ? '#f3f3f3' : ''"
             :value="user.id"
