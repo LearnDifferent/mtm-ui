@@ -203,7 +203,7 @@
       </v-row>
 
       <!-- Tag Range -->
-      <v-row justify="center" v-show="searchMode === 'tag' && inputMsg">
+      <v-row justify="center" v-show="!isSpecialMode && searchMode === 'tag' && inputMsg">
         <v-col
             cols="6"
             md="3"
@@ -579,13 +579,17 @@ export default {
     },
     // 更多操作（打开生成/删除搜索数据库的按钮等）
     moreOptions(tId) {
+      if (!this.isElasticsearchAlive) {
+        alert('You can only do it when Elasticsearch is available!')
+        return;
+      }
       if (tId === 'del') {
-        if (confirm("Are you sure you want to Delete All Bookmark Data?")) {
+        if (confirm("Are you sure you want to Delete All Bookmark Data in Elasticsearch?")) {
           this.deleteData('web');
         }
       }
       if (tId === 'gen') {
-        if (confirm("Are you sure you want to Generate (Update) Bookmark Data?")) {
+        if (confirm("Are you sure you want to Generate (Update) Bookmark Data? in Elasticsearch")) {
           this.genDb();
         }
       }
@@ -595,22 +599,22 @@ export default {
         }
       }
       if (tId === 'updateUser') {
-        if (confirm("Are you sure you want to Update (Generate) User Data?")) {
+        if (confirm("Are you sure you want to Update (Generate) User Data? in Elasticsearch")) {
           this.updateUserData();
         }
       }
       if (tId === 'deleteAllUsers') {
-        if (confirm("Are you sure you want to Delete All User Data?")) {
+        if (confirm("Are you sure you want to Delete All User Data in Elasticsearch?")) {
           this.deleteData("user");
         }
       }
       if (tId === 'updateTag') {
-        if (confirm("Are you sure you want to Update (Generate) Tag Data?")) {
+        if (confirm("Are you sure you want to Update (Generate) Tag Data in Elasticsearch?")) {
           this.updateTagData();
         }
       }
       if (tId === 'deleteAllTags') {
-        if (confirm("Are you sure you want to Delete All Tag Data?")) {
+        if (confirm("Are you sure you want to Delete All Tag Data in Elasticsearch?")) {
           this.deleteData("tag");
         }
       }
