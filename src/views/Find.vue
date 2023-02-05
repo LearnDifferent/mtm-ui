@@ -183,7 +183,7 @@
       </v-row>
 
       <!-- 切换搜索引擎 -->
-      <v-row justify="center">
+      <v-row justify="center" v-show="!isSpecialMode">
         <v-radio-group
             v-model="searchEngine"
             row
@@ -467,7 +467,7 @@ export default {
     hasNewTagUpdate: false,
     // 正在进行搜索数据库相关操作
     processing: '',
-    // search mode: web, user
+    // search mode: web, user, tag
     searchMode: 'web',
     // 查看 bookmarks，value 为用户名
     showBookmarks: null,
@@ -757,11 +757,24 @@ export default {
         // 重新搜索的时候，删除错误信息
         this.errorMsg = '';
 
+        // 重新定义搜索模式
+        // 如果搜索引擎选择的是 MySQL，就要重置搜索模式。其他情况不用重置。
+        let searchMode = this.searchMode;
+        if (this.searchEngine === 'mysql' && searchMode === 'web') {
+          searchMode = 'bookmark_mysql';
+        }
+        if (this.searchEngine === 'mysql' && searchMode === 'tag') {
+          searchMode = 'tag_mysql';
+        }
+        if (this.searchEngine === 'mysql' && searchMode === 'user') {
+          searchMode = 'user_mysql';
+        }
+
         this.axios.get("/search", {
           params: {
             "currentPage": currentPage,
             "keyword": keyword,
-            "mode": this.searchMode,
+            "mode": searchMode,
             "rangeTo": this.rangeTo,
             "rangeFrom": this.rangeFrom,
           }
