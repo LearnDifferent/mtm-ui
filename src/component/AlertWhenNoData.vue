@@ -5,7 +5,7 @@
   >
     <v-row align="center">
       <v-col class="grow">
-        The Search-Engine Database has no {{
+        Elasticsearch has no {{
           searchMode === 'user' ? 'User'
               : searchMode === 'web' ? 'Bookmark' : 'Tag'
         }} Data for searching.
@@ -13,7 +13,7 @@
         Generate {{
           searchMode === 'user' ? 'User'
               : searchMode === 'web' ? 'Bookmark' : 'Tag'
-        }} Data.
+        }} Data in Elasticsearch.
         Please <a href="javascript:void(0)" @click="updateData" style="color: aliceblue">click here</a> or the right
         button to Generate {{
           searchMode === 'user' ? 'User'

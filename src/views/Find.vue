@@ -53,42 +53,45 @@
 
     <v-container fill-height>
 
-      <!-- 提示更新网页搜索的数据库 -->
-      <AlertWhenDataHasChanges
-          v-show="hasNewUpdate && hasDb && searchMode === 'web' && !isSpecialMode"
-          :update-data="genDb"
-      />
+      <v-row>
+        <v-col>
+          <!-- 提示更新网页搜索的数据库 -->
+          <AlertWhenDataHasChanges
+              v-show="hasNewUpdate && hasDb && searchMode === 'web' && !isSpecialMode && isElasticsearchAlive"
+              :update-data="genDb"
+          />
 
-      <!-- 提示更新用户搜索的数据库 -->
-      <AlertWhenDataHasChanges
-          v-show="hasNewUserUpdate && hasUserData && searchMode === 'user' && !isSpecialMode"
-          :update-data="updateUserData"
-      />
+          <!-- 提示更新用户搜索的数据库 -->
+          <AlertWhenDataHasChanges
+              v-show="hasNewUserUpdate && hasUserData && searchMode === 'user' && !isSpecialMode && isElasticsearchAlive"
+              :update-data="updateUserData"
+          />
 
-      <!-- 提示更新 Tag 搜索的数据库 -->
-      <AlertWhenDataHasChanges
-          v-show="hasNewTagUpdate && hasTags && searchMode === 'tag' && !isSpecialMode"
-          :update-data="updateTagData"
-      />
+          <!-- 提示更新 Tag 搜索的数据库 -->
+          <AlertWhenDataHasChanges
+              v-show="hasNewTagUpdate && hasTags && searchMode === 'tag' && !isSpecialMode && isElasticsearchAlive"
+              :update-data="updateTagData"
+          />
 
-      <!-- 没有网页数据的时候，提示生成数据 -->
-      <AlertWhenNoData
-          v-show="!hasDb && searchMode === 'web' && !isSpecialMode"
-          :update-data="genDb"
-          :search-mode="searchMode"/>
+          <!-- 没有网页数据的时候，提示生成数据 -->
+          <AlertWhenNoData
+              v-show="!hasDb && searchMode === 'web' && !isSpecialMode && isElasticsearchAlive"
+              :update-data="genDb"
+              :search-mode="searchMode"/>
 
-      <!-- 没有用户数据的时候，提示生成数据 -->
-      <AlertWhenNoData
-          v-show="!hasUserData && searchMode === 'user' && !isSpecialMode"
-          :update-data="updateUserData"
-          :search-mode="searchMode"/>
+          <!-- 没有用户数据的时候，提示生成数据 -->
+          <AlertWhenNoData
+              v-show="!hasUserData && searchMode === 'user' && !isSpecialMode && isElasticsearchAlive"
+              :update-data="updateUserData"
+              :search-mode="searchMode"/>
 
-      <!-- 没有 tag 数据的时候，提示生成数据 -->
-      <AlertWhenNoData
-          v-show="!hasTags && searchMode === 'tag' && !isSpecialMode"
-          :update-data="updateTagData"
-          :search-mode="searchMode"/>
-
+          <!-- 没有 tag 数据的时候，提示生成数据 -->
+          <AlertWhenNoData
+              v-show="!hasTags && searchMode === 'tag' && !isSpecialMode && isElasticsearchAlive"
+              :update-data="updateTagData"
+              :search-mode="searchMode"/>
+        </v-col>
+      </v-row>
       <div style="margin-top: 1%" v-show="!isSpecialMode">
         <!-- 显示网页热搜按钮 -->
         <v-btn
@@ -130,11 +133,11 @@
               outlined
               @click="moreOptions(tile.tId)"
               style="margin: 2px"
-              :text-color="tile.color"
+              :text-color="isElasticsearchAlive || tile.tId === 'tags' ? tile.color : 'grey'"
           >
             <v-icon
                 left
-                :color="tile.color"
+                :color="isElasticsearchAlive || tile.tId === 'tags' ? tile.color : 'grey'"
             >
               {{ tile.icon }}
             </v-icon>
@@ -411,13 +414,13 @@ export default {
         color: 'red lighten-1'
       },
       {
-        title: 'Generate (Update) Bookmark Data',
+        title: 'Update / Generate Bookmark Data in Elasticsearch',
         tId: 'gen',
         icon: 'mdi-database-refresh',
         color: 'green darken-2'
       },
       {
-        title: 'Delete All Bookmark Data',
+        title: 'Delete All Bookmark Data in Elasticsearch',
         tId: 'del',
         icon: 'mdi-database-remove',
         color: 'red darken-2'
@@ -426,13 +429,13 @@ export default {
     // 搜索用户时的选项
     userTitles: [
       {
-        title: 'Update (Generate) User Data',
+        title: 'Update / Generate User Data in Elasticsearch',
         tId: 'updateUser',
         icon: 'mdi-account-convert',
         color: 'green lighten-1'
       },
       {
-        title: 'Delete All User Data',
+        title: 'Delete All User Data in Elasticsearch',
         tId: 'deleteAllUsers',
         icon: 'mdi-account-off',
         color: 'red lighten-1'
@@ -441,13 +444,13 @@ export default {
     // 搜索 tag 时候的选项
     tagTitles: [
       {
-        title: 'Update (Generate) Tag Data',
+        title: 'Update / Generate Tag Data in Elasticsearch',
         tId: 'updateTag',
         icon: 'mdi-tag-outline',
         color: 'green lighten-1'
       },
       {
-        title: 'Delete All Tag Data',
+        title: 'Delete All Tag Data in Elasticsearch',
         tId: 'deleteAllTags',
         icon: 'mdi-delete-variant',
         color: 'red lighten-1'
@@ -579,7 +582,7 @@ export default {
     },
     // 更多操作（打开生成/删除搜索数据库的按钮等）
     moreOptions(tId) {
-      if (!this.isElasticsearchAlive) {
+      if (!this.isElasticsearchAlive ) {
         alert('You can only do it when Elasticsearch is available!')
         return;
       }
@@ -589,7 +592,7 @@ export default {
         }
       }
       if (tId === 'gen') {
-        if (confirm("Are you sure you want to Generate (Update) Bookmark Data? in Elasticsearch")) {
+        if (confirm("Are you sure you want to Generate (Update) Bookmark Data in Elasticsearch?")) {
           this.genDb();
         }
       }
@@ -599,7 +602,7 @@ export default {
         }
       }
       if (tId === 'updateUser') {
-        if (confirm("Are you sure you want to Update (Generate) User Data? in Elasticsearch")) {
+        if (confirm("Are you sure you want to Update (Generate) User Data in Elasticsearch?")) {
           this.updateUserData();
         }
       }
