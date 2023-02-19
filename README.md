@@ -17,7 +17,7 @@ npm install
 npm run serve
 ```
 
-> The [backend server](https://github.com/LearnDifferent/mtm) is running on [localhost:80](http://localhost:80) and the [frontend client](https://github.com/LearnDifferent/mtm-ui) is running on [localhost:3000](http://localhost:3000)
+> The [backend server](https://github.com/LearnDifferent/mtm) is running on [localhost:8080](http://localhost:8080) and the [frontend client](https://github.com/LearnDifferent/mtm-ui) is running on [localhost:80](http://localhost:80)
 
 ### Compiles and minifies for production
 
