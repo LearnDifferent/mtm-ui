@@ -316,7 +316,9 @@
             <!-- tag 搜索结果 -->
             <v-row dense>
               <v-col class="text-center">
-                <span>
+
+                <!-- 当 Elasticsearch 无法连接的时候，直接显示 -->
+                <span v-show="!isElasticsearchAlive">
                   <v-chip
                       v-show="searchMode==='tag' && !isSpecialMode"
                       class="ma-2"
@@ -326,6 +328,26 @@
                   >
                     {{ item.tag }} ({{ item.number }})
                   </v-chip>
+                </span>
+                <!-- 当 Elasticsearch 可以连接的时候，需要提示一下这个数据包含了隐私书签 -->
+                <span v-show="isElasticsearchAlive">
+                  <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-chip
+                          v-show="searchMode==='tag' && !isSpecialMode"
+                          class="ma-2"
+                          color="#e95464"
+                          text-color="white"
+                          @click="openTagSearch(item.tag, 1)"
+                          v-bind="attrs"
+                          v-on="on"
+                      >
+                        {{ item.tag }} ({{ item.number }})
+                      </v-chip>
+                    </template>
+                    <span>There {{ item.number > 1 ? 'are ' + item.number + ' public bookmarks ' : 'is a bookmark' }} associated with the tag.
+                      <br>Note that not all bookmarks are visible to anyone.</span>
+                  </v-tooltip>
                 </span>
               </v-col>
             </v-row>
@@ -582,7 +604,7 @@ export default {
     },
     // 更多操作（打开生成/删除搜索数据库的按钮等）
     moreOptions(tId) {
-      if (!this.isElasticsearchAlive ) {
+      if (!this.isElasticsearchAlive) {
         alert('You can only do it when Elasticsearch is available!')
         return;
       }
