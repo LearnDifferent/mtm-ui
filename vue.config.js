@@ -1,9 +1,9 @@
 module.exports = {
     devServer: {
-        port: 3000,
+        port: 80,
         proxy: {
             '/': {
-                target: 'http://localhost:80',
+                target: 'http://localhost:8080',
                 ws: true,
                 changeOrigin: true
             }
