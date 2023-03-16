@@ -53,6 +53,15 @@
               Visited Bookmarks
             </v-list-item-title>
           </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title
+                @click="changePage('/admin/admin-user-bookmark-rank', 'Ranking')"
+            >
+              Ranking
+            </v-list-item-title>
+          </v-list-item>
+
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>

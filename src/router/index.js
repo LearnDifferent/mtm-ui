@@ -23,6 +23,7 @@ import AdminNotification from "@/component/AdminNotification";
 import AdminLog from "@/component/AdminLog";
 import AdminUser from "@/component/AdminUser";
 import AdminBookmark from "@/component/AdminBookmark";
+import AdminUserBookmarkRank from "../component/AdminUserBookmarkRank";
 
 Vue.use(VueRouter)
 
@@ -38,6 +39,7 @@ const routes = [
             {path: "admin-log", component: AdminLog},
             {path: "admin-user", component: AdminUser},
             {path: "admin-bookmark", component: AdminBookmark},
+            {path: "admin-user-bookmark-rank", component: AdminUserBookmarkRank},
         ]
     },
     {path: "/admin-register", component: AdminRegister},
