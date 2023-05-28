@@ -239,6 +239,11 @@ export default {
           // 2009 表示不是管理员
           this.status = 'You are not the Administer';
         }
+        if (error.response.data.code === 3020) {
+          // 3020 表示输入有误
+          let errorList = error.response.data.data;
+          this.status = errorList[0];
+        }
       }).finally(() => {
         this.isLoading = false;
       });
