@@ -127,6 +127,16 @@ export default {
             // 代码为 2010 表示已经收藏过
             alert(error.response.data.msg);
           }
+          if (error.response.data.code === 3020) {
+            // 3020 表示输入有误
+            let msg = error.response.data.msg + ':\n';
+
+            let errorList = error.response.data.data;
+            for (let i = 0; i < errorList.length; i++) {
+              msg += errorList[i] + "\n";
+            }
+            alert(msg);
+          }
         });
       }
     },

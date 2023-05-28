@@ -159,6 +159,15 @@ export default {
           // 连接超时
           this.analyseError = 'There seems to be a problem with your Network Connection. ' +
               'Or the server is located in the country that has blocked the website';
+        } else if (code === 3020) {
+          // 3020 表示输入有误
+          let msg = error.response.data.msg + ':\n';
+
+          let errorList = error.response.data.data;
+          for (let i = 0; i < errorList.length; i++) {
+            msg += errorList[i] + "\n";
+          }
+          this.analyseError = msg;
         } else {
           this.analyseError = '';
         }

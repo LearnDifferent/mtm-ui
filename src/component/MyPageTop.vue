@@ -149,8 +149,8 @@ export default {
 
     // 验证登陆信息，用于修改密码
     validate() {
-      this.$refs.form.validate();
-      this.isLoading = true;
+      // this.$refs.form.validate();
+      // this.isLoading = true;
       let submitData = {
         userName: this.user.userName,
         oldPassword: this.oldPassword,
@@ -178,6 +178,16 @@ export default {
         if (error.response.data.code === 2009) {
           // 2009 表示没有权限，这里指 Guest 用户无法修改密码
           alert("Guest don't have permission to change password");
+        }
+        if (error.response.data.code === 3020) {
+          // 3020 表示输入有误
+          let msg = error.response.data.msg + ':\n';
+
+          let errorList = error.response.data.data;
+          for (let i = 0; i < errorList.length; i++) {
+            msg += errorList[i] + "\n";
+          }
+          alert(msg);
         }
       }).finally(() => {
         this.isLoading = false
