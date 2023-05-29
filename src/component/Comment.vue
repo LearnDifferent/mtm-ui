@@ -507,9 +507,12 @@ export default {
     // 对重新编辑过的已有评论进行发送
     sendEditComment(data) {
       this.axios.post("/comment", data).then(res => {
-        if (res.data.code == 200 || res.data.code == 500) {
+        let code = res.data.code;
+        if (code === 200 || code === 500) {
           // 200 表示成功，500 表示失败
           alert(res.data.msg);
+        } else if (code === 3020) {
+          // 交给全局异常捕获器来处理
         } else {
           alert("Something went wrong. Please try again later.");
         }
@@ -685,6 +688,8 @@ export default {
           // 2009 表示没有权限，3009 表示评论已经存在，2001 网页不存在
           // 3010 评论为空，3011 评论太长，3012 表示要回复的评论不存在
           alert(error.response.data.msg);
+        } else if (code === 3020) {
+          // 交给全局异常捕获器来处理
         } else {
           alert("Something went wrong. Please try again later.");
         }
