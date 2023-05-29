@@ -38,6 +38,15 @@ axios.interceptors.response.use(resp => {
     if (code === 2005) {
         return router.push("/login");
     }
+    if (code === 3020) {
+        // 3020 表示输入有误
+        let errorList = error.response.data.data;
+        if (errorList !== undefined && errorList !== null && errorList.length > 0) {
+            alert(errorList[0]);
+        } else {
+            alert(error.response.data.msg);
+        }
+    }
     return Promise.reject(error);
 });
 
