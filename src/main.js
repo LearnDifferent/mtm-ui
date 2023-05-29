@@ -35,10 +35,18 @@ axios.interceptors.response.use(resp => {
     return resp
 }, error => {
     let code = error.response.data.code;
+    let path = error.config.url;
+    let method = error.config.method;
     if (code === 2005) {
         return router.push("/login");
     }
-    if (code === 3020) {
+    if (
+        code === 3020
+        && !(path === '/login' && method === 'post')
+        && !(path === '/bookmark' && method === 'get')
+        && !(path === '/bookmark' && method === 'post')
+        && !(path === '/user/change-password' && method === 'post')
+        ) {
         // 3020 表示输入有误
         let errorList = error.response.data.data;
         if (errorList !== undefined && errorList !== null && errorList.length > 0) {
