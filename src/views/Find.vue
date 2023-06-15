@@ -823,7 +823,9 @@ export default {
           this.isSearching = false;
         }).catch(error => {
           this.processing = '';
-          this.errorMsg = error.response.data.msg;
+          if (error.response.data.code !== 3020) {
+            this.errorMsg = error.response.data.msg;
+          }
           this.isSearching = false;
           this.items = '';
           this.totalCount = 0;
