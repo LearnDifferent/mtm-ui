@@ -221,7 +221,7 @@ export default {
       this.size = this.size + 10;
       this.axios.get("/notification", {
         params: {
-          "lastIndex": this.size
+          "size": this.size
         }
       }).then(res => {
         this.notificationList = res.data;
