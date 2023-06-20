@@ -312,6 +312,8 @@ export default {
       }).catch((error) => {
         if (error.response.data.code === 2009) {
           alert("This is not your bookmark. You can only add tags for your own bookmark.");
+        } else if (error.response.data.code === 3020) {
+          // do nothing
         } else {
           alert(error.response.data.msg);
         }
