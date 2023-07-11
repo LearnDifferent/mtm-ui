@@ -218,10 +218,19 @@ export default {
       }).then(res => {
         if (res.data.code === 200) {
           // 存储 token 信息
-          let tokenValue = res.data.data.tokenValue;
-          let tokenName = res.data.data.tokenName;
+          let saTokenInfo = res.data.data.saTokenInfo;
+          let tokenValue = saTokenInfo.tokenValue;
+          let tokenName = saTokenInfo.tokenName;
           localStorage.setItem('tokenValue', tokenValue);
           localStorage.setItem('tokenName', tokenName);
+
+          // 存储 idempotency key
+          let idempotencyKeyInfo = res.data.data.idempotencyKeyInfo;
+          let idempotencyKeyHeaderName = idempotencyKeyInfo.idempotencyKeyHeaderName;
+          let idempotencyKey = idempotencyKeyInfo.idempotencyKey;
+          localStorage.setItem('idempotencyKeyHeaderName', idempotencyKeyHeaderName);
+          localStorage.setItem('idempotencyKey', idempotencyKey);
+
           // 因为可能在其他标签页内登陆，所以使用点击的方式跳转
           document.getElementById("myHomeBtn").click();
           this.$emit('setIsAdminPanel', this.isAdminPage);
