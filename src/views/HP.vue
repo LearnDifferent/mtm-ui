@@ -204,7 +204,7 @@ export default {
   name: "HP",
   data: () => ({
     // 展示模式
-    pattern: 'latest',
+    pattern: 'latest-timeline',
     // 跳转的用户
     toUserName: '',
     // 分页
@@ -242,7 +242,7 @@ export default {
     // 只查看自己的网页
     findMine() {
       this.isOut = 'mine';
-      this.pattern = 'user';
+      this.pattern = 'user-specific-timeline';
       this.toUserName = this.currentUser;
       this.currentPage = 1;
       this.loadHome(this.currentPage);
@@ -252,7 +252,7 @@ export default {
     findOthers() {
       this.isOut = 'others';
       // 这里表示剔除当前用户之外的所有用户
-      this.pattern = 'block';
+      this.pattern = 'timeline-with-blacklist';
       this.toUserName = this.currentUser;
       this.currentPage = 1;
       this.loadHome(this.currentPage);
@@ -267,7 +267,7 @@ export default {
       } else {
         if (confirm("Don't Show Bookmarks Shared By " + userName + "?")) {
           this.isOut = 'dontShow';
-          this.pattern = 'block';
+          this.pattern = 'timeline-with-blacklist';
           this.toUserName = userName;
           this.currentPage = 1;
           this.loadHome(this.currentPage);
@@ -283,7 +283,7 @@ export default {
       } else {
         if (confirm("View Bookmarks Shared By " + userName + "?")) {
           this.toUserName = userName;
-          this.pattern = 'user';
+          this.pattern = 'user-specific-timeline';
           this.currentPage = 1;
           this.loadHome(this.currentPage);
           this.isOut = 'otherOne';
@@ -294,7 +294,7 @@ export default {
     // 查看最近的帖子
     recent() {
       this.isOut = 'all';
-      this.pattern = 'latest';
+      this.pattern = 'latest-timeline';
       this.currentPage = 1;
       this.loadHome(1);
       this.refreshShow = false;
