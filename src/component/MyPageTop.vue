@@ -174,12 +174,10 @@ export default {
         if (error.response.data.code === 3002) {
           // 3002 表示密码错误
           alert(error.response.data.msg);
-        }
-        if (error.response.data.code === 2009) {
+        } else if (error.response.data.code === 2009) {
           // 2009 表示没有权限，这里指 Guest 用户无法修改密码
           alert("Guest don't have permission to change password");
-        }
-        if (error.response.data.code === 3020) {
+        } else if (error.response.data.code === 3020) {
           // 3020 表示输入有误
           let msg = error.response.data.msg + ':\n';
 
@@ -188,7 +186,10 @@ export default {
             msg += errorList[i] + "\n";
           }
           alert(msg);
+        } else {
+          alert(error.response.data.msg);
         }
+
       }).finally(() => {
         this.isLoading = false
       });
