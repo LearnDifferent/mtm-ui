@@ -164,20 +164,26 @@ export default {
         // 成功修改密码会返回 2014
         if (res.data.code == 2014) {
           this.axios.get("/logout").then(res => {
-            if (res.data.code === 200) {
+            let code = res.data.code;
+            if (code === 200) {
               this.$router.push("/login");
               alert("Please Login again with the new password.");
+            } else if (code === 2009) {
+              alert("You don't have permission to change password");
+            } else {
+              alert(res.data.msg);
             }
           });
         }
       }).catch(error => {
-        if (error.response.data.code === 3002) {
-          // 3002 表示密码错误
+        let code = error.response.data.code;
+        if (code === 3002 || code === 3024 || code === 3007) {
+          // 3002 表示密码错误，3024 表示新旧密码相同，3007 表示没有输入新密码或旧密码
           alert(error.response.data.msg);
-        } else if (error.response.data.code === 2009) {
+        } else if (code === 2009) {
           // 2009 表示没有权限，这里指 Guest 用户无法修改密码
           alert("Guest don't have permission to change password");
-        } else if (error.response.data.code === 3020) {
+        } else if (code === 3020) {
           // 3020 表示输入有误
           let msg = error.response.data.msg + ':\n';
 
@@ -187,7 +193,7 @@ export default {
           }
           alert(msg);
         } else {
-          alert(error.response.data.msg);
+          alert('Something went wrong, please try again later.');
         }
 
       }).finally(() => {
