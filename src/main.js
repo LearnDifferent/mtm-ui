@@ -18,7 +18,22 @@ Vue.filter('dateFormat', function (daraStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.timeout = 10000;
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "/";
+
+/*
+如果是生产环境，就使用 /api 路径
+nginx 配置如下：
+
+location /api {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header REMOTE-HOST $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://localhost:8080/;
+}
+ */
+
+axios.defaults.baseURL = process.env.NODE_ENV === 'production' ? '/api' : '/';
+
 axios.interceptors.request.use(
     config => {
 
