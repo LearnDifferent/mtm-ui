@@ -141,8 +141,8 @@ export default {
   methods:{
     // 下载（导出）用户的网页数据
     exportHtmlFile() {
-      // 打开 3000 端口的 /file 路径，而 3000 号端口映射了后端服务器的端口
-      window.open("/file?username=" + this.toUserName, "_blank");
+      let baseUrl = this.axios.defaults.baseURL;
+      window.open(baseUrl + "/file?username=" + this.toUserName, "_blank");
     },
     // 打开所有标签页面
     openAllTagsPage() {

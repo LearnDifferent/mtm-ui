@@ -99,8 +99,8 @@ export default {
     },
     // 导出数据
     exportHtmlFile() {
-      // 打开 3000 端口的 /file 路径，而 3000 号端口映射了后端服务器的端口
-      window.open("/file?username=" + this.currentUsername, "_blank");
+      let baseUrl = this.axios.defaults.baseURL;
+      window.open(baseUrl + "/file?username=" + this.currentUsername, "_blank");
     },
   },
 }
