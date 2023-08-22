@@ -138,11 +138,45 @@
 export default {
   name: 'HomePageButtons',
 
-  methods:{
+  methods: {
     // 下载（导出）用户的网页数据
     exportHtmlFile() {
-      let baseUrl = this.axios.defaults.baseURL;
-      window.open(baseUrl + "/file?username=" + this.toUserName, "_blank");
+      this.axios.get('/file', {
+        params: {
+          username: this.toUserName
+        },
+        responseType: 'blob'
+      }).then(res => {
+        // data 后面可以包装为一个包含二进制数据的 Blob 对象（因为设置了 responseType: 'blob'）
+        // headers 是 response 的请求头
+        // 分开写为 let data = res.data; 和 let headers = res.headers; 也可以
+        let {data, headers} = res;
+
+        // 通过 new 一个 Blob 对象来获取 blob
+        // 直接 new Blob([data]) 也可以
+        let blob = new Blob([data], {type: headers['content-type']});
+
+        // 获取 headers 中包含 filename 的信息，并提取出 filename
+        let searchString = "attachment; filename=";
+        // 删除第一次出现的 searchString
+        let regex = new RegExp(searchString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        // 最后，获取输出的文件名
+        let fileName = headers['content-disposition'].replace(regex, '');
+
+        // 在 dom 中创建一个 a 标签并下载，下载后删除该元素
+        let url = window.URL.createObjectURL(blob);
+        let aElement = document.createElement('a');
+        aElement.style.display = 'none';
+        aElement.href = url;
+        // 设置下载的属性和值，其值为下载后的文件名
+        aElement.setAttribute('download', fileName);
+        document.body.appendChild(aElement);
+        aElement.click();
+        window.URL.revokeObjectURL(aElement.href);
+        document.body.removeChild(aElement);
+      }).catch(error => {
+        alert(error.response.data.msg);
+      });
     },
     // 打开所有标签页面
     openAllTagsPage() {
