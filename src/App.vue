@@ -112,7 +112,7 @@ export default {
 
       // 如果已经查看了新的系统通知，再看看有没有新的回复通知
       if (this.hasReadNewSystemNotification == true) {
-        this.axios.get("/notification/count").then(res => {
+        this.axios.get("/notification/reply").then(res => {
           if (res.data.code === 200) {
             this.newNotificationCount = res.data.data;
           }

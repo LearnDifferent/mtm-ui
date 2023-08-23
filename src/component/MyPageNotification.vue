@@ -8,7 +8,7 @@
 
       <v-card
           class="mx-auto"
-          :color="notification.message === null ? 'grey' : '#ee827c'"
+          :color="notification.message === null ? 'grey' : notification.isRead == true ? '#eebbcb' : '#ee827c'"
           dark
       >
         <v-card-title style="font-size: medium">
@@ -289,14 +289,23 @@ export default {
           this.showNotification = '';
           alert("Deleted");
         }).catch(error => {
+          alert(1);
           alert(error.response.data.msg);
-        })
+        }).finally(() => {
+          this.markAsRead(notificationData);
+        });
       }
+    },
+
+    // 标记该评论为 read（已阅读）
+    markAsRead(notificationData) {
+      this.axios.post("/notification/reply", notificationData);
     },
 
     // 打开评论通知的内容
     openReplyNotification(index, notificationData) {
       this.showNotification = 'notify' + index;
+      this.markAsRead(notificationData);
       this.getWebsiteDataAndContinue(index, notificationData);
     },
     getWebsiteDataAndContinue(index, notificationData) {
