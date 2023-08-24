@@ -65,17 +65,35 @@
                 align="center"
                 justify="end"
             >
-              <v-col class="shrink">
+              <v-col
+                  class="shrink"
+                  v-show="notification.message !== null && notification.isRead == false"
+              >
                 <v-btn
                     small
-                    v-show="notification.message !== null && notification.isRead == false"
                     color="#bf242a"
                     class="text-none"
                     @click="markAsRead(notification)"
                     outlined
                 >
-                  <v-icon left small>mdi-read</v-icon>
+                  <v-icon left small>mdi-eye</v-icon>
                   Mark as read
+                </v-btn>
+              </v-col>
+              <v-col
+                  class="shrink"
+                  v-show="notification.message !== null && notification.isRead == true"
+              >
+                <v-btn
+                    small
+
+                    color="#bf242a"
+                    class="text-none"
+                    @click="markAsUnread(notification)"
+                    outlined
+                >
+                  <v-icon left small>mdi-eye-off</v-icon>
+                  Mark as unread
                 </v-btn>
               </v-col>
               <v-col class="shrink">
@@ -86,7 +104,7 @@
                     class="text-none"
                     @click="openReplyNotification(i, notification)"
                 >
-                  <v-icon left small>mdi-eye</v-icon>
+                  <v-icon left small>mdi-read</v-icon>
                   View
                 </v-btn>
               </v-col>
@@ -311,8 +329,14 @@ export default {
 
     // 标记该评论为 read（已阅读）
     markAsRead(notificationData) {
-      this.axios.post("/notification/reply", notificationData)
-          .finally(()=> notificationData.isRead = true);
+      this.axios.post("/notification/reply/read", notificationData)
+          .finally(() => notificationData.isRead = true);
+    },
+
+    // 标记该评论为 unread（未阅读）
+    markAsUnread(notificationData) {
+      this.axios.post("/notification/reply/unread", notificationData)
+          .finally(() => notificationData.isRead = false);
     },
 
     // 打开评论通知的内容
@@ -357,8 +381,8 @@ export default {
       }
     },
     checkCommentDataAndContinue(index, notificationData) {
-      this.axios.get("/comment",{
-        params:{
+      this.axios.get("/comment", {
+        params: {
           id: notificationData.commentId,
           bookmarkId: notificationData.bookmarkId
         }
@@ -384,7 +408,7 @@ export default {
     checkReplyDataAndContinue(index, notificationData) {
       // 获取 replyToCommentId 的评论数据，也就是"被回复的评论"，用于传递值
       this.axios.get("/comment", {
-        params:{
+        params: {
           id: notificationData.replyToCommentId,
           bookmarkId: notificationData.bookmarkId
         }
