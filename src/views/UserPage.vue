@@ -187,6 +187,13 @@
         </v-btn>
       </template>
     </v-snackbar>
+
+    <!-- 隐藏的按钮，用于触发更新 reply notification 的数量 -->
+    <button
+        style="display: none"
+        id="countReplyNotificationTrigger"
+        @click="getNewReplyNotification"
+    ></button>
   </div>
 </template>
 

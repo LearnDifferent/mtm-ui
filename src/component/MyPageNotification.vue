@@ -327,16 +327,28 @@ export default {
       }
     },
 
+    // 刷新通知数量
+    refreshNotificationCount() {
+      // 触发上层页面的隐藏按钮，更新通知的数量
+      document.getElementById('countReplyNotificationTrigger').click();
+    },
+
     // 标记该评论为 read（已阅读）
     markAsRead(notificationData) {
       this.axios.post("/notification/reply/read", notificationData)
-          .finally(() => notificationData.isRead = true);
+          .finally(() => {
+            notificationData.isRead = true;
+            this.refreshNotificationCount();
+          });
     },
 
     // 标记该评论为 unread（未阅读）
     markAsUnread(notificationData) {
       this.axios.post("/notification/reply/unread", notificationData)
-          .finally(() => notificationData.isRead = false);
+          .finally(() => {
+            notificationData.isRead = false;
+            this.refreshNotificationCount();
+          });
     },
 
     // 打开评论通知的内容
