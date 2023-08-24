@@ -68,6 +68,19 @@
               <v-col class="shrink">
                 <v-btn
                     small
+                    v-show="notification.message !== null && notification.isRead == false"
+                    color="#bf242a"
+                    class="text-none"
+                    @click="markAsRead(notification)"
+                    outlined
+                >
+                  <v-icon left small>mdi-read</v-icon>
+                  Mark as read
+                </v-btn>
+              </v-col>
+              <v-col class="shrink">
+                <v-btn
+                    small
                     v-show="notification.message !== null"
                     color="#d0576b"
                     class="text-none"
@@ -289,7 +302,6 @@ export default {
           this.showNotification = '';
           alert("Deleted");
         }).catch(error => {
-          alert(1);
           alert(error.response.data.msg);
         }).finally(() => {
           this.markAsRead(notificationData);
@@ -299,7 +311,8 @@ export default {
 
     // 标记该评论为 read（已阅读）
     markAsRead(notificationData) {
-      this.axios.post("/notification/reply", notificationData);
+      this.axios.post("/notification/reply", notificationData)
+          .finally(()=> notificationData.isRead = true);
     },
 
     // 打开评论通知的内容
