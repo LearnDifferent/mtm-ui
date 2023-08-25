@@ -120,6 +120,7 @@ export default {
         let regex = new RegExp(searchString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
         // 最后，获取输出的文件名
         let fileName = headers['content-disposition'].replace(regex, '');
+        fileName = decodeURIComponent(fileName)
 
         // 在 dom 中创建一个 a 标签并下载，下载后删除该元素
         let url = window.URL.createObjectURL(blob);
