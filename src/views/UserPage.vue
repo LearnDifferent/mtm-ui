@@ -368,7 +368,7 @@ export default {
 
     // 获取新的回复消息数量
     getNewReplyNotification() {
-      this.axios.get("/notification/reply").then(res => {
+      this.axios.get("/notification/reply/count").then(res => {
         if (res.data.code === 200) {
           this.newNotificationCount = res.data.data;
         }

@@ -19,10 +19,10 @@
           <!-- message 为 null，说明不存在 -->
           <span v-show="notification.message === null">
            <del>
-              <b>{{ notification.sendUsername === currentUsername ? 'You' : notification.sendUsername }} </b>
+              <b>{{ notification.sender === currentUsername ? 'You' : notification.sender }} </b>
               {{
                notification.replyToCommentId !== null ?
-                   notification.sendUsername === currentUsername ? 'replied to yourself' : 'replied to you'
+                   notification.sender === currentUsername ? 'replied to yourself' : 'replied to you'
                    : 'posted a comment on your activity'
              }}
             </del>
@@ -30,10 +30,10 @@
 
           <!-- message 不为 null，说明存在 -->
           <span v-show="notification.message !== null">
-           <b>{{ notification.sendUsername === currentUsername ? 'You' : notification.sendUsername }} </b>
+           <b>{{ notification.sender === currentUsername ? 'You' : notification.sender }} </b>
             {{
               notification.replyToCommentId !== null ?
-                  notification.sendUsername === currentUsername ? 'replied to yourself :' : 'replied to you :'
+                  notification.sender === currentUsername ? 'replied to yourself :' : 'replied to you :'
                   : 'posted a comment on your activity :'
             }}
           </span>
@@ -250,9 +250,9 @@ export default {
 
       // 让 size + 10
       this.size = this.size + 10;
-      this.axios.get("/notification", {
+      this.axios.get("/notification/reply", {
         params: {
-          "size": this.size
+          "loadCount": this.size
         }
       }).then(res => {
         this.notificationList = res.data;
