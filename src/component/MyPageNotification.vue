@@ -6,18 +6,25 @@
         cols="12"
     >
 
+      <!-- 每一条通知卡片 -->
       <v-card
           class="mx-auto"
-          :color="notification.message === null ? 'grey' : notification.isRead == true ? '#eebbcb' : '#ee827c'"
+          :color="getNotificationCardColor(notification.accessStatus, notification.isRead)"
           dark
       >
+        <!-- 通知标题 -->
         <v-card-title style="font-size: medium">
+          <!-- 标题图标 -->
           <v-icon left>
-            {{ notification.replyToCommentId !== null ? 'mdi-message-reply-text' : 'mdi-comment-text-outline' }}
+            {{
+              notification.replyToCommentId !== null ? 'mdi-message-reply-text'
+                  : 'mdi-comment-text-outline'
+            }}
           </v-icon>
 
-          <!-- message 为 null，说明不存在 -->
-          <span v-show="notification.message === null">
+          <!-- 标题内容 -->
+          <!-- 不可以访问 reply notification 时的标题内容-->
+          <span v-show="notification.accessStatus !== 'ACCESSIBLE'">
            <del>
               <b>{{ notification.sender === currentUsername ? 'You' : notification.sender }} </b>
               {{
@@ -28,28 +35,46 @@
             </del>
           </span>
 
-          <!-- message 不为 null，说明存在 -->
-          <span v-show="notification.message !== null">
+          <!-- 不可以访问 reply notification 时的标题内容-->
+          <span v-show="notification.accessStatus === 'ACCESSIBLE'">
            <b>{{ notification.sender === currentUsername ? 'You' : notification.sender }} </b>
             {{
               notification.replyToCommentId !== null ?
-                  notification.sender === currentUsername ? 'replied to yourself :' : 'replied to you :'
+                  notification.sender === currentUsername ? 'replied to yourself :'
+                      : 'replied to you :'
                   : 'posted a comment on your activity :'
             }}
           </span>
         </v-card-title>
 
-        <v-card-text class="font-weight-bold">
-          {{
-            notification.message === null ?
-                notification.replyToCommentId !== null ?
-                    'This reply has been deleted' : 'This comment has been deleted'
-                : notification.message
-          }}
+        <!-- 通知内容 -->
+        <v-card-text
+            class="font-weight-bold"
+        >
+          <div v-show="notification.accessStatus === 'BOOKMARK_NOT_EXIST'">
+            The bookmark has been deleted or doesn't exist
+          </div>
+
+          <div v-show="notification.accessStatus === 'COMMENT_NOT_EXIST'">
+            {{
+              notification.replyToCommentId !== null ? 'This reply has been deleted'
+                  : 'This comment has been deleted'
+            }}
+          </div>
+
+          <div style="font-size: larger" v-show="notification.accessStatus === 'UNAUTHORIZED'">
+            Access to view the bookmark is not granted to the user
+          </div>
+
+          <div v-show="notification.accessStatus === 'ACCESSIBLE'">
+            {{ notification.message }}
+          </div>
         </v-card-text>
 
+        <!-- 通知按钮位置 -->
         <v-card-actions>
           <v-list-item class="grow">
+            <!-- 通知按钮位置放置时间 -->
             <v-list-item-content>
               <v-list-item-title style="font-size: small">
                 <span style="color: #d3cbc6">
@@ -61,13 +86,17 @@
               </v-list-item-title>
             </v-list-item-content>
 
+            <!-- 通知按钮 -->
             <v-row
                 align="center"
                 justify="end"
             >
+              <!-- Mark notification as read or unread buttons -->
               <v-col
                   class="shrink"
-                  v-show="notification.message !== null && notification.isRead == false"
+                  v-show="
+                  (notification.accessStatus === 'ACCESSIBLE' || notification.accessStatus === 'UNAUTHORIZED')
+                  && notification.isRead == false"
               >
                 <v-btn
                     small
@@ -82,11 +111,12 @@
               </v-col>
               <v-col
                   class="shrink"
-                  v-show="notification.message !== null && notification.isRead == true"
+                  v-show="
+                  (notification.accessStatus === 'ACCESSIBLE' || notification.accessStatus === 'UNAUTHORIZED')
+                  && notification.isRead == true"
               >
                 <v-btn
                     small
-
                     color="#bf242a"
                     class="text-none"
                     @click="markAsUnread(notification)"
@@ -96,27 +126,19 @@
                   Mark as unread
                 </v-btn>
               </v-col>
-              <v-col class="shrink">
+              <!-- 查看通知详情按钮 -->
+              <v-col
+                  class="shrink"
+                  v-show="notification.accessStatus === 'ACCESSIBLE'"
+              >
                 <v-btn
                     small
-                    v-show="notification.message !== null"
                     color="#d0576b"
                     class="text-none"
                     @click="openReplyNotification(i, notification)"
                 >
                   <v-icon left small>mdi-read</v-icon>
                   View
-                </v-btn>
-              </v-col>
-              <v-col class="shrink">
-                <v-btn
-                    small
-                    color="#bf242a"
-                    class="text-none"
-                    @click="deleteReplyNotification(i, notification)"
-                >
-                  <v-icon left small>mdi-delete</v-icon>
-                  Delete
                 </v-btn>
               </v-col>
             </v-row>
@@ -245,6 +267,19 @@ export default {
       this.getMyNotifications();
     },
 
+    getNotificationCardColor(accessStatus, isRead) {
+      if (accessStatus === 'ACCESSIBLE' && isRead == true) {
+        return '#eebbcb';
+      }
+      if (accessStatus === 'ACCESSIBLE' && isRead == false) {
+        return '#ee827c';
+      }
+      if (accessStatus === 'UNAUTHORIZED') {
+        return 'rgba(199,179,112,0.89)';
+      }
+      return 'grey';
+    },
+
     // 获取回复我的通知
     getMyNotifications() {
 
@@ -310,7 +345,13 @@ export default {
       this.axios.get("/view?bookmarkId=" + id);
     },
 
-    // 删除该通知
+    /**
+     * 删除该通知
+     *
+     * @deprecated 通知应该不需要删除
+     * @param index 该通知在通知数组中的位置
+     * @param notificationData 该通知
+     */
     deleteReplyNotification(index, notificationData) {
       if (confirm("Are you sure you want to delete it?")) {
         this.axios.post("/notification", notificationData).then(res => {
