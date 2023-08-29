@@ -86,6 +86,7 @@
           v-show="trueMarkedWebsFalseNotifications===false"
           :current-username="user.userName"
           :total-notifications="totalNotifications"
+          :current-notification-type="currentNotificationType"
       ></MyPageNotification>
 
       <v-container class="mx-auto" v-show="trueMarkedWebsFalseNotifications===true">
@@ -247,6 +248,9 @@ export default {
     // 展示通知相关
     snackbar: false,
     notice: '',
+
+    // 当前通知类型
+    currentNotificationType: 'REPLY_NOTIFICATION',
   }),
 
   components: {

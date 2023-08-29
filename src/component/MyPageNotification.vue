@@ -489,6 +489,10 @@ export default {
     totalNotifications: {
       type: Number,
       required: true
+    },
+    currentNotificationType: {
+      type: String,
+      required: true
     }
   },
 }
