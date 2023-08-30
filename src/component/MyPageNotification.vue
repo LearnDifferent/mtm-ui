@@ -258,6 +258,8 @@ export default {
     showNotification: null,
     // 网页数据
     websiteData: '',
+    // 当前 Notification Type
+    currentNotificationType: 'REPLY_NOTIFICATION',
   }),
 
   methods: {
@@ -479,7 +481,11 @@ export default {
           this.showNotification = '';
         }
       });
-    }
+    },
+
+    updateCurrentNotificationType(notificationType) {
+      this.currentNotificationType = notificationType;
+    },
   },
 
   props: {
@@ -491,10 +497,7 @@ export default {
       type: Number,
       required: true
     },
-    currentNotificationType: {
-      type: String,
-      required: true
-    }
+
   },
 }
 </script>

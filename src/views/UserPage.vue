@@ -22,7 +22,7 @@
         <v-btn
             class="text-none text-center"
             color="green"
-            :outlined="trueMarkedWebsFalseNotifications!==true"
+            :outlined="currentDisplayType !== 'BOOKMARK'"
             @click="getMyWebsData(1)"
         >
           <v-icon left>
@@ -39,8 +39,8 @@
         <v-btn
             class="text-none text-center"
             color="#ee827c"
-            :outlined="trueMarkedWebsFalseNotifications!==false"
-            @click="getMyNotifications"
+            :outlined="currentDisplayType !== 'REPLY_NOTIFICATION'"
+            @click="getMyReplyNotifications"
         >
           <v-badge
               :value="newNotificationCount > 0"
@@ -83,13 +83,12 @@
 
       <MyPageNotification
           ref="myPageNotification"
-          v-show="trueMarkedWebsFalseNotifications===false"
+          v-show="currentDisplayType === 'REPLY_NOTIFICATION' || currentDisplayType === 'SYSTEM_NOTIFICATION'"
           :current-username="user.userName"
           :total-notifications="totalNotifications"
-          :current-notification-type="currentNotificationType"
       ></MyPageNotification>
 
-      <v-container class="mx-auto" v-show="trueMarkedWebsFalseNotifications===true">
+      <v-container class="mx-auto" v-show="currentDisplayType === 'BOOKMARK'">
         <v-row dense>
           <v-col
               v-for="(item, i) in items"
@@ -236,8 +235,6 @@ export default {
     // 显示该 webId 的评论
     showComment: -1,
 
-    // true 显示网页数据，false 显示回复的通知
-    trueMarkedWebsFalseNotifications: '',
     // 回复的通知的数据
     notificationList: '',
     // 消息提醒的总数
@@ -249,8 +246,9 @@ export default {
     snackbar: false,
     notice: '',
 
-    // 当前通知类型
-    currentNotificationType: 'REPLY_NOTIFICATION',
+    // 当前显示的内容
+    // REPLY_NOTIFICATION 表示回复通知，SYSTEM_NOTIFICATION 表示系统通知，BOOKMARK 表示查看书签
+    currentDisplayType: null,
   }),
 
   components: {
@@ -267,6 +265,12 @@ export default {
     MyPageNotification,
     // 评论区
     Comment
+  },
+
+  watch: {
+    currentDisplayType(newVal) {
+      this.$refs.myPageNotification.updateCurrentNotificationType(newVal);
+    }
   },
 
   methods: {
@@ -301,8 +305,13 @@ export default {
     },
 
     // 获取回复我的通知
-    getMyNotifications() {
-      this.trueMarkedWebsFalseNotifications = false;
+    getMyReplyNotifications() {
+      const REPLY_NOTIFICATION = 'REPLY_NOTIFICATION';
+      // 重置 currentDisplayType
+      this.currentDisplayType = REPLY_NOTIFICATION;
+      // 重置子组件的 currentNotificationType
+      this.$refs.myPageNotification.updateCurrentNotificationType(REPLY_NOTIFICATION)
+      // 在子组件中获取通知
       this.$refs.myPageNotification.resetDataAndGetNotifications();
     },
 
@@ -337,7 +346,7 @@ export default {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
       }).finally(() => {
-        this.trueMarkedWebsFalseNotifications = true;
+        this.currentDisplayType = 'BOOKMARK';
       });
     },
 
@@ -413,7 +422,7 @@ export default {
 
     // 是否打开了通知
     checkIfNotificationOff() {
-      this.axios.get("/notification/mute").then(res=>{
+      this.axios.get("/notification/mute").then(res => {
         let code = res.data.code;
         if (code === 200) {
           this.isNotificationOff = true;
