@@ -40,12 +40,12 @@
             class="text-none text-center"
             color="#ee827c"
             :outlined="currentDisplayType !== 'REPLY_NOTIFICATION'"
-            @click="getMyReplyNotifications"
+            @click="getNotifications('REPLY_NOTIFICATION')"
         >
           <v-badge
-              :value="newNotificationCount > 0"
+              :value="unreadRepliesCount > 0"
               color="red"
-              :content="newNotificationCount"
+              :content="unreadRepliesCount"
           >
             <v-icon left>
               mdi-at
@@ -58,6 +58,25 @@
             class="mx-2"
             vertical
         ></v-divider>
+
+
+        <v-btn
+            class="text-none text-center"
+            color="yellow darken-2"
+            outlined
+            @click="getNotifications('SYSTEM_NOTIFICATION')"
+        >
+          <v-badge
+              :value="hasUnreadSystemNotifications"
+              color="red"
+              dot
+          >
+            <v-icon left>
+              mdi-earth
+            </v-icon>
+            System Notifications
+          </v-badge>
+        </v-btn>
 
 
         <v-divider
@@ -191,7 +210,7 @@
     <button
         style="display: none"
         id="countReplyNotificationTrigger"
-        @click="getNewReplyNotification"
+        @click="countUnreadReplies"
     ></button>
   </div>
 </template>
@@ -237,8 +256,11 @@ export default {
     notificationList: '',
     // 消息提醒的总数
     totalNotifications: 0,
-    // 新消息的数量
-    newNotificationCount: 0,
+    // 未读的回复消息数量
+    unreadRepliesCount: 0,
+
+    // 是否有未读的系统通知
+    hasUnreadSystemNotifications: false,
 
     // 展示通知相关
     snackbar: false,
@@ -289,12 +311,11 @@ export default {
     },
 
     // 获取回复我的通知
-    getMyReplyNotifications() {
-      const REPLY_NOTIFICATION = 'REPLY_NOTIFICATION';
+    getNotifications(notificationType) {
       // 重置 currentDisplayType
-      this.currentDisplayType = REPLY_NOTIFICATION;
+      this.currentDisplayType = notificationType;
       // 重置子组件的 currentNotificationType
-      this.$refs.myPageNotification.updateCurrentNotificationType(REPLY_NOTIFICATION)
+      this.$refs.myPageNotification.updateCurrentNotificationType(notificationType)
       // 在子组件中获取通知
       this.$refs.myPageNotification.resetDataAndGetNotifications();
     },
@@ -364,11 +385,18 @@ export default {
     },
 
     // 获取新的回复消息数量
-    getNewReplyNotification() {
+    countUnreadReplies() {
       this.axios.get("/notification/reply/count").then(res => {
         if (res.data.code === 200) {
-          this.newNotificationCount = res.data.data;
+          this.unreadRepliesCount = res.data.data;
         }
+      });
+    },
+
+    // 获取是否有未读的系统通知
+    checkIfHasUnreadSystemNotification() {
+      this.axios.get("/notification/system").then(res => {
+        this.hasUnreadSystemNotifications = res.data;
       });
     },
 
@@ -423,7 +451,8 @@ export default {
       document.getElementById("myUserBtn").click();
     }
     this.getPersonalInfo();
-    this.getNewReplyNotification();
+    this.countUnreadReplies();
+    this.checkIfHasUnreadSystemNotification();
     this.getRoleChange();
     this.checkIfNotificationOff();
 

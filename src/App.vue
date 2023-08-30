@@ -34,7 +34,7 @@
 
             <v-tab id="myUserBtn" @click="changePage('/user')">
               <v-badge
-                  :value="hasReadNewSystemNotification == false || newNotificationCount > 0"
+                  :value="hasReadAllSystemNotification == false || newNotificationCount > 0"
                   color="red"
                   dot
               >
@@ -77,7 +77,7 @@
 export default {
   name: 'App',
   data: () => ({
-    hasReadNewSystemNotification: true,
+    hasReadAllSystemNotification: true,
     newNotificationCount: 0,
     isAdminPanel: false,
   }),
@@ -89,7 +89,7 @@ export default {
     changePage(page) {
       this.$router.push({path: page});
       if (page !== '/user') {
-        this.getNewNotification();
+        this.checkIfHasNewNotifications();
       }
     },
     /**
@@ -104,14 +104,14 @@ export default {
       }
     },
     // 获取新消息数量
-    getNewNotification() {
+    checkIfHasNewNotifications() {
       // 查看是否查看了最新的系统消息
-      this.axios.get("/system/read").then(res => {
-        this.hasReadNewSystemNotification = res.data.code === 200;
+      this.axios.get("/notification/system").then(res => {
+        this.hasReadAllSystemNotification = !res.data;
       });
 
       // 如果已经查看了新的系统通知，再看看有没有新的回复通知
-      if (this.hasReadNewSystemNotification == true) {
+      if (this.hasReadAllSystemNotification == true) {
         this.axios.get("/notification/reply/count").then(res => {
           if (res.data.code === 200) {
             this.newNotificationCount = res.data.data;
@@ -133,7 +133,7 @@ export default {
   },
 
   created() {
-    this.getNewNotification();
+    this.checkIfHasNewNotifications();
   }
 };
 </script>
