@@ -285,8 +285,9 @@ export default {
 
       // 让 size + 10
       this.size = this.size + 10;
-      this.axios.get("/notification/reply", {
+      this.axios.get("/notification", {
         params: {
+          "notificationType": this.currentNotificationType,
           "loadCount": this.size
         }
       }).then(res => {
