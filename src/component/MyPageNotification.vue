@@ -244,7 +244,7 @@ export default {
   name: "MyPageNotification",
   components: {Comment},
   data: () => ({
-    // 消息提醒的总数
+    // 所有通知的总数
     totalNotifications: 0,
     // 需要加载多少条数据
     size: 0,
@@ -266,7 +266,20 @@ export default {
     // 清除数据并打开通知
     resetDataAndGetNotifications() {
       this.showNotification = null;
+      // reset total notifications count
+      this.updateTotalNotificationNumber();
+      // get notifications
       this.getMyNotifications();
+    },
+
+    updateTotalNotificationNumber() {
+      this.axios.get("/notification/count/all", {
+        params: {
+          "notificationType": this.currentNotificationType
+        }
+      }).then(res => {
+        this.totalNotifications = res.data;
+      });
     },
 
     getNotificationCardColor(accessStatus, isRead) {
@@ -491,10 +504,6 @@ export default {
   props: {
     currentUsername: {
       type: String,
-      required: true
-    },
-    totalNotifications: {
-      type: Number,
       required: true
     },
 

@@ -103,7 +103,6 @@
           ref="myPageNotification"
           v-show="currentDisplayType === 'REPLY_NOTIFICATION' || currentDisplayType === 'SYSTEM_NOTIFICATION'"
           :current-username="user.userName"
-          :total-notifications="totalNotifications"
       ></MyPageNotification>
 
       <v-container class="mx-auto" v-show="currentDisplayType === 'BOOKMARK'">
@@ -254,8 +253,7 @@ export default {
 
     // 回复的通知的数据
     notificationList: '',
-    // 消息提醒的总数
-    totalNotifications: 0,
+
     // 未读的回复消息数量
     unreadRepliesCount: 0,
 
@@ -306,7 +304,6 @@ export default {
       this.axios.get("/user").then(res => {
         this.user = res.data.user;
         this.ip = res.data.ip;
-        this.totalNotifications = res.data.totalReplyNotifications;
       });
     },
 
