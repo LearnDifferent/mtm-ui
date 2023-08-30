@@ -59,7 +59,6 @@
             vertical
         ></v-divider>
 
-        <SystemNotification :get-system-notifications="showOrCloseNotice"/>
 
         <v-divider
             class="mx-2"
@@ -199,7 +198,6 @@
 
 <script>
 
-import SystemNotification from "@/component/SystemNotification";
 import BookmarkTime from "@/component/BookmarkTime";
 import BookmarkPic from "@/component/BookmarkPic";
 import BookmarkTagButton from "@/component/BookmarkTagButton";
@@ -252,7 +250,6 @@ export default {
   }),
 
   components: {
-    SystemNotification,
     BookmarkTime,
     BookmarkPic,
     BookmarkTagButton,
@@ -274,19 +271,6 @@ export default {
   },
 
   methods: {
-    // 查看通知按钮
-    showOrCloseNotice() {
-      this.snackbar = !this.snackbar;
-      if (this.snackbar === true) {
-        this.getNotify();
-      }
-    },
-    // 获取通知
-    getNotify() {
-      this.axios.get("/system").then(res => {
-        this.notice = res.data.data;
-      });
-    },
     // 打开评论
     openComment(bookmarkId) {
       if (this.showComment == bookmarkId) {
