@@ -9,22 +9,28 @@
       <!-- 每一条通知卡片 -->
       <v-card
           class="mx-auto"
-          :color="getNotificationCardColor(notification.accessStatus, notification.isRead)"
+          :color="getNotificationCardColor(notification)"
           dark
+          outlined
       >
-        <!-- 通知标题 -->
+        <!-- 通知标题位置 -->
         <v-card-title style="font-size: medium">
           <!-- 标题图标 -->
-          <v-icon left>
+          <v-icon left v-show="notification.notificationType === 'REPLY_NOTIFICATION'">
             {{
               notification.replyToCommentId !== null ? 'mdi-message-reply-text'
                   : 'mdi-comment-text-outline'
             }}
           </v-icon>
 
+          <v-icon left v-show="notification.notificationType === 'SYSTEM_NOTIFICATION'">
+            mdi-comment-account-outline
+          </v-icon>
+
           <!-- 标题内容 -->
           <!-- 不可以访问 reply notification 时的标题内容-->
-          <span v-show="notification.accessStatus !== 'ACCESSIBLE'">
+          <span v-show="notification.notificationType === 'REPLY_NOTIFICATION'
+          && notification.accessStatus !== 'ACCESSIBLE'">
            <del>
               <b>{{ notification.sender === currentUsername ? 'You' : notification.sender }} </b>
               {{
@@ -35,8 +41,9 @@
             </del>
           </span>
 
-          <!-- 不可以访问 reply notification 时的标题内容-->
-          <span v-show="notification.accessStatus === 'ACCESSIBLE'">
+          <!-- 可以访问 reply notification 时的标题内容-->
+          <span v-show="notification.notificationType === 'REPLY_NOTIFICATION'
+          && notification.accessStatus === 'ACCESSIBLE'">
            <b>{{ notification.sender === currentUsername ? 'You' : notification.sender }} </b>
             {{
               notification.replyToCommentId !== null ?
@@ -45,30 +52,50 @@
                   : 'posted a comment on your activity :'
             }}
           </span>
+
+          <!-- system notification 的标题内容 -->
+          <span v-show="notification.notificationType === 'SYSTEM_NOTIFICATION'">
+            {{ notification.sender }}
+          </span>
         </v-card-title>
 
         <!-- 通知内容 -->
         <v-card-text
             class="font-weight-bold"
         >
-          <div v-show="notification.accessStatus === 'BOOKMARK_NOT_EXIST'">
+          <!-- Bookmark 不存在的情况-->
+          <div v-show="notification.notificationType === 'REPLY_NOTIFICATION'
+          && notification.accessStatus === 'BOOKMARK_NOT_EXIST'">
             The bookmark has been deleted or doesn't exist
           </div>
 
-          <div v-show="notification.accessStatus === 'COMMENT_NOT_EXIST'">
+          <!-- Comment 不存在的情况 -->
+          <div v-show="notification.notificationType === 'REPLY_NOTIFICATION'
+          && notification.accessStatus === 'COMMENT_NOT_EXIST'">
             {{
               notification.replyToCommentId !== null ? 'This reply has been deleted'
                   : 'This comment has been deleted'
             }}
           </div>
 
-          <div style="font-size: larger" v-show="notification.accessStatus === 'UNAUTHORIZED'">
+          <!-- 没有访问 Bookmark 的权限 -->
+          <div
+              style="font-size: larger"
+              v-show="notification.notificationType === 'REPLY_NOTIFICATION'
+                 && notification.accessStatus === 'UNAUTHORIZED'"
+          >
             Access to view the bookmark is not granted to the user
           </div>
 
-          <div v-show="notification.accessStatus === 'ACCESSIBLE'">
+          <!-- 可以正常查看 reply notification 或 system notification 的情况 -->
+          <div
+              v-show="
+              (notification.notificationType === 'REPLY_NOTIFICATION' && notification.accessStatus === 'ACCESSIBLE')
+                || notification.notificationType === 'SYSTEM_NOTIFICATION'"
+          >
             {{ notification.message }}
           </div>
+
         </v-card-text>
 
         <!-- 通知按钮位置 -->
@@ -77,8 +104,8 @@
             <!-- 通知按钮位置放置时间 -->
             <v-list-item-content>
               <v-list-item-title style="font-size: small">
-                <span style="color: #d3cbc6">
-                  <v-icon color="#d3cbc6" small>
+                <span :style="'color:' + getCreationTimeColor(notification)">
+                  <v-icon :color="getCreationTimeColor(notification)" small>
                     mdi-clock-outline
                   </v-icon>
                   {{ notification.creationTime | dateFormat('YYYY-MM-DD HH:mm') }}
@@ -95,15 +122,17 @@
               <v-col
                   class="shrink"
                   v-show="
-                  (notification.accessStatus === 'ACCESSIBLE' || notification.accessStatus === 'UNAUTHORIZED')
+                  (notification.accessStatus === 'ACCESSIBLE'
+                  || notification.accessStatus === 'UNAUTHORIZED'
+                  || notification.notificationType === 'SYSTEM_NOTIFICATION')
                   && notification.isRead == false"
               >
                 <v-btn
                     small
-                    color="#bf242a"
+                    :color="notification.notificationType === 'REPLY_NOTIFICATION' ? '#bf242a' : '#ff9a00'"
                     class="text-none"
                     @click="markAsRead(notification)"
-                    outlined
+                    :outlined="notification.notificationType === 'REPLY_NOTIFICATION'"
                 >
                   <v-icon left small>mdi-eye</v-icon>
                   Mark as read
@@ -112,15 +141,17 @@
               <v-col
                   class="shrink"
                   v-show="
-                  (notification.accessStatus === 'ACCESSIBLE' || notification.accessStatus === 'UNAUTHORIZED')
+                  (notification.accessStatus === 'ACCESSIBLE'
+                  || notification.accessStatus === 'UNAUTHORIZED'
+                  || notification.notificationType === 'SYSTEM_NOTIFICATION')
                   && notification.isRead == true"
               >
                 <v-btn
                     small
-                    color="#bf242a"
+                    :color="notification.notificationType === 'REPLY_NOTIFICATION' ? '#bf242a' : '#ff9a00'"
                     class="text-none"
                     @click="markAsUnread(notification)"
-                    outlined
+                    :outlined="notification.notificationType === 'REPLY_NOTIFICATION'"
                 >
                   <v-icon left small>mdi-eye-off</v-icon>
                   Mark as unread
@@ -146,7 +177,7 @@
         </v-card-actions>
       </v-card>
 
-      <!-- 显示通知 -->
+      <!-- 显示消息通知中的 bookmark 的 reply 详情页 -->
       <div v-show="showNotification==='notify' + i">
 
         <v-card :id="websiteData.id">
@@ -224,7 +255,7 @@
     <v-col v-show="totalNotifications > 0 && totalNotifications > countNotifications">
       <v-btn
           block
-          color="#ee827c"
+          :color="this.currentNotificationType === 'REPLY_NOTIFICATION' ? '#ee827c' : '#eebb23'"
           @click="getMyNotifications"
       >
         <v-icon left>
@@ -266,6 +297,8 @@ export default {
     // 清除数据并打开通知
     resetDataAndGetNotifications() {
       this.showNotification = null;
+      // reset load count
+      this.size = 0;
       // reset total notifications count
       this.updateTotalNotificationNumber();
       // get notifications
@@ -282,22 +315,44 @@ export default {
       });
     },
 
-    getNotificationCardColor(accessStatus, isRead) {
-      if (accessStatus === 'ACCESSIBLE' && isRead == true) {
+    getNotificationCardColor(notification) {
+      let notificationType = notification.notificationType;
+      let accessStatus = notification.accessStatus;
+      let isRead = notification.isRead;
+
+      if ((notificationType === 'REPLY_NOTIFICATION' && accessStatus === 'ACCESSIBLE') && isRead == true) {
         return '#eebbcb';
       }
-      if (accessStatus === 'ACCESSIBLE' && isRead == false) {
+      if (notificationType === 'REPLY_NOTIFICATION' && accessStatus === 'ACCESSIBLE' && isRead == false) {
         return '#ee827c';
       }
-      if (accessStatus === 'UNAUTHORIZED') {
+      if (notificationType === 'REPLY_NOTIFICATION' && accessStatus === 'UNAUTHORIZED') {
         return 'rgba(199,179,112,0.89)';
+      }
+      if (notificationType === 'SYSTEM_NOTIFICATION' && isRead == true) {
+        return 'rgba(248,220,136,0.8)'
+      }
+      if (notificationType === 'SYSTEM_NOTIFICATION' && isRead == false) {
+        return '#eebb23'
       }
       return 'grey';
     },
 
+    getCreationTimeColor(notification) {
+      let notificationType = notification.notificationType;
+      let isRead = notification.isRead;
+      if (notificationType === 'REPLY_NOTIFICATION' && isRead == false) {
+        return '#d3cbc6';
+      }
+      if (notificationType === 'REPLY_NOTIFICATION' && isRead == true) {
+        return '#e7e2e1';
+      }
+
+      return 'white';
+    },
+
     // 获取回复我的通知
     getMyNotifications() {
-
       // 让 size + 10
       this.size = this.size + 10;
       this.axios.get("/notification", {

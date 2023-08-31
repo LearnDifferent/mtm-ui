@@ -62,8 +62,8 @@
 
         <v-btn
             class="text-none text-center"
-            color="yellow darken-2"
-            outlined
+            color="#eec362"
+            :outlined="currentDisplayType !== 'SYSTEM_NOTIFICATION'"
             @click="getNotifications('SYSTEM_NOTIFICATION')"
         >
           <v-badge
