@@ -103,6 +103,7 @@
           ref="myPageNotification"
           v-show="currentDisplayType === 'REPLY_NOTIFICATION' || currentDisplayType === 'SYSTEM_NOTIFICATION'"
           :current-username="user.userName"
+          :checkUnreadNotifications="checkUnreadNotifications"
       ></MyPageNotification>
 
       <v-container class="mx-auto" v-show="currentDisplayType === 'BOOKMARK'">
@@ -204,13 +205,6 @@
         </v-btn>
       </template>
     </v-snackbar>
-
-    <!-- 隐藏的按钮，用于触发更新 reply notification 的数量 -->
-    <button
-        style="display: none"
-        id="countReplyNotificationTrigger"
-        @click="countUnreadReplies"
-    ></button>
   </div>
 </template>
 
@@ -378,6 +372,15 @@ export default {
             alert("Something went wrong... Please try again later.")
           }
         });
+      }
+    },
+
+    checkUnreadNotifications(notificationType) {
+      if (notificationType === 'REPLY_NOTIFICATION') {
+        this.countUnreadReplies();
+      }
+      if (notificationType === 'SYSTEM_NOTIFICATION') {
+        this.checkIfHasUnreadSystemNotification();
       }
     },
 

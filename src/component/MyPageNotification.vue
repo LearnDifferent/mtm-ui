@@ -160,7 +160,8 @@
               <!-- 查看通知详情按钮 -->
               <v-col
                   class="shrink"
-                  v-show="notification.accessStatus === 'ACCESSIBLE'"
+                  v-show="notification.notificationType === 'REPLY_NOTIFICATION'
+                  && notification.accessStatus === 'ACCESSIBLE'"
               >
                 <v-btn
                     small
@@ -439,27 +440,26 @@ export default {
       }
     },
 
-    // 刷新通知数量
-    refreshNotificationCount() {
-      // 触发上层页面的隐藏按钮，更新通知的数量
-      document.getElementById('countReplyNotificationTrigger').click();
+    // 刷新未读通知
+    retrieveUnreadNotifications() {
+      this.checkUnreadNotifications(this.currentNotificationType);
     },
 
     // 标记该评论为 read（已阅读）
     markAsRead(notificationData) {
-      this.axios.post("/notification/reply/read", notificationData)
+      this.axios.post("/notification/read", notificationData)
           .finally(() => {
             notificationData.isRead = true;
-            this.refreshNotificationCount();
+            this.retrieveUnreadNotifications();
           });
     },
 
     // 标记该评论为 unread（未阅读）
     markAsUnread(notificationData) {
-      this.axios.post("/notification/reply/unread", notificationData)
+      this.axios.post("/notification/unread", notificationData)
           .finally(() => {
             notificationData.isRead = false;
-            this.refreshNotificationCount();
+            this.retrieveUnreadNotifications();
           });
     },
 
@@ -561,7 +561,9 @@ export default {
       type: String,
       required: true
     },
-
+    checkUnreadNotifications: {
+      type: Function,
+    }
   },
 }
 </script>
