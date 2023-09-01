@@ -67,9 +67,9 @@
             @click="getNotifications('SYSTEM_NOTIFICATION')"
         >
           <v-badge
-              :value="hasUnreadSystemNotifications"
+              :value="unreadSysNotificationsCount > 0"
               color="red"
-              dot
+              :content="unreadSysNotificationsCount"
           >
             <v-icon left>
               mdi-earth
@@ -252,7 +252,10 @@ export default {
     unreadRepliesCount: 0,
 
     // 是否有未读的系统通知
-    hasUnreadSystemNotifications: false,
+    // hasUnreadSystemNotifications: false,
+    // 未读的系统通知数量
+    unreadSysNotificationsCount: 0,
+
 
     // 展示通知相关
     snackbar: false,
@@ -380,20 +383,32 @@ export default {
         this.countUnreadReplies();
       }
       if (notificationType === 'SYSTEM_NOTIFICATION') {
-        this.checkIfHasUnreadSystemNotification();
+        this.countUnreadSysNotifications();
       }
     },
 
-    // 获取新的回复消息数量
+    // 获取未读回复消息数量
     countUnreadReplies() {
-      this.axios.get("/notification/reply/count").then(res => {
+      this.axios.get("/notification/count/reply").then(res => {
         if (res.data.code === 200) {
           this.unreadRepliesCount = res.data.data;
         }
       });
     },
 
-    // 获取是否有未读的系统通知
+    // 获取新的系统消息数量
+    countUnreadSysNotifications() {
+      this.axios.get("/notification/count/system").then(res => {
+        if (res.data.code === 200) {
+          this.unreadSysNotificationsCount = res.data.data;
+        }
+      });
+    },
+
+    /**
+     * 获取是否有未读的系统通知
+     * @deprecated
+     */
     checkIfHasUnreadSystemNotification() {
       this.axios.get("/notification/system").then(res => {
         this.hasUnreadSystemNotifications = res.data;
@@ -452,7 +467,7 @@ export default {
     }
     this.getPersonalInfo();
     this.countUnreadReplies();
-    this.checkIfHasUnreadSystemNotification();
+    this.countUnreadSysNotifications();
     this.getRoleChange();
     this.checkIfNotificationOff();
 
