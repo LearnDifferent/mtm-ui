@@ -34,7 +34,7 @@
 
             <v-tab id="myUserBtn" @click="changePage('/user')">
               <v-badge
-                  :value="hasReadAllSystemNotification == false || newNotificationCount > 0"
+                  :value="unreadSysNotifications > 0 || unreadReplies > 0"
                   color="red"
                   dot
               >
@@ -77,8 +77,8 @@
 export default {
   name: 'App',
   data: () => ({
-    hasReadAllSystemNotification: true,
-    newNotificationCount: 0,
+    unreadReplies: 0,
+    unreadSysNotifications: 0,
     isAdminPanel: false,
   }),
 
@@ -88,9 +88,7 @@ export default {
     // 跳转页面
     changePage(page) {
       this.$router.push({path: page});
-      if (page !== '/user') {
-        this.checkIfHasNewNotifications();
-      }
+      this.checkIfHasNewNotifications();
     },
     /**
      * 当页面为管理员面板时，隐藏 tabs，并跳转到管理员页面
@@ -106,15 +104,17 @@ export default {
     // 获取新消息数量
     checkIfHasNewNotifications() {
       // 查看是否查看了最新的系统消息
-      this.axios.get("/notification/system").then(res => {
-        this.hasReadAllSystemNotification = !res.data;
+      this.axios.get("/notification/count/system").then(res => {
+        if (res.data.code === 200) {
+          this.unreadSysNotifications = res.data.data;
+        }
       });
 
-      // 如果已经查看了新的系统通知，再看看有没有新的回复通知
-      if (this.hasReadAllSystemNotification == true) {
+      // 如果没有未读的系统消息，再查看有没有未读的评论通知
+      if (this.unreadSysNotifications === 0) {
         this.axios.get("/notification/count/reply").then(res => {
           if (res.data.code === 200) {
-            this.newNotificationCount = res.data.data;
+            this.unreadReplies = res.data.data;
           }
         });
       }
