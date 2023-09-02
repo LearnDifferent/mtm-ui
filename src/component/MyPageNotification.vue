@@ -1,5 +1,19 @@
 <template>
   <v-container class="mx-auto">
+
+    <v-col>
+      <v-btn
+          v-show="notificationList.length > 0"
+          block
+          :color="currentNotificationType === 'REPLY_NOTIFICATION' ? '#d0576b' : '#ff9a00'"
+          class="text-none"
+          outlined
+          @click="changeNotificationOrder"
+      >
+        {{ isNotificationOrderReversed ? 'Newest To Oldest' : 'Oldest To Newest' }}
+      </v-btn>
+    </v-col>
+
     <v-col
         v-for="(notification, i) in notificationList"
         :key="i"
@@ -292,6 +306,8 @@ export default {
     websiteData: '',
     // 当前 Notification Type
     currentNotificationType: 'REPLY_NOTIFICATION',
+    // notification 是否为从新到旧
+    isNotificationOrderReversed: true,
   }),
 
   methods: {
@@ -352,6 +368,12 @@ export default {
       return 'white';
     },
 
+    // 修改 notification 展示顺序
+    changeNotificationOrder() {
+      this.isNotificationOrderReversed = !this.isNotificationOrderReversed;
+      this.getMyNotifications();
+    },
+
     // 获取回复我的通知
     getMyNotifications() {
       // 让 size + 10
@@ -359,7 +381,8 @@ export default {
       this.axios.get("/notification", {
         params: {
           "notificationType": this.currentNotificationType,
-          "loadCount": this.size
+          "loadCount": this.size,
+          "isOrderReversed": this.isNotificationOrderReversed,
         }
       }).then(res => {
         this.notificationList = res.data;
