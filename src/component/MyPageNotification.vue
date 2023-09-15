@@ -1,16 +1,26 @@
 <template>
   <v-container class="mx-auto">
 
-    <v-col>
+    <v-col align="center">
       <v-btn
           v-show="notificationList.length > 0"
-          block
           :color="currentNotificationType === 'REPLY_NOTIFICATION' ? '#d0576b' : '#ff9a00'"
           class="text-none"
           outlined
           @click="changeNotificationOrder"
+          style="margin-right: 2px"
       >
         {{ isNotificationOrderReversed ? 'Newest To Oldest' : 'Oldest To Newest' }}
+      </v-btn>
+      <v-btn
+          v-show="notificationList.length > 0"
+          :color="currentNotificationType === 'REPLY_NOTIFICATION' ? '#d0576b' : '#ff9a00'"
+          class="text-none"
+          outlined
+          @click="changeNotificationDisplayType"
+          style="margin-left: 2px"
+      >
+        {{ notificationDisplayType }}
       </v-btn>
     </v-col>
 
@@ -308,6 +318,8 @@ export default {
     currentNotificationType: 'REPLY_NOTIFICATION',
     // notification 是否为从新到旧
     isNotificationOrderReversed: true,
+    // choose 'read', 'unread' or 'all' notification to display
+    notificationDisplayType: 'All',
   }),
 
   methods: {
@@ -374,11 +386,38 @@ export default {
       this.getMyNotifications();
     },
 
+    // 修改读取的是 Read、Unread 还是 All
+    changeNotificationDisplayType() {
+      if (this.notificationDisplayType === 'All') {
+        this.notificationDisplayType = 'Unread';
+      } else {
+        this.notificationDisplayType = 'All';
+      }
+      // if (this.notificationDisplayType === 'All') {
+      //   this.notificationDisplayType = 'Read';
+      // } else if (this.notificationDisplayType === 'Read') {
+      //   this.notificationDisplayType = 'Unread';
+      // } else if (this.notificationDisplayType === 'Unread') {
+      //   this.notificationDisplayType = 'All';
+      // } else {
+      //   console.error('Wrong notification display type', this.notificationDisplayType);
+      //   this.notificationDisplayType = 'All';
+      // }
+      this.getMyNotifications();
+    },
+
     // 获取回复我的通知
     getMyNotifications() {
+      let queryUrl = '/notification';
+      if (this.notificationDisplayType === 'Unread') {
+        queryUrl += '/unread';
+      }
+      if (this.notificationDisplayType === 'read') {
+        queryUrl += '/read';
+      }
       // 让 size + 10
       this.size = this.size + 10;
-      this.axios.get("/notification", {
+      this.axios.get(queryUrl, {
         params: {
           "notificationType": this.currentNotificationType,
           "loadCount": this.size,
