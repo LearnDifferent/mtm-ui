@@ -3,7 +3,6 @@
 
     <v-col align="center">
       <v-btn
-          v-show="notificationList.length > 0"
           :color="currentNotificationType === 'REPLY_NOTIFICATION' ? '#d0576b' : '#ff9a00'"
           class="text-none"
           outlined
@@ -13,7 +12,6 @@
         {{ isNotificationOrderReversed ? 'Newest To Oldest' : 'Oldest To Newest' }}
       </v-btn>
       <v-btn
-          v-show="notificationList.length > 0"
           :color="currentNotificationType === 'REPLY_NOTIFICATION' ? '#d0576b' : '#ff9a00'"
           class="text-none"
           outlined
@@ -276,6 +274,21 @@
       </div>
     </v-col>
 
+    <!-- 提示无消息 -->
+    <v-col v-show="totalNotifications === 0 || countNotifications === 0">
+      <v-footer
+          padless
+          :color="this.currentNotificationType === 'REPLY_NOTIFICATION' ? '#eebbcb' : 'rgba(248,220,136,0.8)'"
+      >
+      <v-col
+          class="text-center"
+          cols="12"
+      >
+          No Notifications Yet
+      </v-col>
+      </v-footer>
+    </v-col>
+
     <!-- 加载新通知 -->
     <v-col v-show="totalNotifications > 0 && totalNotifications > countNotifications">
       <v-btn
@@ -412,9 +425,9 @@ export default {
       if (this.notificationDisplayType === 'Unread') {
         queryUrl += '/unread';
       }
-      if (this.notificationDisplayType === 'read') {
-        queryUrl += '/read';
-      }
+      // if (this.notificationDisplayType === 'Read') {
+      //   queryUrl += '/read';
+      // }
       // 让 size + 10
       this.size = this.size + 10;
       this.axios.get(queryUrl, {
@@ -424,7 +437,9 @@ export default {
           "isOrderReversed": this.isNotificationOrderReversed,
         }
       }).then(res => {
-        this.notificationList = res.data;
+        let data = res.data;
+        this.notificationList = data.notifications;
+        this.totalNotifications = data.count;
         this.countNotifications = this.notificationList.length;
       }).catch(error => {
         let code = error.response.data.code;
