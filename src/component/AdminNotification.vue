@@ -107,13 +107,14 @@ export default {
         alert("Please enter something..");
         return;
       }
-      this.axios.get("/system/send", {
+      this.axios.get("/notification/system/send", {
         params: {
           message: this.noticeCon,
-          priority: priority
         }
       }).then(res => {
-        alert(res.data.msg);
+        alert("Sent");
+      }).catch(()=>{
+        alert("Something went wrong, please try again later");
       }).finally(() => {
         // 更新发送的内容
         this.noticeCon = '';
