@@ -55,13 +55,13 @@
             <td>
               <a :href="item.url" target="_blank">{{ item.title }}</a>
             </td>
-            <td>{{ item.userName }}</td>
+            <td>{{ item.username }}</td>
             <td>
               <v-btn
                   class="text-none"
                   x-small
                   :color="item.isPublic ? 'green' : 'red'"
-                  @click="changePrivacy(item.bookmarkId, item.userName, item.isPublic)"
+                  @click="changePrivacy(item.bookmarkId, item.username, item.isPublic)"
               >
                 {{ item.isPublic ? 'Public' : 'Private' }}
               </v-btn>
