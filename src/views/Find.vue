@@ -301,7 +301,8 @@
             <v-card v-show="searchMode==='user' && !isSpecialMode">
               <UserInfoList :user="item" v-show="searchMode==='user'"></UserInfoList>
               <v-card-actions>
-                <v-btn class="text-none" color="#e198b4" @click="checkoutBookmarks(item.userName, item.bookmarkNumber)">
+                <v-btn class="text-none" color="#e198b4"
+                       @click="checkoutBookmarks(item.userName, item.id, item.bookmarkNumber)">
                   <v-icon left>mdi-bookmark-outline</v-icon>
                   {{
                     item.bookmarkNumber > 0 ? 'View Bookmarks (' + item.bookmarkNumber + ')' : 'No Bookmarks'
@@ -496,6 +497,8 @@ export default {
     searchMode: 'web',
     // 查看 bookmarks，value 为用户名
     showBookmarks: null,
+    // 被请求的用户 ID
+    requestedUserId: -1,
     // 正在被搜索的 tag
     searchingTag: null,
   }),
@@ -535,6 +538,7 @@ export default {
       this.isSearching = false;
       this.rangeFrom = '';
       this.rangeTo = '';
+      this.requestedUserId = -1;
     },
 
     // 切换搜索模式
@@ -728,17 +732,18 @@ export default {
       this.resetData();
     },
 
-    checkoutBookmarks(username, websiteDataCount) {
+    checkoutBookmarks(username, userId, websiteDataCount) {
       if (websiteDataCount < 1) {
         alert("No Bookmarks");
       } else {
         this.showBookmarks = username;
+        this.requestedUserId = userId;
         this.checkOutUserBookmarks(1);
       }
     },
     // 查看该用户收藏的网页
     checkOutUserBookmarks(currentPage) {
-      this.axios.get("/bookmark/get/user/" + this.showBookmarks, {
+      this.axios.get("/bookmark/get/user/" + this.requestedUserId, {
         params: {currentPage: currentPage}
       }).then(res => {
         this.items = res.data.bookmarks;
