@@ -106,7 +106,7 @@
         <v-icon left>
           mdi-download
         </v-icon>
-        Download {{ toUserName == currentUser ? "My" : toUserName + "'s" }} Bookmarks
+        Download {{ requestedUserId == currentUserId ? "My" : requestedUsername + "'s" }} Bookmarks
       </v-chip>
     </div>
 
@@ -127,7 +127,7 @@
           mdi-account-circle
         </v-icon>
         <span :style="isOut === 'otherOne' ? '':'text-decoration: line-through'">
-            {{ toUserName }}
+            {{ requestedUsername }}
           </span>
       </v-chip>
     </div>
@@ -143,7 +143,7 @@ export default {
     exportHtmlFile() {
       this.axios.get('/file', {
         params: {
-          username: this.toUserName
+          userId: this.requestedUserId
         },
         responseType: 'blob'
       }).then(res => {
@@ -193,13 +193,14 @@ export default {
   },
 
   props: {
-    currentUser: {},
+    currentUserId: {},
     findAll: {},
     findMine: {},
     findOthers: {},
     isOut: {},
     recent: {},
-    toUserName: {}
+    requestedUserId: {},
+    requestedUsername: {},
   }
 }
 </script>

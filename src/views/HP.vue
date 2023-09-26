@@ -4,10 +4,14 @@
     <MarkUrl :username="currentUsername" @showRefresh="showRefresh"/>
     <v-divider></v-divider>
     <br>
-    <HomePageButtons :current-user="currentUsername" :find-all="findAll"
-                     :find-mine="findMine" :find-others="findOthers" :is-out="isOut"
+    <HomePageButtons :currentUserId="currentUserId"
+                     :find-all="findAll"
+                     :find-mine="findMine"
+                     :find-others="findOthers"
+                     :is-out="isOut"
                      :recent="recent"
-                     :to-user-name="toUserName"/>
+                     :requested-username="requestedUsername"
+                     :requestedUserId="requestedUserId"/>
 
     <br>
     <v-container class="mx-auto">
@@ -207,7 +211,7 @@ export default {
     pattern: 'latest-timeline',
     // 被请求的用户 ID
     requestedUserId: -1,
-    toUserName: '',
+    requestedUsername: '',
     // 分页
     currentPage: 1,
     totalPage: 1,
@@ -286,6 +290,7 @@ export default {
       } else {
         if (confirm("View Bookmarks Shared By " + userName + "?")) {
           this.requestedUserId = userId;
+          this.requestedUsername = userName;
           this.pattern = 'user-specific-timeline';
           this.currentPage = 1;
           this.loadHome(this.currentPage);

@@ -101,7 +101,8 @@ export default {
     exportHtmlFile() {
       this.axios.get('/file', {
         params: {
-          username: this.toUserName
+          // null 表示当前用户
+          userId: null
         },
         responseType: 'blob'
       }).then(res => {
