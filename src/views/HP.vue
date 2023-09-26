@@ -1,10 +1,10 @@
 <template>
   <v-container fill-height>
     <!-- 发送框 -->
-    <MarkUrl :username="currentUser" @showRefresh="showRefresh"/>
+    <MarkUrl :username="currentUsername" @showRefresh="showRefresh"/>
     <v-divider></v-divider>
     <br>
-    <HomePageButtons :current-user="currentUser" :find-all="findAll"
+    <HomePageButtons :current-user="currentUsername" :find-all="findAll"
                      :find-mine="findMine" :find-others="findOthers" :is-out="isOut"
                      :recent="recent"
                      :to-user-name="toUserName"/>
@@ -52,11 +52,11 @@
                         label
                         outlined
                     >
-                      <v-icon left @click="toUser(item.userName)">
-                        {{ currentUser == item.userName ? 'mdi-account-check' : 'mdi-account' }}
+                      <v-icon left @click="toUser(item.userId, item.userName)">
+                        {{ currentUserId == item.userId ? 'mdi-account-check' : 'mdi-account' }}
                       </v-icon>
                       <span
-                          @click="toUser(item.userName)"
+                          @click="toUser(item.userId, item.userName)"
                           :style="onThisWebData == item.id ? 'color: black' : 'color: grey' "
                       >
                       {{ item.userName }}
@@ -67,7 +67,7 @@
                           small
                           v-show="showExcludeUserBtn == item.id"
                           color="pink"
-                          @click="dontShowUser(item.userName)"
+                          @click="dontShowUser(item.userId, item.userName)"
                       >
                         <v-icon>mdi-eye-off-outline</v-icon>
                       </v-btn>
@@ -81,7 +81,7 @@
                   ></v-divider>
 
                   <v-chip
-                      v-show="currentUser!=item.userName"
+                      v-show="currentUserId != item.userId"
                       color="green"
                       outlined
                       @click="mark(item)"
@@ -94,7 +94,7 @@
                   </v-chip>
 
                   <BookmarkPrivacy
-                      v-show="currentUser==item.userName"
+                      v-show="currentUserId == item.userId"
                       :is-public="item.isPublic"
                       :web-id="item.id"
                       :user-name="item.userName"
@@ -110,12 +110,12 @@
                       :show-comment="showComment"/>
 
                   <BookmarkTagButton :key="item.id" :item="item"
-                                     :current-user="currentUser"
+                                     :current-user="currentUsername"
                                      :previous-page-num="currentPage"
                                      previous-page="home"/>
 
                   <v-chip
-                      v-show="currentUser == item.userName && onThisWebData == item.id"
+                      v-show="currentUserId == item.userId && onThisWebData == item.id"
                       color="red"
                       outlined
                       @click="delWeb(item.id, i)"
@@ -143,7 +143,7 @@
             <Comment
                 :realWebId="item.id"
                 :webId="showComment"
-                :currentUsername="currentUser"
+                :currentUsername="currentUsername"
             ></Comment>
           </div>
 
@@ -205,13 +205,16 @@ export default {
   data: () => ({
     // 展示模式
     pattern: 'latest-timeline',
-    // 跳转的用户
+    // 被请求的用户 ID
+    requestedUserId: -1,
     toUserName: '',
     // 分页
     currentPage: 1,
     totalPage: 1,
     // 当前用户
-    currentUser: '',
+    currentUsername: '',
+    // 当前用户 ID
+    currentUserId: -1,
 
     // 存放遍历的 website 的数据：id,userName,url,img,title,desc
     // （还可能有 count 数据和是否公开 isPublic）
@@ -243,7 +246,7 @@ export default {
     findMine() {
       this.isOut = 'mine';
       this.pattern = 'user-specific-timeline';
-      this.toUserName = this.currentUser;
+      this.requestedUserId = this.currentUserId;
       this.currentPage = 1;
       this.loadHome(this.currentPage);
       this.refreshShow = false;
@@ -253,14 +256,14 @@ export default {
       this.isOut = 'others';
       // 这里表示剔除当前用户之外的所有用户
       this.pattern = 'timeline-with-blacklist';
-      this.toUserName = this.currentUser;
+      this.requestedUserId = this.currentUserId;
       this.currentPage = 1;
       this.loadHome(this.currentPage);
       this.refreshShow = false;
     },
     // 不查看某人的收藏网页
-    dontShowUser(userName) {
-      if (userName === this.currentUser) {
+    dontShowUser(userId, userName) {
+      if (userId === this.currentUserId) {
         if (confirm("Don't Show Yours?")) {
           this.findOthers();
         }
@@ -268,21 +271,21 @@ export default {
         if (confirm("Don't Show Bookmarks Shared By " + userName + "?")) {
           this.isOut = 'dontShow';
           this.pattern = 'timeline-with-blacklist';
-          this.toUserName = userName;
+          this.requestedUserId = userId;
           this.currentPage = 1;
           this.loadHome(this.currentPage);
         }
       }
     },
     // 查找某个用户收藏的所有网页
-    toUser(userName) {
-      if (userName === this.currentUser) {
+    toUser(userId, userName) {
+      if (userId === this.currentUserId) {
         if (confirm("View Your Bookmarks?")) {
           this.findMine();
         }
       } else {
         if (confirm("View Bookmarks Shared By " + userName + "?")) {
-          this.toUserName = userName;
+          this.requestedUserId = userId;
           this.pattern = 'user-specific-timeline';
           this.currentPage = 1;
           this.loadHome(this.currentPage);
@@ -336,13 +339,15 @@ export default {
         params: {
           "currentPage": currentPage,
           "timeline": this.pattern,
-          "requestedUsername": this.toUserName
+          "requestedUserId": this.requestedUserId
         }
       }).then(res => {
-        this.currentUser = res.data.currentUser;
-        this.items = res.data.bookmarksAndTotalPages.bookmarks;
-        this.totalPage = res.data.bookmarksAndTotalPages.totalPages;
-        this.toUserName = res.data.requestedUsername;
+        let data = res.data;
+        this.currentUsername = data.currentUsername;
+        this.currentUserId = data.currentUserId;
+        this.items = data.bookmarksAndTotalPages.bookmarks;
+        this.totalPage = data.bookmarksAndTotalPages.totalPages;
+        this.requestedUserId = data.requestedUserId;
 
         if (this.totalPage < this.currentPage && this.totalPage !== 0) {
           this.currentPage = this.totalPage;
