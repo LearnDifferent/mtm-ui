@@ -32,27 +32,55 @@
           </v-icon>
           Send Notification
         </v-btn>
-
-<!--        <v-btn-->
-<!--            color="#f73859"-->
-<!--            class="mr-4 text-none"-->
-<!--            @click="delNotify"-->
-<!--        >-->
-<!--          <v-icon left>-->
-<!--            mdi-delete-->
-<!--          </v-icon>-->
-<!--          Delete Notifications-->
-<!--        </v-btn>-->
       </v-card-text>
 
     </v-card>
     <!-- 显示通知 -->
-    <v-alert
-        outlined
-        style="margin-top: 20px"
-    >
-      <div v-html="notifications"></div>
-    </v-alert>
+    <div>
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+          <tr>
+            <th class="text-left">
+              Creation Time
+            </th>
+            <th class="text-left">
+              Sender
+            </th>
+            <th class="text-left">
+              Message
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+              v-for="notification in notifications"
+              :key="notification.id"
+          >
+            <td>{{ notification.creationTime | dateFormat('YYYY-MM-DD HH:mm') }}</td>
+            <td>{{ notification.sender }}</td>
+            <td>{{ notification.message }}</td>
+          </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+
+      <!-- 加载新通知 -->
+      <v-col v-show="totalSystemNotificationCount > 0
+      && totalSystemNotificationCount > currentSystemNotificationCount">
+        <v-btn
+            outlined
+            block
+            color="#eebb23"
+            @click="getSystemNotification"
+        >
+          <v-icon left>
+            mdi-refresh
+          </v-icon>
+          More
+        </v-btn>
+      </v-col>
+    </div>
 
   </div>
 </template>
@@ -60,36 +88,34 @@
 export default {
   name: 'AdminNotification',
   data: () => ({
-    // 通知相关
+    // 发送的通知内容
     content: '',
-    // 所有通知
-    notifications: '',
+    // 所有的通知
+    notifications: [],
+    // 所有的通知数量
+    totalSystemNotificationCount: 0,
+    // 当前加载的通知数量
+    currentSystemNotificationCount: 0,
   }),
   methods: {
-    // 删除所有通知
-    // delNotify() {
-    //   if (confirm("Remove All System Notifications?")) {
-    //     this.axios.delete("/system").then(res => {
-    //       if (res.data.code == 200) {
-    //         alert("Deleted");
-    //       } else {
-    //         alert("Please wait a minute before you try again");
-    //       }
-    //     }).catch(error => {
-    //       if (error.response.data.code === 2009) {
-    //         alert("You are now login as Guest: Guest can't delete system notifications\n\n" +
-    //             "Please login as Standard User or Admin to delete system notifications");
-    //       }
-    //     }).finally(() => {
-    //       // 更新通知
-    //       this.getSystemNotification();
-    //     });
-    //   }
-    // },
     // 获取通知
     getSystemNotification() {
-      this.axios.get("/system").then(res => {
-        this.notifications = res.data.data;
+      this.axios.get("/notification", {
+        params: {
+          notificationType: 'SYSTEM_NOTIFICATION',
+          loadCount: this.currentSystemNotificationCount + 10,
+          isOrderReversed: true
+        }
+      }).then(res => {
+        let data = res.data;
+        this.notifications = data.notifications;
+        this.totalSystemNotificationCount = data.count;
+        if (this.notifications.length > 0) {
+          this.currentSystemNotificationCount = this.notifications.length;
+        }
+      }).catch(error=>{
+        this.notifications = 0;
+        this.totalSystemNotificationCount = 0;
       });
     },
     // 发送通知
@@ -123,6 +149,6 @@ export default {
   created() {
     // 进入页面就获取系统通知
     this.getSystemNotification();
-  }
+  },
 }
 </script>
