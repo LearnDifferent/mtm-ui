@@ -28,36 +28,41 @@
             v-model="group"
             active-class="orange--text text--accent-4"
         >
-          <v-list-item @click="changePage('/admin/admin-notification', 'System Notifications')">
+          <v-list-item
+              id="admin-default-system-notification"
+              @click="changePage('/admin/admin-notification', 'System Notifications')"
+          >
             <v-list-item-title>
               System Notifications
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item @click="changePage('/admin/admin-log', 'System Logs')">
+          <v-list-item
+              @click="changePage('/admin/admin-log', 'System Logs')"
+          >
             <v-list-item-title>Logs</v-list-item-title>
           </v-list-item>
 
-          <v-list-item>
-            <v-list-item-title
-                @click="changePage('/admin/admin-user', 'List All Users')"
-            >
+          <v-list-item
+              @click="changePage('/admin/admin-user', 'List All Users')"
+          >
+            <v-list-item-title>
               All Users
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item>
-            <v-list-item-title
-                @click="changePage('/admin/admin-bookmark', 'All Visited Bookmarks')"
-            >
+          <v-list-item
+              @click="changePage('/admin/admin-bookmark', 'All Visited Bookmarks')"
+          >
+            <v-list-item-title>
               Visited Bookmarks
             </v-list-item-title>
           </v-list-item>
 
-          <v-list-item>
-            <v-list-item-title
-                @click="changePage('/admin/admin-user-bookmark-rank', 'Ranking')"
-            >
+          <v-list-item
+              @click="changePage('/admin/admin-user-bookmark-rank', 'Ranking')"
+          >
+            <v-list-item-title>
               Ranking
             </v-list-item-title>
           </v-list-item>
