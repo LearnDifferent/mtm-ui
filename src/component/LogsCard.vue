@@ -10,6 +10,9 @@
         <thead>
         <tr>
           <th class="text-left">
+            ID
+          </th>
+          <th class="text-left">
             Time
           </th>
           <th class="text-left">
@@ -32,8 +35,9 @@
         <tbody>
         <tr
             v-for="item in logs"
-            :key="item.name"
+            :key="item.id"
         >
+          <td>{{ item.id }}</td>
           <td>{{ item.optTime | dateFormat }}</td>
           <td>{{ item.title }}</td>
           <td>{{ item.method }}</td>
