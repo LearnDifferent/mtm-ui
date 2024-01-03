@@ -26,7 +26,11 @@ export default {
       this.$emit("openComment", id);
     },
     countComment() {
-      this.axios.get("/comment/bookmark/" + this.item.id).then(res => {
+      this.axios.get("/comment/bookmark/count", {
+        params: {
+          bookmarkId: this.item.id
+        }
+      }).then(res => {
         if (res.data.code === 200) {
           this.commentCount = res.data.data;
         }
