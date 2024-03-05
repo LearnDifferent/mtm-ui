@@ -7,7 +7,7 @@
 
     <div style="margin: 10px">
       Data will be updated every 12 hours. You can
-      <a @click="updateViews">
+      <a @click="updateBookmarkViewsBatchJob">
         click here to
         <v-btn class="text-none" color="#93ca76" x-small>
           <v-icon x-small>
@@ -151,8 +151,39 @@ export default {
       }
     },
 
+    /**
+     * Update the views of bookmarks using batch job
+     */
+    updateBookmarkViewsBatchJob() {
+      if (confirm("Are you sure you want to update now? It might take a long time.")) {
+        console.log(this.axios)
+        this.axios.get("/batch-job/update-bookmark-views").then(res => {
+          let result = res.data;
+          let exitCode = result.exitCode;
+          if (exitCode === 'COMPLETED') {
+            alert('Success. Job ID: ' + result.jobId);
+            // refresh
+            this.getVisitedBookmarks();
+          } else {
+            alert('Not Fully Successful. Job ID: ' + result.jobId);
+            console.error('Job ID: ' + result.jobId
+                + ', Instance Id:' + result.jobInstanceId
+                + ', Job Parameters:' + result.jobParameters
+                + ', Exit Code: ' + exitCode
+                + ', Exit Description: ' + result.exitDescription);
+          }
 
-    // 更新阅读量数据
+        }).catch((error) => {
+          alert(error.response.data.msg);
+        });
+      }
+    },
+
+    /**
+     * Update the views of the bookmark
+     *
+     * @deprecated
+     */
     updateViews() {
       if (confirm("Are you sure you want to update now? It might take a long time.")) {
         this.axios.get("/view/update").then(res => {
