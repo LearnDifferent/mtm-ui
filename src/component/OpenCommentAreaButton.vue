@@ -23,9 +23,16 @@
 export default {
   name: 'OpenCommentAreaButton',
   props: {
-    commentCount: {},
+    commentCount: {
+      type: Number,
+      required: false,
+      default: 0
+    },
     showCommentArea: {},
     showCommentsFunc: {}
+  },
+  created() {
+    console.log(this.commentCount);
   }
 }
 </script>

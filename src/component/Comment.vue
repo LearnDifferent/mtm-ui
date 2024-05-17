@@ -394,16 +394,20 @@ export default {
   methods: {
     // 获取评论总数
     countComment() {
+      console.log("countComment, bookmark id: " + this.item.id);
       this.axios.get("/comment/bookmark/count", {
         params: {
           bookmarkId: this.item.id
         }
       }).then(res => {
+        console.log("countComment get result:" + this.item.id)
         if (res.data.code === 200) {
+          console.log('bookmark ID: ' + this.item.id + ' comment count: ' + this.commentCount);
           this.commentCount = res.data.data;
-        }
+        } else {console.log("not 200")}
       }).catch(error => {
         // do nothing...
+        console.log("error")
       });
     },
 
