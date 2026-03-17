@@ -73,6 +73,11 @@
 </template>
 
 <script>
+import { logout } from "@/api/auth";
+import {
+  getUnreadReplyNotificationCount,
+  getUnreadSystemNotificationCount
+} from "@/api/notification";
 
 export default {
   name: 'App',
@@ -104,7 +109,7 @@ export default {
     // 获取新消息数量
     checkIfHasNewNotifications() {
       // 查看是否查看了最新的系统消息
-      this.axios.get("/notification/count/system").then(res => {
+      getUnreadSystemNotificationCount().then(res => {
         if (res.data.code === 200) {
           this.unreadSysNotifications = res.data.data;
         }
@@ -112,7 +117,7 @@ export default {
 
       // 如果没有未读的系统消息，再查看有没有未读的评论通知
       if (this.unreadSysNotifications === 0) {
-        this.axios.get("/notification/count/reply").then(res => {
+        getUnreadReplyNotificationCount().then(res => {
           if (res.data.code === 200) {
             this.unreadReplies = res.data.data;
           }
@@ -122,7 +127,7 @@ export default {
     // 退出登陆
     logoutNow() {
       if (confirm("Are you sure you want to sign out?")) {
-        this.axios.get("/logout").then(res => {
+        logout().then(res => {
           if (res.data.code === 200) {
             alert("Good Bye")
             this.$router.push("/login");
